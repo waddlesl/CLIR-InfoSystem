@@ -1,0 +1,9 @@
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.csproj.AssemblyReference.cache
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.AssemblyInfoInputs.cache
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.AssemblyInfo.cs
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.csproj.CoreCompileInputs.cache
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.RazorAssemblyInfo.cache
+C:\Users\Raphael\source\repos\CLIR-InfoSystem\CLIR-InfoSystem\obj\Debug\net10.0\CLIR-InfoSystem.RazorAssemblyInfo.cs

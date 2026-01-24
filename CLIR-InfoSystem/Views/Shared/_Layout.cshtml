@@ -1,0 +1,168 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    // Retrieve the user role from the session
+    var role = Context.Session.GetString("UserRole");
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CLIR System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Top Banner */
+        .top-banner {
+            background-color: #1a2035;
+            color: white;
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-text { font-size: 0.85rem; line-height: 1.2; font-weight: bold; }
+        .logout-link { color: white; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .logout-link:hover { opacity: 0.7; color: #ff4d4d; }
+
+        /* Sidebar Layout */
+        .wrapper { display: flex; }
+
+        .sidebar {
+            width: 240px;
+            background: #1a2035;
+            min-height: calc(100vh - 58px);
+            color: #b5b5b5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-group-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 20px 20px 5px 20px;
+            color: #6e7a91;
+            font-weight: bold;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-item a {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+        }
+
+        .nav-item:hover, .nav-active {
+            background: #2b3553;
+            color: white !important;
+            border-left: 4px solid #d92d20; /* Red accent */
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: calc(100vh - 58px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #6e7a91;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-banner">
+        <div class="d-flex align-items-center">
+            <div class="brand-text">
+                CENTER FOR LEARNING AND INFORMATION RESOURCES<br />
+                <small style="font-weight: normal; opacity: 0.8;">MAPÚA MALAYAN COLLEGES LAGUNA</small>
+            </div>
+        </div>
+        <a asp-controller="Account" asp-action="Logout" class="logout-link">Logout ⏻</a>
+    </div>
+
+    <div class="wrapper">
+        <div class="sidebar">
+            <div class="nav-item @(currentAction.Contains("Dashboard") ? "nav-active" : "")">
+                <a asp-controller="Dashboard" asp-action="Index">Home</a>
+            </div>
+
+            @* Admin Only Menu *@
+            @if (role == "Admin")
+            {
+                <div class="nav-item">
+                    <a asp-controller="Account" asp-action="ManageStaff">Staff Management</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Reports & Analytics</a>
+                </div>
+            }
+
+            @* Librarian / Staff Menu *@
+            @if (role == "Librarian" || role == "Admin")
+            {
+                <div class="nav-item">
+                    <a href="#">Patron Management</a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Book" asp-action="Index">Book Catalog</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Digital Service Requests</a>
+                </div>
+            }
+
+            @* Student Assistant Menu *@
+            @if (role == "Student Assistant")
+            {
+                <div class="nav-item">
+                    <a asp-controller="Book" asp-action="Index">View Catalog</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Help Desk</a>
+                </div>
+            }
+
+            @* PATRON LINKS *@
+            @if (role == "Patron")
+            {
+                <div class="nav-group-label">Library Services</div>
+                <div class="nav-item"><a href="#">📖 Catalog</a></div>
+                <div class="nav-item"><a href="#">📚 My Loans</a></div>
+                <div class="nav-item"><a href="#">📩 Service Requests</a></div>
+                <div class="nav-item"><a href="#">🪑 Seat Reservation</a></div>
+                <div class="nav-item"><a href="#">👤 My Records</a></div>
+            }
+
+            <div class="sidebar-footer">
+                ⚙ Options
+            </div>
+        </div>
+
+        <div class="main-content">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

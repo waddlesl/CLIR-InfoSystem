@@ -1,0 +1,56 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-box {
+            background: #1a2035;
+            color: white;
+            padding: 40px;
+            width: 380px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .form-control {
+            border-radius: 2px;
+            height: 40px;
+            margin-bottom: 15px;
+        }
+
+        .btn-red {
+            background: #d92d20;
+            color: white;
+            width: 100%;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-banner" style="background:#1a2035; color:white; padding:15px;">
+        <small>CENTER FOR LEARNING AND INFORMATION RESOURCES</small>
+    </div>
+    <div class="d-flex justify-content-center align-items-center flex-grow-1">
+        <div class="login-box shadow-lg">
+            <h5 class="mb-4">Library Management System</h5>
+            <form asp-action="Login" method="post">
+                <input type="text" name="username" class="form-control" placeholder="Username" />
+                <input type="password" name="password" class="form-control" placeholder="Password" />
+                <button type="submit" class="btn-red mt-3">LOGIN</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

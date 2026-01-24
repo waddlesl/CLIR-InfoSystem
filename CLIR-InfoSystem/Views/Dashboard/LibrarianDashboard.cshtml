@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Librarian Dashboard";
+}
+
+<style>
+    .dash-card { height: 140px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; padding: 15px; cursor: pointer; transition: 0.3s; }
+    .dash-card:hover { filter: brightness(1.1); }
+    .bg-green { background-color: #2ec4b6; }
+    .bg-orange { background-color: #ff9f1c; }
+    .bg-blue { background-color: #008bf8; }
+</style>
+
+<h2>Welcome, Librarian!</h2>
+<div class="row g-4 mt-4">
+    <div class="col-md-3"><div class="dash-card bg-green">Issue/Return Book</div></div>
+    <div class="col-md-3"><div class="dash-card bg-orange">Register New Patron</div></div>
+    <div class="col-md-3"><div class="dash-card bg-blue">Approve Grammarly</div></div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm border-0" style="height: 140px;">
+            <h6 class="text-muted">Current Stats</h6>
+            <p class="mb-0">Books: <strong>@ViewBag.BookCount</strong></p>
+            <p>Patrons: <strong>@ViewBag.PatronCount</strong></p>
+        </div>
+    </div>
+</div>

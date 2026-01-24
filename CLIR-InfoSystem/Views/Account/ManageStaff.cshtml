@@ -1,0 +1,46 @@
+﻿<div class="container">
+    <h2>Staff Management</h2>
+    
+    <form method="get" asp-action="ManageStaff" class="mb-3">
+        <input type="text" name="searchTerm" placeholder="Search by ID or Username..." class="form-control w-25 d-inline" />
+        <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Staff ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Role</th>
+                <th>Username</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var staff in Model) {
+                <tr style="@(staff.Status == "Inactive" ? "opacity: 0.6;" : "")">
+                    <td>@staff.StaffId</td>
+                    <td>@staff.FirstName</td>
+                    <td>@staff.LastName</td>
+                    <td>@staff.TypeOfUser</td>
+                    <td>@staff.Username</td>
+                    <td>
+                        <span class="badge @(staff.Status == "Active" ? "bg-success" : "bg-secondary")">
+                            @staff.Status
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-action="EditStaff" asp-route-id="@staff.StaffId">Edit</a> |
+                        @if (staff.Status == "Active") {
+                            <a asp-action="ToggleStatus" asp-route-id="@staff.StaffId" class="text-danger">Archive</a>
+                        } else {
+                            <a asp-action="ToggleStatus" asp-route-id="@staff.StaffId" class="text-success">Activate</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

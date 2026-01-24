@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Assistant Dashboard";
+}
+
+<style>
+    .dash-card { height: 140px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; padding: 15px; cursor: pointer; transition: 0.3s; }
+    .dash-card:hover { filter: brightness(1.1); }
+    .bg-blue { background-color: #008bf8; }
+    .bg-red { background-color: #f02d3a; }
+</style>
+
+<h2>Welcome, Assistant!</h2>
+<div class="row g-4 mt-4">
+    <div class="col-md-4"><div class="dash-card bg-blue">Search Catalog</div></div>
+    <div class="col-md-4"><div class="dash-card bg-red">Book A Seat</div></div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-0" style="height: 140px;">
+            <h6 class="text-muted">Shift Info</h6>
+            <p class="mb-0"><strong>Location:</strong> Main Desk</p>
+            <p><strong>Status:</strong> On Duty</p>
+        </div>
+    </div>
+</div>
