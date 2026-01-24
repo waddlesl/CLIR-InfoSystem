@@ -6,15 +6,16 @@ namespace CLIR_InfoSystem.Models
     [Table("book_borrowing")]
     public class BookBorrowing
     {
+        //add "?" to make it nullable hehe
         [Key]
         [Column("borrow_id")]
         public int BorrowId { get; set; }
 
         [Column("patron_id")]
-        public string PatronId { get; set; }
+        public string? PatronId { get; set; }
 
         [Column("accession_id")]
-        public string AccessionId { get; set; }
+        public string? AccessionId { get; set; }
 
         [Column("borrow_date")]
         public DateTime BorrowDate { get; set; }
@@ -26,6 +27,14 @@ namespace CLIR_InfoSystem.Models
         public string Status { get; set; } // 'Borrowed', 'Returned', 'Overdue'
 
         [Column("staff_in_charge")]
-        public string StaffInCharge { get; set; }
+        public string? StaffInCharge { get; set; }
+
+        //foreign keys
+
+        [ForeignKey("AccessionId")]
+        public virtual Book? Book { get; set; }
+
+        [ForeignKey("PatronId")]
+        public virtual Patron? Patron { get; set; }
     }
 }

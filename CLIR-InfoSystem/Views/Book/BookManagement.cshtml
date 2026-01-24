@@ -1,0 +1,114 @@
+﻿<h2>Book Management</h2>
+<div class="row g-4 mt-2">
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-0">
+            <h6 class="text-muted">Available Books</h6>
+            <h3>@ViewBag.BookCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-0">
+            <h6 class="text-muted">Borrowed Books</h6>
+            <h3>@ViewBag.BorrowedBookCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-0">
+            <h6 class="text-muted">Overdue Books</h6>
+            <h3>@ViewBag.OverdueBookCount</h3>
+        </div>
+    </div>
+   
+</div>
+<div class="row g-4 mt-2">
+    <div class="col-md-6">
+
+        <div class="card p-3 shadow-sm border-0">
+            <div class="card-header">
+                <h3 class="card-title">Books List</h3>
+                <a asp-controller="Book" asp-action="AddBook" class="btn-primary">Add Book</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Acc No.</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Date Issued</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var book in Model)
+                        {
+                            <tr>
+                                <td>@book.AccessionId</td>
+                                <td>@book.Title</td>
+                                <td>@book.Author</td>
+                                <td>Date</td>
+                                <td>
+                                    <a asp-action="EditBook" asp-route-id="@book.AccessionId">Edit</a> |
+                                    @if (book.AvailabilityStatus == "Available")// kailangan natin dagdag sa status ung archived
+                                    {
+                                        <a asp-action="ArchiveBook" asp-route-id="@book.AccessionId" class="text-danger">Archive</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="ActivateBook" asp-route-id="@book.AccessionId" class="text-success">Activate</a>
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer">
+                <button class="see-all">See All</button>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+
+        <div class="card p-3 shadow-sm border-0">
+            <div class="card-header">
+                <h3 class="card-title">Current Borrower</h3>
+                <a asp-controller="Book" asp-action="AddBorrower" class="btn-primary">Add Borrower</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Borrow ID</th>
+                            <th>Name</th>
+                            <th>Book Title</th>
+                            <th>Date Borrowed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var bb in ViewBag.BorrowedBooks)
+                        {
+                            <tr>
+                                <td>@bb.BorrowId</td>
+                                <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
+                                <td>@(bb.Book?.Title ?? "No Title")</td>
+                                <td>@bb.BorrowDate</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer">
+                <button class="see-all">See All</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
