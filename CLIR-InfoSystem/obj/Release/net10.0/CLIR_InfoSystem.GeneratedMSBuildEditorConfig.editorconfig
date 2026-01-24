@@ -42,6 +42,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEFkbWluRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Raphael/source/repos/CLIR-InfoSystem/CLIR-InfoSystem/Views/Dashboard/AssistantDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEFzc2lzdGFudERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Raphael/source/repos/CLIR-InfoSystem/CLIR-InfoSystem/Views/Dashboard/LibrarianDashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXExpYnJhcmlhbkRhc2hib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -52,10 +56,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Raphael/source/repos/CLIR-InfoSystem/CLIR-InfoSystem/Views/Dashboard/StaffCommonDashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXFN0YWZmQ29tbW9uRGFzaGJvYXJkLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Raphael/source/repos/CLIR-InfoSystem/CLIR-InfoSystem/Views/Dashboard/StudentAssistantDashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXFN0dWRlbnRBc3Npc3RhbnREYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Raphael/source/repos/CLIR-InfoSystem/CLIR-InfoSystem/Views/Shared/Error.cshtml]

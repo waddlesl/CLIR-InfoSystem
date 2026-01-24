@@ -7,7 +7,7 @@ namespace CLIR_InfoSystem.Data
     {
         public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options) { }
 
-        public DbSet<User> Staff { get; set; }
+        public DbSet<Staff> Staff { get; set; }
         public DbSet<Patron> Patrons { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<BookBorrowing> BookBorrowings { get; set; }

@@ -24,7 +24,7 @@ namespace CLIR_InfoSystem.Controllers
             {
                 "Admin" => RedirectToAction("AdminDashboard"),
                 "Staff" => RedirectToAction("LibrarianDashboard"),
-                "Student Assistant" => RedirectToAction("AssistantDashboard"),
+                "Student Assistant" => RedirectToAction("StudentAssistantDashboard"),
                 "Patron" => RedirectToAction("PatronDashboard"), 
                 _ => RedirectToAction("Login", "Account")
             };
@@ -58,7 +58,7 @@ namespace CLIR_InfoSystem.Controllers
         }
 
         public IActionResult LibrarianDashboard() => StaffCommonView();
-        public IActionResult AssistantDashboard() => StaffCommonView();
+        public IActionResult StudentAssistantDashboard() => StaffCommonView();
 
         private IActionResult StaffCommonView()
         {

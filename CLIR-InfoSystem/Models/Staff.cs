@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CLIR_InfoSystem.Models
 {
     [Table("staff")]
-    public class User
+    public class Staff
     {
         [Key]
         [Column("staff_id")]
@@ -23,9 +23,9 @@ namespace CLIR_InfoSystem.Models
         public string Password { get; set; }
 
         [Column("type_of_user")]
-        public string TypeOfUser { get; set; }
+        public string TypeOfUser { get; set; } // Admin, Librarian, Student Assistant
 
         [Column("status")]
-        public string Status { get; set; }
+        public string Status { get; set; } // Active, Inactive
     }
 }
