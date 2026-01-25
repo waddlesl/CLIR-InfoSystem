@@ -251,7 +251,7 @@
             @if (role == "Librarian" || role == "Admin")
             {
                 <div class="nav-item">
-                    <a href="#">Patron Management</a>
+                    <a asp-controller="Patron" asp-action="ManagePatrons">Patron Management</a>
                 </div>
                 <div class="nav-item">
                     <a asp-controller="Book" asp-action="BookManagement">Book Catalog</a>

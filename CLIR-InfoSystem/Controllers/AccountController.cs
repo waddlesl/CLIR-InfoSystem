@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Http;
 using CLIR_InfoSystem.Models;
 using CLIR_InfoSystem.Data;
 using System.Linq;
@@ -15,24 +15,26 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
+        #region Authentication
+
         [HttpGet]
         public IActionResult Login() => View();
 
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            // 1. Staff still need a password for security
+            // 1. Staff Login
             var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Password == password);
             if (staff != null)
             {
                 HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
                 HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+
                 string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
                 return RedirectToAction(dashboardAction, "Dashboard");
             }
 
-            // 2. Patron Quick Access (ID Only)
-            // If password is empty, we check if the username exists in the Patron table
+            // 2. Patron Login (ID Only)
             var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == username);
             if (patron != null)
             {
@@ -46,11 +48,16 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.Error = "ID not found in system.";
             return View();
         }
+
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear(); // Clear session on logout
+            HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
+
+        #endregion
+
+        #region Staff Management
 
         public IActionResult ManageStaff(string searchTerm)
         {
@@ -70,7 +77,6 @@ namespace CLIR_InfoSystem.Controllers
             return View(query.ToList());
         }
 
-
         [HttpGet]
         public IActionResult GetStaffDetails(int id)
         {
@@ -80,19 +86,31 @@ namespace CLIR_InfoSystem.Controllers
         }
 
         [HttpPost]
+        public IActionResult AddStaff([FromBody] Staff newStaff)
+        {
+            if (newStaff == null) return Json(new { success = false });
+
+            _context.Staff.Add(newStaff);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
         public IActionResult UpdateStaff([FromBody] Staff updatedStaff)
         {
+            if (updatedStaff == null) return Json(new { success = false, message = "No data received" });
+
             var staff = _context.Staff.Find(updatedStaff.StaffId);
-            if (staff != null)
-            {
-                staff.FirstName = updatedStaff.FirstName;
-                staff.LastName = updatedStaff.LastName;
-                staff.Username = updatedStaff.Username;
-                staff.TypeOfUser = updatedStaff.TypeOfUser;
-                _context.SaveChanges();
-                return Json(new { success = true });
-            }
-            return Json(new { success = false });
+            if (staff == null) return Json(new { success = false, message = "Staff member not found" });
+
+            // Update allowed fields
+            staff.FirstName = updatedStaff.FirstName;
+            staff.LastName = updatedStaff.LastName;
+            staff.Username = updatedStaff.Username;
+            staff.TypeOfUser = updatedStaff.TypeOfUser;
+
+            _context.SaveChanges();
+            return Json(new { success = true });
         }
 
         public IActionResult ToggleStatus(int id)
@@ -107,16 +125,6 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("ManageStaff");
         }
 
-        [HttpPost]
-        public IActionResult AddStaff([FromBody] Staff newStaff)
-        {
-            if (newStaff != null)
-            {
-                _context.Staff.Add(newStaff);
-                _context.SaveChanges();
-                return Json(new { success = true });
-            }
-            return Json(new { success = false });
-        }
+        #endregion
     }
 }
