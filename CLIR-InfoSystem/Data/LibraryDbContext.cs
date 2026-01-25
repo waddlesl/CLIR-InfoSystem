@@ -11,7 +11,7 @@ namespace CLIR_InfoSystem.Data
         public DbSet<Patron> Patrons { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<BookBorrowing> BookBorrowings { get; set; }
-        public DbSet<ServiceRequest> ServiceRequests { get; set; }
+        public DbSet<ServiceRequests> ServiceRequests { get; set; }
         public DbSet<SeatBooking> SeatBookings { get; set; }
         public DbSet<LibrarianBooking> LibrarianBookings { get; set; }
         public DbSet<GrammarlyAndTurnitinRequest> GrammarlyAndTurnitinRequests { get; set; }
