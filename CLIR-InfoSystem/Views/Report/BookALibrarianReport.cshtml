@@ -1,0 +1,53 @@
+﻿<div id="reports-page-container">
+    <div class="report-tabs">
+        <button class="tab active">Book A Seat (Rizal)</button>
+        <button class="tab">Book A Seat (Einstein)</button>
+        <button class="tab">Book Borrowing</button>
+        <button class="tab">Book a Librarian</button>
+        <button class="tab">ODDS</button>
+        <button class="tab">Grammarly</button>
+        <button class="tab">Turnitin</button>
+    </div>
+
+    <h2 class="section-subtitle">Book A Seat (Rizal)</h2>
+
+    <div class="stats-row-top">
+        <div class="report-card dark-card">
+            <p class="card-label">Total Reservations</p>
+            <h1 class="card-value">@ViewBag.RBookingCount</h1>
+        </div>
+
+        <div class="report-card graph-placeholder">
+            <p class="card-label">Volume per hour</p>
+            <div class="graph-box">
+                <p>Graph Data Placeholder</p>
+                <div class="simple-bar-container">
+                    <div class="bar" style="height: 40%"></div>
+                    <div class="bar" style="height: 70%"></div>
+                    <div class="bar" style="height: 50%"></div>
+                    <div class="bar" style="height: 90%"></div>
+                    <div class="bar" style="height: 30%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-row-bottom">
+        <div class="report-card mini-card">
+            <p class="card-label">College</p>
+            <h2 class="card-value">@ViewBag.RBookingCountForCollege</h2>
+        </div>
+        <div class="report-card mini-card">
+            <p class="card-label">SHS</p>
+            <h2 class="card-value">@ViewBag.RBookingCountForSHS</h2>
+        </div>
+        <div class="report-card mini-card">
+            <p class="card-label">Most Dept. Utilized</p>
+            <h2 class="card-value highlight">MITL</h2>
+        </div>
+        <div class="report-card mini-card">
+            <p class="card-label">Most Utilized Seat</p>
+            <h2 class="card-value highlight">Bean Bag</h2>
+        </div>
+    </div>
+</div>

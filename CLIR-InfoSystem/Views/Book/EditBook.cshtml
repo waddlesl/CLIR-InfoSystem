@@ -1,0 +1,64 @@
+﻿@model CLIR_InfoSystem.Models.Book
+
+<div id="bm-page-container">
+    <div class="bm-card-component">
+        <h3 class="bm-card-title">Add New Book</h3>
+        <p style="color: #6B7280; font-size: 14px;">Enter the details to register a new book in the system.</p>
+        <hr />
+
+        <form asp-action="EditBook" method="post">
+
+            <div class="bm-form-group">
+                <label>Acc ID</label>
+                <input asp-for="AccessionId" class="bm-form-input" readonly />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Book Title</label>
+                <input asp-for="Title" class="bm-form-input" placeholder="e.g. The Great Gatsby" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Author</label>
+                <input asp-for="Author" class="bm-form-input" placeholder="e.g. F. Scott Fitzgerald" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Edition</label>
+                <input asp-for="Edition" class="bm-form-input" placeholder="e.g. 1st" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Publication Year</label>
+                <input asp-for="YearOfPublication" class="bm-form-input" placeholder="e.g. 2008" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Publisher</label>
+                <input asp-for="Publisher" class="bm-form-input" placeholder="e.g. Pearson" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Collection</label>
+                <input asp-for="Collection" class="bm-form-input" placeholder="e.g. Reference" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Price</label>
+                <input asp-for="Price" class="bm-form-input" placeholder="e.g. 100" required />
+            </div>
+
+            <div class="bm-form-group">
+                <label>Subtotal</label>
+                <input asp-for="Subtotal" class="bm-form-input" placeholder="e.g. 1500" required />
+            </div>
+
+            <input type="hidden" asp-for="AvailabilityStatus" value="Available" />
+
+            <div class="bm-form-actions" style="margin-top: 20px;">
+                <button type="submit" class="bm-btn-primary">Add Book</button>
+                <a asp-action="BookManagement" class="bm-btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>

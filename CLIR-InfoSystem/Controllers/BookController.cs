@@ -76,5 +76,42 @@ namespace CLIR_InfoSystem.Controllers
             }
             return View(newBorrower);
         }
+
+
+        [HttpGet]
+        public IActionResult EditBook(string id)
+        {
+            var book = _context.Books.Find(id);
+
+            if (book != null)
+            {
+                return View(book);
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult EditBook(Book updatedBook)
+        {
+            
+            if (ModelState.IsValid)
+            {
+                try
+                {
+
+                    _context.Books.Update(updatedBook);
+                    _context.SaveChanges();
+                    return RedirectToAction("BookManagement", "Book");
+                }
+                catch (DbUpdateException) 
+                { 
+                    ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
+                }
+               
+            }
+
+            return View(updatedBook);
+        }
     }
 }

@@ -1,0 +1,53 @@
+﻿<div id="reports-page-container">
+    <div class="report-tabs">
+        <a asp-controller="Report" asp-action="ReportDashboard" class="tab active">Book A Seat (Rizal)</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
+        <a asp-controller="Report" asp-action="BookBorrowingReport" class="tab">Book Borrowing</a>
+        <a asp-controller="Report" asp-action="BookALibrarianReport" class="tab">Book a Librarian</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">ODDS</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Grammarly</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Turnitin</a>
+    </div>
+
+    <h2 class="section-subtitle">Book A Seat (Einstein)</h2>
+
+    <div class="stats-row-top">
+        <div class="report-card dark-card">
+            <p class="card-label">Total Reservations</p>
+            <h1 class="card-value">@ViewBag.EBookingCount</h1>
+        </div>
+
+        <div class="report-card graph-placeholder">
+            <p class="card-label">Volume per hour</p>
+            <div class="graph-box">
+                <p>Graph Data Placeholder</p>
+                <div class="simple-bar-container">
+                    <div class="bar" style="height: 40%"></div>
+                    <div class="bar" style="height: 70%"></div>
+                    <div class="bar" style="height: 50%"></div>
+                    <div class="bar" style="height: 90%"></div>
+                    <div class="bar" style="height: 30%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-row-bottom">
+        <div class="report-card mini-card">
+            <p class="card-label">College</p>
+            <h2 class="card-value">@ViewBag.EBookingCountForCollege</h2>
+        </div>
+        <div class="report-card mini-card">
+            <p class="card-label">SHS</p>
+            <h2 class="card-value">@ViewBag.EBookingCountForSHS</h2>
+        </div>
+        <div class="report-card mini-card">
+            <p class="card-label">Most Dept. Utilized</p>
+            <h2 class="card-value highlight">@ViewBag.EBookingTopDepartment</h2>
+        </div>
+        <div class="report-card mini-card">
+            <p class="card-label">Most Utilized Seat</p>
+            <h2 class="card-value highlight">Bean Bag</h2>
+        </div>
+    </div>
+</div>

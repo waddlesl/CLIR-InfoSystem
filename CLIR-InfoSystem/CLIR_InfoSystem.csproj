@@ -10,7 +10,6 @@
   <ItemGroup>
     <Folder Include="Views\Transaction\" />
     <Folder Include="Views\Service\" />
-    <Folder Include="Views\Report\" />
   </ItemGroup>
 
   <ItemGroup>

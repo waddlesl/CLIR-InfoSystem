@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BgwKC7JZVzE=",
+  "dgSpecHash": "p3AaWqYaSkc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Idneous\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj",
+  "projectFilePath": "C:\\Users\\Idneous\\Documents\\GitHub\\CLIR-InfoSystem2\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Idneous\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Idneous\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
