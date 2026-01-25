@@ -58,10 +58,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEFkbWluRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Dashboard/AssistantDashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEFzc2lzdGFudERhc2hib2FyZC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Dashboard/LibrarianDashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXExpYnJhcmlhbkRhc2hib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -72,6 +68,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Dashboard/StaffCommonDashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXFN0YWZmQ29tbW9uRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Dashboard/StudentAssistantDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXFN0dWRlbnRBc3Npc3RhbnREYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Report/BookALibrarianReport.cshtml]
@@ -86,12 +86,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XEJvb2tCb3Jyb3dpbmdSZXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Report/ReportDashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFJlcG9ydERhc2hib2FyZC5jc2h0bWw=
+[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Report/GrammarlyAndTurnitinReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XEdyYW1tYXJseUFuZFR1cm5pdGluUmVwb3J0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Report/SerivceReportDashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFNlcml2Y2VSZXBvcnREYXNoYm9hcmQuY3NodG1s
+[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Report/ODDSReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XE9ERFNSZXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Report/ReportDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFJlcG9ydERhc2hib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Shared/Error.cshtml]

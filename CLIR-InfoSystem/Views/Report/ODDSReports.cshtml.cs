@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CLIR_InfoSystem.Views.Dashboard
 {
-    public class GrammarlyReportDashboardModel : PageModel
+    public class ODDSReportsModel : PageModel
     {
         public void OnGet()
         {

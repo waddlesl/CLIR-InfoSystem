@@ -1,53 +1,90 @@
 ﻿<div id="reports-page-container">
     <div class="report-tabs">
-        <button class="tab active">Book A Seat (Rizal)</button>
-        <button class="tab">Book A Seat (Einstein)</button>
-        <button class="tab">Book Borrowing</button>
-        <button class="tab">Book a Librarian</button>
-        <button class="tab">ODDS</button>
-        <button class="tab">Grammarly</button>
-        <button class="tab">Turnitin</button>
+        <a asp-controller="Report" asp-action="ReportDashboard" class="tab">Book A Seat (Rizal)</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
+        <a asp-controller="Report" asp-action="BookBorrowingReport" class="tab">Book Borrowing</a>
+        <a asp-controller="Report" asp-action="BookALibrarianReport" class="tab active">Book a Librarian</a>
+        <a asp-controller="Report" asp-action="ODDSReports" class="tab">ODDS</a>
+        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="tab @(ViewBag.CurrentService == "Grammarly" ? "active" : "")">Grammarly</a>
+        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
     </div>
 
-    <h2 class="section-subtitle">Book A Seat (Rizal)</h2>
+    <h2 class="section-subtitle">Book A Librarian</h2>
 
     <div class="stats-row-top">
         <div class="report-card dark-card">
             <p class="card-label">Total Reservations</p>
-            <h1 class="card-value">@ViewBag.RBookingCount</h1>
+            <h1 class="card-value">@ViewBag.LBookingCount</h1>
         </div>
 
-        <div class="report-card graph-placeholder">
-            <p class="card-label">Volume per hour</p>
-            <div class="graph-box">
-                <p>Graph Data Placeholder</p>
-                <div class="simple-bar-container">
-                    <div class="bar" style="height: 40%"></div>
-                    <div class="bar" style="height: 70%"></div>
-                    <div class="bar" style="height: 50%"></div>
-                    <div class="bar" style="height: 90%"></div>
-                    <div class="bar" style="height: 30%"></div>
-                </div>
+        <div class="report-card mini-card">
+            <p class="card-label">Top Department</p>
+            <h2 class="card-value">@ViewBag.LBookingTopDepartment</h2>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="report-card mini-card">
+                <p class="card-label">College</p>
+                <h2 class="card-value">@ViewBag.LBookingCountForCollege</h2>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="report-card mini-card">
+                <p class="card-label">SHS</p>
+                <h2 class="card-value">@ViewBag.LBookingCountForSHS</h2>
             </div>
         </div>
     </div>
 
+   
+    
+    <div class="report-card mini-card">
+        <p class="card-label">Top 5 Programs</p>
+                
+        @if (ViewBag.LBookProgram == null || !Enumerable.Any(ViewBag.LBookProgram))
+        {
+            <h2 class="card-value">N/A</h2>
+        }
+        else{
+            <ul style="list-style: none; padding: 0;">
+            @foreach (var book in ViewBag.LBookProgram)
+            {
+                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                    <strong>@book.Program</strong>
+                    <strong>@book.Count</strong>
+                </li>
+            }
+            </ul>
+        }
+                
+            
+    </div>
+
+
+    
+
+
+
+  <!--
     <div class="stats-row-bottom">
         <div class="report-card mini-card">
             <p class="card-label">College</p>
-            <h2 class="card-value">@ViewBag.RBookingCountForCollege</h2>
+            <h2 class="card-value">@ViewBag.LBookingCountForCollege</h2>
         </div>
         <div class="report-card mini-card">
             <p class="card-label">SHS</p>
-            <h2 class="card-value">@ViewBag.RBookingCountForSHS</h2>
+            <h2 class="card-value">@ViewBag.LBookingCountForSHS</h2>
         </div>
         <div class="report-card mini-card">
             <p class="card-label">Most Dept. Utilized</p>
-            <h2 class="card-value highlight">MITL</h2>
+            <h2 class="card-value highlight">@ViewBag.LBookingTopDepartment</h2>
         </div>
         <div class="report-card mini-card">
-            <p class="card-label">Most Utilized Seat</p>
-            <h2 class="card-value highlight">Bean Bag</h2>
+            <p class="card-label">Top 5 Programs</p>
+            <h2 class="card-value highlight">@ViewBag.LBookProgram</h2>
         </div>
     </div>
+        -->
 </div>
