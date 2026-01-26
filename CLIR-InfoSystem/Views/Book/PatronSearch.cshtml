@@ -1,0 +1,57 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
+@{
+    ViewData["Title"] = "Search Library";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@* Search Bar *@
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search by Title or Author..." />
+        <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Author</td>
+                <td>
+                    @* Dynamic Badge Color *@
+                    <span class="badge @(item.AvailabilityStatus == "Available" ? "bg-success" : "bg-secondary")">
+                        @item.AvailabilityStatus
+                    </span>
+                </td>
+                <td>
+                    @if (item.AvailabilityStatus == "Available")
+                    {
+                        <form asp-controller="Transaction" asp-action="RequestBook" method="post">
+                            <input type="hidden" name="accessionId" value="@item.AccessionId" />
+                            <button type="submit"
+                                    class="btn btn-sm btn-success"
+                                    onclick="return confirm('Borrow this book?');">
+                                Borrow
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-secondary" disabled>Unavailable</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

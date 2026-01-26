@@ -22,6 +22,11 @@ namespace CLIR_InfoSystem.Controllers
 
             return View(odds);
         }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 
     }

@@ -113,5 +113,25 @@ namespace CLIR_InfoSystem.Controllers
 
             return View(updatedBook);
         }
+
+        public IActionResult Index(string searchString)
+        {
+            var books = _context.Books.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                books = books.Where(s => s.Title.Contains(searchString) || s.Author.Contains(searchString));
+            }
+
+            // If the user is a Patron, we might want to only show 'Available' books
+            if (HttpContext.Session.GetString("UserRole") == "Patron")
+            {
+         
+                var patronBooks = books.Where(b => b.AvailabilityStatus == "Available").ToList();
+                return View("PatronSearch", patronBooks);
+            }
+
+            return View(books.ToList());
+        }
     }
 }

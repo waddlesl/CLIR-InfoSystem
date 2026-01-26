@@ -3,6 +3,7 @@
     // Retrieve the user role from the session
     var role = Context.Session.GetString("UserRole");
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
 }
 
 <!DOCTYPE html>
@@ -240,15 +241,18 @@
             @if (role == "Admin")
             {
                 <div class="nav-item">
-                    <a asp-controller="Account" asp-action="ManageStaff">Staff Management</a>
+                    <a asp-controller="Account" asp-action="ManageStaff">Manage Staffs</a>
                 </div>
                 <div class="nav-item">
-                    <a asp-controller="Report" asp-action="SystemReport">System Reports</a>
+                    <a asp-controller="#" asp-action="#">Audit Logs</a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="#" asp-action="#">System Reports</a>
                 </div>
             }
 
             @* Librarian / Staff Menu *@
-            @if (role == "Librarian" || role == "Admin")
+            @if (role == "Librarian")
             {
                 <div class="nav-item">
                     <a asp-controller="Patron" asp-action="ManagePatrons">Patron Management</a>
@@ -278,12 +282,27 @@
             @* PATRON LINKS *@
             @if (role == "Patron")
             {
-                <div class="nav-group-label">Library Services</div>
-                <div class="nav-item"><a href="#">📖 Catalog</a></div>
-                <div class="nav-item"><a href="#">📚 My Loans</a></div>
-                <div class="nav-item"><a href="#">📩 Service Requests</a></div>
-                <div class="nav-item"><a href="#">🪑 Seat Reservation</a></div>
-                <div class="nav-item"><a href="#">👤 My Records</a></div>
+
+                @* Points to BookController *@
+                <div class="nav-item">
+                    <a asp-controller="Book" asp-action="Index">📚 Borrow Books</a>
+                </div>
+
+                @* Points to TransactionController (for borrowing logic) *@
+                <div class="nav-item">
+                    <a asp-controller="Transaction" asp-action="Index">📖 My Borrowings</a>
+                </div>
+
+
+                @* Points to FacilityController (for Seat Reservation) *@
+                <div class="nav-item">
+                    <a asp-controller="Facility" asp-action="Index">🪑 Book a Seat</a>
+                </div>
+
+                @* Points to PatronController (personal records) *@
+                <div class="nav-item">
+                    <a asp-controller="Patron" asp-action="Index">📜 Transaction History</a>
+                </div>
             }
 
             <div class="sidebar-footer">
