@@ -8,6 +8,11 @@ public class PatronController : Controller
     private readonly LibraryDbContext _context;
     public PatronController(LibraryDbContext context) => _context = context;
 
+    public IActionResult Index()
+    {
+        return View();
+    }
+
     public IActionResult ManagePatrons(string searchTerm)
     {
         var query = _context.Patrons.AsQueryable();

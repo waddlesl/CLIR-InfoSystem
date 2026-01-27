@@ -6,7 +6,6 @@ namespace CLIR_InfoSystem.Models
     [Table("book_borrowing")]
     public class BookBorrowing
     {
-        //add "?" to make it nullable hehe
         [Key]
         [Column("borrow_id")]
         public int BorrowId { get; set; }
@@ -20,17 +19,20 @@ namespace CLIR_InfoSystem.Models
         [Column("borrow_date")]
         public DateTime BorrowDate { get; set; }
 
+        // Added to match your new SQL column
+        [Column("due_date")]
+        public DateTime? DueDate { get; set; }
+
         [Column("return_date")]
         public DateTime? ReturnDate { get; set; }
 
         [Column("status")]
-        public string Status { get; set; } // 'Borrowed', 'Returned', 'Overdue'
+        public string Status { get; set; } = "Reserved";
 
         [Column("staff_in_charge")]
         public string? StaffInCharge { get; set; }
 
-        //foreign keys
-
+        // Navigation Properties
         [ForeignKey("AccessionId")]
         public virtual Book? Book { get; set; }
 

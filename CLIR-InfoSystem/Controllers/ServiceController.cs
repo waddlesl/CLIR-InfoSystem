@@ -15,12 +15,17 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageODDS()
         {
-            var odds = _context.ServiceRequests
+            var odds = _context.Odds
                 .Include(s => s.Patron)
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
             return View(odds);
+        }
+
+        public IActionResult Index()
+        {
+            return View();
         }
     }
 

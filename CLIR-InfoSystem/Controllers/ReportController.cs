@@ -1,9 +1,12 @@
 ﻿using CLIR_InfoSystem.Data;
+using CLIR_InfoSystem.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class ReportController: Controller
+    public class ReportController : Controller
     {
         private readonly LibraryDbContext _context;
 
@@ -11,21 +14,24 @@ namespace CLIR_InfoSystem.Controllers
         {
             _context = context;
         }
+
         public IActionResult ReportDashboard()
         {
-            ViewBag.RBookingCount = _context.SeatBookings.Count(s => s.Building == "Rizal");
-            ViewBag.RBookingCountForCollege = _context.SeatBookings.Count(sb => sb.Patron.Department != "SHS" && sb.Building == "Rizal");
-            ViewBag.RBookingCountForSHS = _context.SeatBookings.Count(sb => sb.Patron.Department == "SHS" && sb.Building == "Rizal");
-            ViewBag.RBookingTopDepartment = _context.SeatBookings
-            .Where(sb => sb.Patron.Department == "Rizal")
-            .GroupBy(sb => sb.Patron.Department)
-            .OrderByDescending(g => g.Count())
-            .Select(g => g.Key)
-            .FirstOrDefault() ?? "N/A";
+            // Use .Include to join LibrarySeat and Patron tables
+            var bookings = _context.SeatBookings
+                .Include(s => s.LibrarySeat)
+                .Include(s => s.Patron);
 
-            ViewBag.RBookingPreferedSeat = _context.SeatBookings
-                .Where(sb => sb.Building == "Rizal")
-                .GroupBy(sb => sb.PreferredSeating)
+            ViewBag.RBookingCount = bookings
+                .Count(s => s.LibrarySeat != null && s.LibrarySeat.Building == "Rizal Building");
+
+            ViewBag.RBookingCountForCollege = bookings
+                .Count(sb => sb.Patron != null && sb.Patron.Department != "SHS" &&
+                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building");
+
+            ViewBag.RBookingTopDepartment = bookings
+                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.Patron != null)
+                .GroupBy(sb => sb.Patron.Department)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
@@ -36,19 +42,31 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult BookASeatEinstienReport()
         {
-            ViewBag.EBookingCount = _context.SeatBookings.Count(s => s.Building == "Einstein");
-            ViewBag.EBookingCountForCollege = _context.SeatBookings.Count(sb => sb.Patron.Department != "SHS" && sb.Building == "Einstein");
-            ViewBag.EBookingCountForSHS = _context.SeatBookings.Count(sb => sb.Patron.Department == "SHS" && sb.Building == "Einstein");
-            ViewBag.EBookingTopDepartment = _context.SeatBookings
-                .Where(sb => sb.Patron.Department == "Einstein")
-                .GroupBy(sb => sb.PreferredSeating)
+            var bookings = _context.SeatBookings
+                .Include(s => s.LibrarySeat)
+                .Include(s => s.Patron);
+
+            ViewBag.EBookingCount = bookings
+                .Count(s => s.LibrarySeat != null && s.LibrarySeat.Building == "Einstein Building");
+
+            ViewBag.EBookingCountForCollege = bookings
+                .Count(sb => sb.Patron != null && sb.Patron.Department != "SHS" &&
+                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building");
+
+            ViewBag.EBookingCountForSHS = bookings
+                .Count(sb => sb.Patron != null && sb.Patron.Department == "SHS" &&
+                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building");
+
+            ViewBag.EBookingTopDepartment = bookings
+                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building" && sb.Patron != null)
+                .GroupBy(sb => sb.Patron.Department)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
 
-            ViewBag.EBookingPreferedSeat = _context.SeatBookings
-                .Where(sb => sb.Building == "Einstein")
-                .GroupBy(bb => bb.PreferredSeating)
+            ViewBag.EBookingPreferedSeat = bookings
+                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building")
+                .GroupBy(sb => sb.LibrarySeat.SeatType)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
@@ -59,82 +77,73 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult BookBorrowingReport()
         {
-            ViewBag.BookBorrowCount = _context.BookBorrowings.Count();
-            ViewBag.BookBorrowCountForCollege = _context.BookBorrowings.Count(sb => sb.Patron.Department != "SHS");
-            ViewBag.BookBorrowCountForSHS = _context.BookBorrowings.Count(sb => sb.Patron.Department == "SHS");
-            ViewBag.BookTopProgram = _context.BookBorrowings
+            var borrowings = _context.BookBorrowings
+                .Include(b => b.Patron)
+                .Include(b => b.Book);
+
+            ViewBag.BookBorrowCount = borrowings.Count();
+            ViewBag.BookBorrowCountForCollege = borrowings.Count(sb => sb.Patron != null && sb.Patron.Department != "SHS");
+            ViewBag.BookBorrowCountForSHS = borrowings.Count(sb => sb.Patron != null && sb.Patron.Department == "SHS");
+
+            ViewBag.BookTopProgram = borrowings
+                .Where(bb => bb.Patron != null)
                 .GroupBy(bb => bb.Patron.Program)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
 
-            var currentYear = DateTime.Now.Year; // to get the year change later if we want it to be dynamic
-            ViewBag.BookTopBooks = _context.BookBorrowings
-                .Where(bb => bb.BorrowDate.Year == currentYear)
+            var currentYear = DateTime.Now.Year;
+            ViewBag.BookTopBooks = borrowings
+                .Where(bb => bb.Book != null && bb.BorrowDate.Year == currentYear)
                 .GroupBy(bb => bb.Book.Title)
                 .OrderByDescending(g => g.Count())
                 .Take(5)
                 .Select(g => new { Title = g.Key, Count = g.Count() })
                 .ToList();
 
-            
             return View();
         }
 
         public IActionResult BookALibrarianReport()
         {
-            ViewBag.LBookingCount = _context.LibrarianBookings.Count();
-            ViewBag.LBookingCountForCollege = _context.LibrarianBookings.Count(sb => sb.Patron.Department != "SHS");
-            ViewBag.LBookingCountForSHS = _context.LibrarianBookings.Count(sb => sb.Patron.Department == "SHS");
-            ViewBag.LBookingTopDepartment = _context.LibrarianBookings
+            var bookings = _context.LibrarianBookings.Include(b => b.Patron);
+
+            ViewBag.LBookingCount = bookings.Count();
+            ViewBag.LBookingCountForCollege = bookings.Count(sb => sb.Patron != null && sb.Patron.Department != "SHS");
+            ViewBag.LBookingCountForSHS = bookings.Count(sb => sb.Patron != null && sb.Patron.Department == "SHS");
+
+            ViewBag.LBookingTopDepartment = bookings
+                .Where(bb => bb.Patron != null)
                 .GroupBy(bb => bb.Patron.Department)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
-
-            ViewBag.LBookProgram = _context.LibrarianBookings
-                .GroupBy(bb => bb.Patron.Program)
-                .OrderByDescending(g => g.Count())
-                .Take(5)
-                .Select(g => new { Program = g.Key, Count = g.Count() })
-                .ToList();
-
 
             return View();
         }
 
         public IActionResult ODDSReports()
         {
-            ViewBag.ODDSCount = _context.ServiceRequests.Count();
-            ViewBag.ODDSCountForCollege = _context.ServiceRequests.Count(sb => sb.Patron.Department != "SHS");
-            ViewBag.ODDSCountForSHS = _context.ServiceRequests.Count(sb => sb.Patron.Department == "SHS");
+            // Fetches from the 'odds' table using the OddsRequest model
+            var requests = _context.Odds.Include(r => r.Patron).ToList();
 
-            ViewBag.ODDSProgram = _context.ServiceRequests
-                .GroupBy(bb => bb.Patron.Program)
-                .OrderByDescending(g => g.Count())
-                .Take(5)
-                .Select(g => new { Program = g.Key, Count = g.Count() })
-                .ToList();
-
+            ViewBag.ODDSCount = requests.Count;
+            ViewBag.ODDSCountForCollege = requests.Count(sb => sb.Patron != null && sb.Patron.Department != "SHS");
+            ViewBag.ODDSCountForSHS = requests.Count(sb => sb.Patron != null && sb.Patron.Department == "SHS");
 
             return View();
         }
+
         public IActionResult GrammarlyAndTurnitinReport(string service)
         {
+            var requests = _context.Services.Include(r => r.Patron);
+
             ViewBag.CurrentService = string.IsNullOrEmpty(service) ? "Grammarly" : service;
-            ViewBag.GATCount = _context.GrammarlyAndTurnitinRequests.Count(gat => gat.ServiceType == service);
-            ViewBag.GATCountForCollege = _context.GrammarlyAndTurnitinRequests.Count(gat => gat.Patron.Department != "SHS" && gat.ServiceType == service);
-            ViewBag.GATCountForSHS = _context.GrammarlyAndTurnitinRequests.Count(gat => gat.Patron.Department == "SHS" && gat.ServiceType == service);
+            ViewBag.GATCount = requests.Count(gat => gat.ServiceType == service);
+            ViewBag.GATCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.Department != "SHS" && gat.ServiceType == service);
+            ViewBag.GATCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.Department == "SHS" && gat.ServiceType == service);
 
-            ViewBag.GATProgram = _context.GrammarlyAndTurnitinRequests
-                .GroupBy(bb => bb.Patron.Program)
-                .OrderByDescending(g => g.Count())
-                .Select(g => g.Key)
-                .FirstOrDefault() ?? "N/A";
-
-            ViewBag.CurrentService = service;
             return View();
         }
-
     }
 }
