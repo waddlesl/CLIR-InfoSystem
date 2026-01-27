@@ -27,7 +27,7 @@ namespace CLIR_InfoSystem.Models
         public DateTime? ReturnDate { get; set; }
 
         [Column("status")]
-        public string Status { get; set; } = "Borrowed";
+        public string Status { get; set; } = "Reserved";
 
         [Column("staff_in_charge")]
         public string? StaffInCharge { get; set; }

@@ -23,8 +23,10 @@ namespace CLIR_InfoSystem.Controllers
             var userId = HttpContext.Session.GetString("UserId");
 
             var myLoans = _context.BookBorrowings
-                .Include(b => b.Book) // This line fixes the empty titles
-                .Where(b => b.PatronId == userId && b.Status == "Borrowed")
+                .Include(b => b.Book)
+                // This hides 'Returned' records so the book only appears once in the active list
+                .Where(b => b.PatronId == userId && b.Status != "Returned")
+                .OrderByDescending(b => b.BorrowDate)
                 .ToList();
 
             return View(myLoans);
@@ -34,30 +36,27 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult RequestBook(string accessionId)
         {
             var patronId = HttpContext.Session.GetString("UserId");
-
-            if (string.IsNullOrEmpty(patronId))
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
 
             var request = new BookBorrowing
             {
                 PatronId = patronId,
                 AccessionId = accessionId,
                 BorrowDate = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(7), // Sets a 1-week deadline
-                Status = "Borrowed"
+                Status = "Reserved"
             };
 
+            // CRITICAL: Ensure the request is added to the database set
             _context.BookBorrowings.Add(request);
 
-            // Update book status so others can't request it
             var book = _context.Books.Find(accessionId);
-            if (book != null) { book.AvailabilityStatus = "Borrowed"; }
+            if (book != null)
+            {
+                book.AvailabilityStatus = "Reserved";
+            }
 
             _context.SaveChanges();
-
-            return RedirectToAction("Index", "Transaction");
+            return RedirectToAction("Index");
         }
     }
 

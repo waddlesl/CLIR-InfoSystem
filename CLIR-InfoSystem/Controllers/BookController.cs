@@ -19,14 +19,20 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult BookManagement()
         {
             ViewBag.BookCount = _context.Books.Count();
-            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count();
-            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b=>b.Status == "Overdue");
 
+            // Updated: Count only active Borrowed or Reserved items
+            ViewBag.BorrowedBookCount = _context.BookBorrowings
+                .Count(b => b.Status == "Borrowed" || b.Status == "Reserved");
+
+            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
 
             var books = _context.Books.ToList();
-            ViewBag.BorrowedBooks = _context.BookBorrowings.Include(bb => bb.Book).Include(bb => bb.Patron).ToList();
-            return View(books); 
-        
+            ViewBag.BorrowedBooks = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .ToList();
+
+            return View(books);
         }
 
         [HttpGet]
@@ -123,11 +129,11 @@ namespace CLIR_InfoSystem.Controllers
                 books = books.Where(s => s.Title.Contains(searchString) || s.Author.Contains(searchString));
             }
 
-            // If the user is a Patron, we might want to only show 'Available' books
             if (HttpContext.Session.GetString("UserRole") == "Patron")
             {
-         
-                var patronBooks = books.Where(b => b.AvailabilityStatus == "Available").ToList();
+            
+                // Now it fetches ALL books matching the search string
+                var patronBooks = books.ToList();
                 return View("PatronSearch", patronBooks);
             }
 

@@ -17,8 +17,20 @@
             <tr>
                 <td>@loan.Book?.Title</td>
                 <td>@loan.BorrowDate.ToString("MMM dd, yyyy")</td>
-                <td>@loan.DueDate?.ToString("MMM dd, yyyy")</td>
-                <td><span class="badge bg-warning text-dark">@loan.Status</span></td>
+                <td>
+                    @* Show date only if it's not a pending reservation *@
+                    @(loan.Status == "Reserved" ? "---" : loan.DueDate?.ToString("MMM dd, yyyy"))
+                </td>
+                <td>
+                    @if (loan.Status == "Reserved")
+                    {
+                        <span class="badge bg-info text-dark">Reserved</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">@loan.Status</span>
+                    }
+                </td>
             </tr>
         }
     </tbody>
