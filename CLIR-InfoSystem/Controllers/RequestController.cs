@@ -23,37 +23,55 @@ namespace CLIR_InfoSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubmitServiceRequest(string serviceType)
+        public IActionResult SubmitServiceRequest(ServiceRequest model)
         {
-            string? patronId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
+            model.PatronId = HttpContext.Session.GetString("UserId");
+            model.RequestDate = DateTime.Now;
+            model.RequestStatus = "Pending";
 
-            var newRequest = new ServiceRequest
+            _context.Services.Add(model);
+            _context.SaveChanges();
+
+            // Change this line to stay on the form
+            // We pass the ServiceType back so the CheckExistingRequest logic runs
+            if (model.ServiceType == "Grammarly")
             {
-                PatronId = patronId,
-                RequestDate = DateTime.Now.Date,
-                ServiceType = serviceType,
-                RequestStatus = "Pending"
-            };
-
-            // Ignore navigation objects for validation
-            ModelState.Remove("Patron");
-
-            if (ModelState.IsValid)
-            {
-                _context.Services.Add(newRequest);
-                _context.SaveChanges();
-                TempData["Success"] = $"Your {serviceType} request has been submitted!";
-                return RedirectToAction("Index", "Patron");
+                return RedirectToAction("RequestGrammarly");
             }
-
-            return View("Services");
+            else
+            {
+                return RedirectToAction("RequestTurnitin");
+            }
         }
 
-        // Shows the Turnitin Form
-        public IActionResult RequestTurnitin() => View("ServiceForm", "Turnitin");
+        // Action for Turnitin
+        public IActionResult RequestTurnitin()
+        {
+            return CheckExistingRequest("Turnitin");
+        }
 
-        // Shows the Grammarly Form
-        public IActionResult RequestGrammarly() => View("ServiceForm", "Grammarly");
+        // Action for Grammarly
+        public IActionResult RequestGrammarly()
+        {
+            return CheckExistingRequest("Grammarly");
+        }
+
+        // Reusable check to see if they already requested the service
+        private IActionResult CheckExistingRequest(string type)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+
+            // Check if a pending request already exists in the database
+            var existing = _context.Services.FirstOrDefault(s =>
+                s.PatronId == userId &&
+                s.ServiceType == type &&
+                s.RequestStatus == "Pending");
+
+            // Pass the existence status to the View
+            ViewBag.IsAlreadySubmitted = (existing != null);
+
+            return View("ServiceForm", new ServiceRequest { ServiceType = type });
+        }
+
     }
 }

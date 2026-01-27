@@ -1,69 +1,102 @@
 ﻿@model CLIR_InfoSystem.Models.ServiceRequest
 
-@{
-    string serviceName = ViewContext.RouteData.Values["id"]?.ToString() ?? "Service";
-}
-
 <style>
+    /* Centers the entire box in the middle of the screen */
+    .form-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 20px;
+    }
+
     .request-box {
-        max-width: 600px;
-        margin: 50px auto;
+        width: 100%;
+        max-width: 500px;
         padding: 40px;
         background: #fff;
         border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* Optional shadow to match your screenshot style */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
-    .form-group label {
-        font-weight: bold;
-        margin-bottom: 8px;
-        display: block;
+    .form-group {
+        margin-bottom: 25px;
     }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            color: #333;
+        }
 
     .display-field {
         background: #fdfdfd;
-        border: 1px solid #eee;
+        border: 1px solid #dee2e6;
         padding: 12px;
-        border-radius: 4px;
-        margin-bottom: 20px;
-        color: #666;
+        border-radius: 6px;
+        color: #555;
     }
 
+    /* Standard Submit Button */
     .btn-submit {
         background-color: #00c853;
         color: white;
         border: none;
-        padding: 10px 40px;
+        padding: 12px 35px;
         border-radius: 4px;
         font-weight: bold;
         float: right;
     }
+
+    /* Already Submitted State */
+    .btn-disabled {
+        background-color: #a0a4a8;
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 4px;
+        font-weight: bold;
+        float: right;
+        cursor: not-allowed;
+    }
 </style>
 
-<div class="request-box">
-    <h2 class="text-center mb-5">Request @serviceName Access</h2>
+<div class="form-wrapper">
+    <div class="request-box">
+        <h2 class="text-center mb-5" style="font-weight: bold;">Request @Model.ServiceType Access</h2>
 
-    <form asp-action="SubmitServiceRequest" method="post">
-        <input type="hidden" name="serviceType" value="@serviceName" />
+        <form asp-action="SubmitServiceRequest" method="post">
+            <input type="hidden" asp-for="ServiceType" />
 
-        <div class="form-group">
-            <label>Patron ID</label>
-            <div class="display-field">@Context.Session.GetString("UserId")</div>
-        </div>
+            <div class="form-group">
+                <label>Patron ID</label>
+                <div class="display-field">@Context.Session.GetString("UserId")</div>
+            </div>
 
-        <div class="form-group">
-            <label>Confirm Email</label>
-            <div class="display-field">@Context.Session.GetString("UserEmail")</div>
-        </div>
+            <div class="form-group">
+                <label>Confirm Email</label>
+                <div class="display-field">@Context.Session.GetString("UserEmail")</div>
+            </div>
 
-        <div class="form-check mt-4 mb-4">
-            <input class="form-check-input" type="checkbox" id="academicCheck" required>
-            <label class="form-check-label" for="academicCheck">
-                I understand access is for academic use only.
-            </label>
-        </div>
+            <div class="form-check mt-4 mb-5">
+                <input class="form-check-input" type="checkbox" id="academicCheck" required
+                       @(ViewBag.IsAlreadySubmitted ? "disabled checked" : "")>
+                <label class="form-check-label" for="academicCheck">
+                    I understand access is for academic use only.
+                </label>
+            </div>
 
-        <button type="submit" class="btn btn-submit">SUBMIT</button>
-        <div class="clearfix"></div>
-    </form>
+            @if (ViewBag.IsAlreadySubmitted)
+            {
+                <button type="button" class="btn-disabled" disabled>ALREADY SUBMITTED</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-submit">SUBMIT</button>
+            }
+            <div class="clearfix"></div>
+        </form>
+    </div>
 </div>

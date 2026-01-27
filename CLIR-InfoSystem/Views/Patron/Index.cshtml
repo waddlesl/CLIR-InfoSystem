@@ -1,6 +1,42 @@
 ﻿@{
-    ViewData["Title"] = "Page Name"; // e.g., "Search Library"
+    ViewData["Title"] = "Patron Dashboard";
 }
 
-<h1>@ViewData["Title"]</h1>
-<p>This feature is currently under development.</p>
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i> @TempData["Info"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row mt-5">
+        <div class="col-md-8">
+            <h3>Library Features</h3>
+            <p class="text-muted">Features like book searching and seat reservations are currently under development.</p>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("RequestGrammarly", "Request")" class="btn btn-outline-primary">Request Grammarly</a>
+                        <a href="@Url.Action("RequestTurnitin", "Request")" class="btn btn-outline-primary">Request Turnitin</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
