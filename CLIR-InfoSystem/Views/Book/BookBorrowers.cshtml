@@ -1,4 +1,89 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
+<div class="row g-4 mt-2">
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-0">
+            <h6 class="text-muted">Borrowed Books</h6>
+            <h3>@ViewBag.BorrowedBookCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-0">
+            <h6 class="text-muted">Overdue Books</h6>
+            <h3>@ViewBag.OverdueBookCount</h3>
+        </div>
+    </div>
+</div>
+<br />
+<div id="bm-page-container">
+    <div class="card p-3 shadow-sm border-0">
+        <div class="card-header">
+            <h3 class="card-title">Borrower Requests</h3>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>Borrow ID</th>
+                        <th>Name</th>
+                        <th>Book Title</th>
+                        <th>Date Borrowed</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var reservedRequests = Model.Where(bb => bb.Status == "Reserved");
+                    }
+
+                    @if (!reservedRequests.Any())
+                    {
+                        <tr>
+                            <td>
+                                <em>No borrower requests found.</em>
+                            </td>
+                        </tr>
+                    }
+                    else{
+                        foreach (var bb in reservedRequests)
+                        {
+                            <tr>
+                                <td>@bb.BorrowId</td>
+                                <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
+                                <td>@(bb.Book?.Title ?? "No Title")</td>
+                                <td>@bb.BorrowDate</td>
+                                @if (ViewBag.IsStudentAssistant == false)
+                                {
+                                    <td>
+                                        <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
+                                        <button class="denybuttons" onclick="denyReques('@bb.BorrowId')">Deny</button>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <a class="disabled-link">Confirm</a> | <a class="disabled-link">Deny</a>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    
+                    }
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer">
+            <!--
+                <button class="see-all">See All</button>        #Dont Need Yet
+                -->
+        </div>
+    </div>
+</div>
+
+<br />
 
 <div id="bm-page-container">
     <div class="card p-3 shadow-sm border-0">
@@ -9,20 +94,7 @@
             {
                 //<a asp-controller="Book" asp-action="AddBorrower" class="btn-primary">Add Borrower</a>            #dont need yet
             }
-            <div class="row g-4 mt-2">
-            <div class="col-md-4">
-                <div class="card p-3 shadow-sm border-0">
-                    <h6 class="text-muted">Borrowed Books</h6>
-                    <h3>@ViewBag.BorrowedBookCount</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-3 shadow-sm border-0">
-                    <h6 class="text-muted">Overdue Books</h6>
-                    <h3>@ViewBag.OverdueBookCount</h3>
-                </div>
-            </div>
-            </div>
+           
             <br />
             <!--Search-->
             <div class="d-flex align-items-center">
@@ -40,7 +112,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table align-middle text-center">
                 <thead>
                     <tr>
                         <th>Borrow ID</th>
@@ -51,7 +123,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var bb in Model)
+                    @{
+                        var allRequests = Model.Where(bb => bb.Status != "Reserved");
+                    }
+
+                    @if (!allRequests.Any())
+                    {
+                        <tr>
+                            <td>
+                                <em>No book borrowers found.</em>
+                            </td>
+                        </tr>
+                    }
+                    else{
+                    foreach (var bb in allRequests)
                     {
                         <tr>
                             <td>@bb.BorrowId</td>
@@ -72,6 +157,7 @@
                             }
                         </tr>
                     }
+                    }
                 </tbody>
             </table>
         </div>
@@ -83,3 +169,30 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+        function confirmRequest(id) {
+            // Immediate execution without Swal.fire
+            processRequest('/Book/ConfirmRequest', id);
+        }
+
+        function denyRequest(id) {
+            processRequest('/Book/DenyRequest', id);
+        }
+
+        function processRequest(url, id) {
+            fetch(`${url}?id=${id}`, { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    // Reload immediately to reflect the table changes
+                    location.reload();
+                } else {
+                    alert("Update failed. Please check the console.");
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+}

@@ -194,5 +194,43 @@ namespace CLIR_InfoSystem.Controllers
             _context.SaveChanges();
             return Ok();
         }
+
+        // Accept Borrow Request
+        public IActionResult confirmRequest(int id)
+        {
+            var request = _context.BookBorrowings.Find(id);
+            if (request != null)
+            {
+                request.Status = "Borrowed";
+                request.BorrowDate = DateTime.Now;
+                request.DueDate = DateTime.Now.AddDays(7);
+                _context.SaveChanges();
+            }
+
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            return Ok(query);
+        }
+
+        //deny
+        public IActionResult denyRequest(int id)
+        {
+            var request = _context.BookBorrowings.Find(id);
+            if (request != null)
+            {
+                request.Status = "Denied";
+                _context.SaveChanges();
+            }
+
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            return Ok(query);
+        }
     }
 }

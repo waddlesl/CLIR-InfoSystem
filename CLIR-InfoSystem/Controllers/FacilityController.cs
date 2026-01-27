@@ -94,11 +94,12 @@ namespace CLIR_InfoSystem.Controllers
         {
             var activeBookings = _context.SeatBookings
                 .Include(b => b.TimeSlot)
-                .Include(b => b.Patron) // Add this line
-                .Where(b => b.Status == "Reserved")
+                //.Include(b => b.Patron) // Add this line
+                //.Where(b => b.Status == "Reserved")
                 .ToList();
 
             return View(activeBookings);
+    
         }
 
         [HttpPost]

@@ -15,7 +15,7 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
-        public IActionResult ReportDashboard()
+        public IActionResult ReportAndAnalytics()
         {
             // Use .Include to join LibrarySeat and Patron tables
             var bookings = _context.SeatBookings
