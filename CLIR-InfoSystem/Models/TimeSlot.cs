@@ -9,7 +9,11 @@ namespace CLIR_InfoSystem.Models
         [Key]
         [Column("slot_id")]
         public int SlotId { get; set; }
+
         [Column("display_text")]
         public string DisplayText { get; set; }
+
+        [Column("start_time")]
+        public TimeSpan StartTime { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CLIR_InfoSystem.Data;
 using CLIR_InfoSystem.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -13,18 +14,32 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
+        // --- PATRON ACTIONS ---
+
         public IActionResult BookASeat()
         {
-            // Get the ID from the logged-in user identity or session
-            string loggedInPatronId = User.Identity.Name;
+            var currentTime = DateTime.Now.TimeOfDay;
 
-            var model = new SeatBooking
+            // Initial load: Only show slots that haven't passed yet for today
+            var availableSlots = _context.TimeSlots
+                .Where(s => s.StartTime >= currentTime)
+                .ToList();
+
+            ViewBag.TimeSlots = availableSlots;
+            return View();
+        }
+
+        public JsonResult GetAvailableSlots(DateTime selectedDate)
+        {
+            var slots = _context.TimeSlots.AsQueryable();
+
+            if (selectedDate.Date == DateTime.Today)
             {
-                PatronId = loggedInPatronId
-            };
+                var now = DateTime.Now.TimeOfDay;
+                slots = slots.Where(s => s.StartTime >= now);
+            }
 
-            ViewBag.TimeSlots = _context.TimeSlots.ToList();
-            return View(model);
+            return Json(slots.ToList());
         }
 
         [HttpGet]
@@ -33,7 +48,7 @@ namespace CLIR_InfoSystem.Controllers
             var occupiedSeatIds = _context.SeatBookings
                 .Where(b => b.BookingDate.Date == date.Date &&
                             b.SlotId == slotId &&
-                            b.Status == "Reserved")
+                            (b.Status == "Reserved" || b.Status == "Completed"))
                 .Select(b => b.SeatId).ToList();
 
             var availableSeats = _context.LibrarySeats
@@ -47,19 +62,18 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult ConfirmBooking(SeatBooking booking)
         {
-            // 1. Pull using the EXACT key from AccountController
-            string loggedInId = HttpContext.Session.GetString("UserId");
+            string? loggedInId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(loggedInId)) return RedirectToAction("Login", "Account");
 
-            if (string.IsNullOrEmpty(loggedInId))
-            {
-                // If session expired, send them back to login
-                return RedirectToAction("Login", "Account");
-            }
-
-            // 2. Assign the ID and clear validation
             booking.PatronId = loggedInId;
             booking.Status = "Reserved";
+
+            // 🚩 FORCE REMOVE these from validation or IsValid will stay FALSE
+            ModelState.Remove("Patron");
+            ModelState.Remove("LibrarySeat"); // Add this
+            ModelState.Remove("TimeSlot");
             ModelState.Remove("PatronId");
+            ModelState.Remove("Status");
 
             if (ModelState.IsValid)
             {
@@ -69,11 +83,48 @@ namespace CLIR_InfoSystem.Controllers
                 return RedirectToAction("BookASeat");
             }
 
+            // If it fails, reload the data for the dropdowns
             ViewBag.TimeSlots = _context.TimeSlots.ToList();
             return View("BookASeat", booking);
         }
+
+        // --- LIBRARIAN / STAFF ACTIONS ---
+
+        public IActionResult ManageBookings()
+        {
+            var activeBookings = _context.SeatBookings
+                .Include(b => b.TimeSlot)
+                .Include(b => b.Patron) // Add this line
+                .Where(b => b.Status == "Reserved")
+                .ToList();
+
+            return View(activeBookings);
+        }
+
+        [HttpPost]
+        public IActionResult CheckIn(int bookingId)
+        {
+            var booking = _context.SeatBookings.Find(bookingId);
+            if (booking != null)
+            {
+                booking.Status = "Completed";
+                _context.SaveChanges();
+                TempData["Success"] = "Patron checked in successfully.";
+            }
+            return RedirectToAction("ManageBookings");
+        }
+
+        [HttpPost]
+        public IActionResult CancelBooking(int bookingId)
+        {
+            var booking = _context.SeatBookings.Find(bookingId);
+            if (booking != null)
+            {
+                booking.Status = "Cancelled";
+                _context.SaveChanges();
+                TempData["Info"] = "Booking has been cancelled.";
+            }
+            return RedirectToAction("ManageBookings");
+        }
     }
-
-
-
 }

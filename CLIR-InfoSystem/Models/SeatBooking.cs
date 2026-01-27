@@ -14,23 +14,25 @@ namespace CLIR_InfoSystem.Models
         [Column("patron_id")]
         public string PatronId { get; set; }
 
+        [ForeignKey("PatronId")]
+        public virtual Patron? Patron { get; set; }
+
         [Column("seat_id")]
         public int SeatId { get; set; }
 
+        [ForeignKey("SeatId")]
+        public virtual LibrarySeat? LibrarySeat { get; set; }
+
         [Column("slot_id")]
         public int SlotId { get; set; }
+
+        [ForeignKey("SlotId")]
+        public virtual TimeSlot? TimeSlot { get; set; }
 
         [Column("booking_date")]
         public DateTime BookingDate { get; set; }
 
         [Column("status")]
-        public string Status { get; set; } = "Reserved";
-
-        // Navigation Properties (Required for ReportController)
-        [ForeignKey("SeatId")]
-        public virtual LibrarySeat? LibrarySeat { get; set; }
-
-        [ForeignKey("PatronId")]
-        public virtual Patron? Patron { get; set; }
+        public string? Status { get; set; }
     }
 }

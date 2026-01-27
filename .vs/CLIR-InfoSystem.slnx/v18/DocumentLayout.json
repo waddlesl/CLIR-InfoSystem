@@ -3,24 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\facilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\controllers\\facilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\views\\facility\\bookaseat.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\views\\facility\\bookaseat.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\facilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\controllers\\facilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\seatbooking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\seatbooking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\patron.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\patron.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\timeslot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\timeslot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\libraryseat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\libraryseat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -31,24 +39,16 @@
       "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\data\\librarydbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\bookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\controllers\\bookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\views\\book\\addbook.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\views\\book\\addbook.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\libraryseat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\libraryseat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\timeslot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\timeslot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\controllers\\bookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\controllers\\bookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\views\\transaction\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -179,10 +179,6 @@
       "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\views\\dashboard\\studentassistantdashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\patron.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\patron.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|c:\\users\\raphael\\source\\repos\\clir-infosystem\\clir-infosystem\\models\\staff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67056A87-D22E-6C55-02AC-35D5D2C59111}|CLIR-InfoSystem\\CLIR_InfoSystem.csproj|solutionrelative:clir-infosystem\\models\\staff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -210,118 +206,141 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 6,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "FacilityController.cs",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\FacilityController.cs",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\FacilityController.cs",
               "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\FacilityController.cs",
               "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\FacilityController.cs",
-              "ViewState": "AgIAACkAAAAAAAAAAAAqwC4AAAASAAAAAAAAAA==",
+              "ViewState": "AgIAADcAAAAAAAAAAAAQwEkAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:16:11.223Z",
+              "WhenOpened": "2026-01-27T08:35:35.253Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "BookaSeat.cshtml",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
-              "RelativeToolTip": "CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-27T06:22:07.098Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "AddBook.cshtml",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Book\\AddBook.cshtml",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Book\\AddBook.cshtml",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Book\\AddBook.cshtml",
-              "RelativeToolTip": "CLIR-InfoSystem\\Views\\Book\\AddBook.cshtml",
-              "ViewState": "AgIAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-26T13:15:37.265Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "SeatBooking.cs",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\SeatBooking.cs",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\SeatBooking.cs",
               "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\SeatBooking.cs",
               "RelativeToolTip": "CLIR-InfoSystem\\Models\\SeatBooking.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABMAAAAAAAAAAAAmwCMAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-23T14:34:24.611Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "BookController.cs",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\BookController.cs",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\BookController.cs",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\BookController.cs",
-              "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\BookController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA0AAAAPAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:15:29.794Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "ReportController.cs",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\ReportController.cs",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\ReportController.cs",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\ReportController.cs",
-              "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\ReportController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAgAAAAAAAAAA==",
+              "Title": "LibrarySeat.cs",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\LibrarySeat.cs",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\LibrarySeat.cs",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\LibrarySeat.cs",
+              "RelativeToolTip": "CLIR-InfoSystem\\Models\\LibrarySeat.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAYwBIAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:16:29.376Z",
+              "WhenOpened": "2026-01-27T05:50:14.666Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "LibraryDbContext.cs",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Data\\LibraryDbContext.cs",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Data\\LibraryDbContext.cs",
               "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Data\\LibraryDbContext.cs",
               "RelativeToolTip": "CLIR-InfoSystem\\Data\\LibraryDbContext.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAxwBgAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-23T14:37:05.924Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
+              "Title": "TimeSlot.cs",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\TimeSlot.cs",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\TimeSlot.cs",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\TimeSlot.cs",
+              "RelativeToolTip": "CLIR-InfoSystem\\Models\\TimeSlot.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAzwBMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T05:47:00.43Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Patron.cs",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\Patron.cs",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\Patron.cs",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\Patron.cs",
+              "RelativeToolTip": "CLIR-InfoSystem\\Models\\Patron.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAYwBsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-23T14:34:07.078Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BookaSeat.cshtml",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
+              "RelativeToolTip": "CLIR-InfoSystem\\Views\\Facility\\BookaSeat.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-27T06:22:07.098Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAuwBoAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-23T14:15:16.028Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ReportController.cs",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\ReportController.cs",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\ReportController.cs",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\ReportController.cs",
+              "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\ReportController.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAjwC0AAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-23T14:16:29.376Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAPYAAAAAAAAAAAAkwAgBAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-24T04:56:55.76Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "Login.cshtml",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Account\\Login.cshtml",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Account\\Login.cshtml",
@@ -329,34 +348,19 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Account\\Login.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAADcAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-23T23:02:17.372Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T23:02:17.372Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AccountController.cs",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\AccountController.cs",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\AccountController.cs",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\AccountController.cs",
-              "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\AccountController.cs",
-              "ViewState": "AgIAAFQAAAAAAAAAAAAiwHQAAAAJAAAAAAAAAA==",
+              "DocumentIndex": 11,
+              "Title": "BookController.cs",
+              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\BookController.cs",
+              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Controllers\\BookController.cs",
+              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Controllers\\BookController.cs",
+              "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\BookController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA0AAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:15:16.028Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "TimeSlot.cs",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\TimeSlot.cs",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\TimeSlot.cs",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\TimeSlot.cs",
-              "RelativeToolTip": "CLIR-InfoSystem\\Models\\TimeSlot.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-27T05:47:00.43Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T14:15:29.794Z"
             },
             {
               "$type": "Document",
@@ -368,8 +372,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\_ViewImports.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-23T22:22:13.514Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T22:22:13.514Z"
             },
             {
               "$type": "Document",
@@ -381,8 +384,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Shared\\Error.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-23T22:21:14.667Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T22:21:14.667Z"
             },
             {
               "$type": "Document",
@@ -394,34 +396,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-24T06:28:40.099Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "CLIR-InfoSystem\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAABEBAAAAAAAAAAAkwCsBAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-24T04:56:55.76Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "LibrarySeat.cs",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\LibrarySeat.cs",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\LibrarySeat.cs",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\LibrarySeat.cs",
-              "RelativeToolTip": "CLIR-InfoSystem\\Models\\LibrarySeat.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-27T05:50:14.666Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T06:28:40.099Z"
             },
             {
               "$type": "Document",
@@ -433,8 +408,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Transaction\\Index.cshtml",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAACAAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-26T13:59:17.708Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-26T13:59:17.708Z"
             },
             {
               "$type": "Document",
@@ -446,8 +420,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Dashboard\\LibrarianDashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-24T04:53:09.167Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T04:53:09.167Z"
             },
             {
               "$type": "Document",
@@ -459,8 +432,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Dashboard\\PatronDashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-24T06:13:23.703Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T06:13:23.703Z"
             },
             {
               "$type": "Document",
@@ -472,8 +444,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Dashboard\\StaffCommonDashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-24T05:31:51.163Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T05:31:51.163Z"
             },
             {
               "$type": "Document",
@@ -485,8 +456,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Report\\ReportDashboard.cshtml",
               "ViewState": "AgIAABIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-27T05:55:05.312Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-27T05:55:05.312Z"
             },
             {
               "$type": "Document",
@@ -498,8 +468,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Dashboard\\AdminDashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-24T04:53:02.964Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T04:53:02.964Z"
             },
             {
               "$type": "Document",
@@ -511,8 +480,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Controllers\\TransactionController.cs",
               "ViewState": "AgIAABkAAAAAAAAAAAAAwDAAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:15:51.527Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T14:15:51.527Z"
             },
             {
               "$type": "Document",
@@ -524,8 +492,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Models\\Book.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAADwvycAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:33:58.555Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T14:33:58.555Z"
             },
             {
               "$type": "Document",
@@ -537,8 +504,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Models\\BorrowingRecord.cs",
               "ViewState": "AgIAAA0AAAAAAAAAAAAywBwAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:34:12.728Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-23T14:34:12.728Z"
             },
             {
               "$type": "Document",
@@ -550,8 +516,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Book\\BookManagement.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-26T13:15:39.818Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-26T13:15:39.818Z"
             },
             {
               "$type": "Document",
@@ -563,8 +528,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Report\\GrammarlyAndTurnitinReport.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-27T01:02:43.728Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-27T01:02:43.728Z"
             },
             {
               "$type": "Document",
@@ -576,8 +540,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Models\\LibrarianBooking.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-26T15:19:24.896Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-26T15:19:24.896Z"
             },
             {
               "$type": "Document",
@@ -589,8 +552,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Report\\BookALibrarianReport.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-27T01:02:28.374Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-27T01:02:28.374Z"
             },
             {
               "$type": "Document",
@@ -602,8 +564,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Report\\BookBorrowingReport.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-27T01:02:36.448Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-27T01:02:36.448Z"
             },
             {
               "$type": "Document",
@@ -615,8 +576,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Report\\BookASeatEinstienReport.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-27T01:02:37.073Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-27T01:02:37.073Z"
             },
             {
               "$type": "Document",
@@ -664,8 +624,7 @@
               "RelativeToolTip": "CLIR-InfoSystem\\Views\\Book\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-26T13:58:30.616Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-26T13:58:30.616Z"
             },
             {
               "$type": "Document",
@@ -790,18 +749,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 44,
-              "Title": "Patron.cs",
-              "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\Patron.cs",
-              "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\Patron.cs",
-              "ToolTip": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\Patron.cs",
-              "RelativeToolTip": "CLIR-InfoSystem\\Models\\Patron.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-23T14:34:07.078Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 45,
               "Title": "Staff.cs",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Models\\Staff.cs",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Models\\Staff.cs",
@@ -813,7 +760,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 46,
+              "DocumentIndex": 45,
               "Title": "ManageStaff.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Views\\Account\\ManageStaff.cshtml.cs",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Views\\Account\\ManageStaff.cshtml.cs",
@@ -825,7 +772,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 47,
+              "DocumentIndex": 46,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Program.cs",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Program.cs",
@@ -837,7 +784,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 48,
+              "DocumentIndex": 47,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\appsettings.json",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\appsettings.json",
@@ -849,7 +796,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 49,
+              "DocumentIndex": 48,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "CLIR-InfoSystem\\Properties\\launchSettings.json",

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.SeatBooking>
+
+<h2>Manage Seat Bookings</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Patron ID</th>
+            <th>Seat ID</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.BookingDate.ToShortDateString()</td>
+                <td>@item.PatronId</td>
+                <td>@item.SeatId</td>
+                <td>
+                    @{
+                        // Dynamic badge colors based on status
+                        string badgeClass = item.Status switch
+                        {
+                            "Reserved" => "bg-primary",
+                            "Completed" => "bg-success",
+                            "Cancelled" => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+                    }
+                    <span class="badge @badgeClass">@item.Status</span>
+                </td>
+                <td>
+                    @if (item.Status == "Reserved")
+                    {
+                        <div class="d-flex gap-2">
+                            <form asp-action="CheckIn" method="post">
+                                <input type="hidden" name="bookingId" value="@item.BookingId" />
+                                <button type="submit" class="btn btn-sm btn-success">Mark Completed</button>
+                            </form>
+
+                            @* Optional: Add a Cancel button *@
+                            <form asp-action="CancelBooking" method="post">
+                                <input type="hidden" name="bookingId" value="@item.BookingId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <small class="text-muted">No actions available</small>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

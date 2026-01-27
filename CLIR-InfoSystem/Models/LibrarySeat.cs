@@ -9,11 +9,21 @@ namespace CLIR_InfoSystem.Models
         [Key]
         [Column("id")]
         public int Id { get; set; }
+
         [Column("building")]
         public string Building { get; set; }
+
+        [Column("location_room")]
+        public string LocationRoom { get; set; }
+
         [Column("seat_name")]
         public string SeatName { get; set; }
+
         [Column("seat_type")]
         public string SeatType { get; set; }
+
+        [Column("is_available")]
+        public bool IsAvailable { get; set; }
     }
+
 }
