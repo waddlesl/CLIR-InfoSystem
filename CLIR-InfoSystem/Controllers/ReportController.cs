@@ -36,6 +36,13 @@ namespace CLIR_InfoSystem.Controllers
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
 
+            ViewBag.RBookingPreferedSeat = bookings
+                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building")
+                .GroupBy(sb => sb.LibrarySeat.SeatType)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key)
+                .FirstOrDefault() ?? "N/A";
+
             ViewBag.Term = "AY 2024-2025 - T1";
             return View();
         }
@@ -142,6 +149,13 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.GATCount = requests.Count(gat => gat.ServiceType == service);
             ViewBag.GATCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.Department != "SHS" && gat.ServiceType == service);
             ViewBag.GATCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.Department == "SHS" && gat.ServiceType == service);
+
+            ViewBag.GATProgram = requests
+                .Where(sr => sr.Patron != null && sr.ServiceType == service)
+                .GroupBy(sr => sr.Patron.Department)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key)
+                .FirstOrDefault() ?? "N/A";
 
             return View();
         }
