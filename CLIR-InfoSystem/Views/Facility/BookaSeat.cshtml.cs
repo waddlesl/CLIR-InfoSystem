@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CLIR_InfoSystem.Views.Facility
 {
-    public class IndexModel : PageModel
+    public class BookaSeatModel : PageModel
     {
         public void OnGet()
         {

@@ -1,0 +1,75 @@
+﻿@model CLIR_InfoSystem.Models.SeatBooking
+
+<h2>Book a Library Seat</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="ConfirmBooking" method="post">
+    <div class="form-group mb-3">
+        <label>Booking Date</label>
+        <input type="date" id="BookingDate" asp-for="BookingDate" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Building</label>
+        <select id="Building" class="form-control" required disabled>
+            <option value="">-- Select Building --</option>
+            <option value="Rizal Building">Rizal Building</option>
+            <option value="Einstein Building">Einstein Building</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Time Slot</label>
+        <select id="SlotId" asp-for="SlotId" class="form-control" required disabled>
+            <option value="">-- Select Slot --</option>
+            @foreach (var slot in ViewBag.TimeSlots)
+            {
+                <option value="@slot.SlotId">@slot.DisplayText</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Available Seats</label>
+        <select id="SeatId" asp-for="SeatId" class="form-control" required disabled>
+            <option value="">-- Select Date, Building, and Slot first --</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Confirm Reservation</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Step-by-step enablement
+        $('#BookingDate').change(function() {
+            if($(this).val()) $('#Building').prop('disabled', false);
+        });
+
+        $('#Building').change(function() {
+            if($(this).val()) $('#SlotId').prop('disabled', false);
+        });
+
+        $('#BookingDate, #Building, #SlotId').change(function() {
+            var date = $('#BookingDate').val();
+            var bld = $('#Building').val();
+            var slot = $('#SlotId').val();
+
+            if (date && bld && slot) {
+                $('#SeatId').prop('disabled', false);
+                $.getJSON('/Facility/GetAvailableSeats', { building: bld, slotId: slot, date: date }, function(data) {
+                    var items = '<option value="">-- Select a Seat --</option>';
+                    $.each(data, function(i, seat) {
+                        items += "<option value='" + seat.id + "'>" + seat.name + "</option>";
+                    });
+                    $('#SeatId').html(items);
+                });
+            }
+        });
+    });
+</script>
