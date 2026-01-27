@@ -16,18 +16,61 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
-        public IActionResult BookManagement()
+        public IActionResult BookManagement(string searchTerm)
         {
+          
+            var role = HttpContext.Session.GetString("UserRole");
+            ViewBag.IsStudentAssistant = role == "Student Assistant";
+
+            
             ViewBag.BookCount = _context.Books.Count();
             ViewBag.BorrowedBookCount = _context.BookBorrowings.Count();
-            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b=>b.Status == "Overdue");
+            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
 
+           
+            var query = _context.Books.AsQueryable();
 
-            var books = _context.Books.ToList();
-            ViewBag.BorrowedBooks = _context.BookBorrowings.Include(bb => bb.Book).Include(bb => bb.Patron).ToList();
-            return View(books); 
-        
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(p => p.Title.Contains(searchTerm) ||
+                                         p.Author.Contains(searchTerm) ||
+                                         p.AccessionId == searchTerm);
+            }
+
+            var books = query.ToList();
+            return View(books);
         }
+
+
+        public IActionResult BookBorrowers(string searchTerm)
+        {
+            
+            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count();
+            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
+
+            var role = HttpContext.Session.GetString("UserRole");
+            ViewBag.IsStudentAssistant = role == "Student Assistant";
+
+            
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(p => p.Patron.FirstName.Contains(searchTerm) ||
+                                         p.Patron.LastName.Contains(searchTerm) ||
+                                         p.BorrowId.ToString() == searchTerm); 
+            }
+
+         
+            var results = query.ToList();
+            return View(results);
+        }
+
+
 
         [HttpGet]
         public IActionResult AddBook()
@@ -36,18 +79,20 @@ namespace CLIR_InfoSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddBook(Book newBook)
+        public IActionResult AddBook([FromBody] Book newBook)
         {
+            if (newBook == null) return BadRequest();
+
+            bool exists = _context.Books.Any(b => b.AccessionId == newBook.AccessionId);
+            if (exists) return BadRequest("Accession ID already exists.");
             if (ModelState.IsValid)
             {
-                
                 _context.Books.Add(newBook);
                 _context.SaveChanges();
-
-                return RedirectToAction("BookManagement", "Book");
+                return Ok(); 
             }
-           
-            return View(newBook);
+
+            return BadRequest(ModelState);
         }
 
         [HttpGet]
@@ -112,6 +157,42 @@ namespace CLIR_InfoSystem.Controllers
             }
 
             return View(updatedBook);
+        }
+        [HttpGet]
+        public IActionResult GetBookDetails(string id)
+        {
+            var book = _context.Books.FirstOrDefault(b => b.AccessionId == id);
+            if (book == null) return NotFound();
+            return Json(book);
+        }
+
+        
+        [HttpPost]
+        public IActionResult UpdateBook([FromBody] Book updatedBook)
+        {
+            if (updatedBook == null) return BadRequest();
+
+            var existingBook = _context.Books.Find(updatedBook.AccessionId);
+            if (existingBook == null) return NotFound();
+
+            existingBook.Title = updatedBook.Title;
+            existingBook.Author = updatedBook.Author;
+            existingBook.AvailabilityStatus = updatedBook.AvailabilityStatus;
+            existingBook.Edition = updatedBook.Edition;
+            existingBook.YearOfPublication = updatedBook.YearOfPublication;
+            existingBook.Publisher = updatedBook.Publisher;
+            existingBook.Collection = updatedBook.Collection;
+            existingBook.Location = updatedBook.Location;
+            existingBook.Supplier = updatedBook.Supplier;
+            existingBook.Source = updatedBook.Source;
+            existingBook.Subtotal = updatedBook.Subtotal;
+            existingBook.Price = updatedBook.Price;
+            existingBook.Discount = updatedBook.Discount;
+            existingBook.Subtotal = updatedBook.Subtotal;
+            
+
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

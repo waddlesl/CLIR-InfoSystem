@@ -1,4 +1,5 @@
 ﻿<h2>Book Management</h2>
+
 <div class="row g-4 mt-2">
     <div class="col-md-4">
         <div class="card p-3 shadow-sm border-0">
@@ -6,27 +7,28 @@
             <h3>@ViewBag.BookCount</h3>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Borrowed Books</h6>
-            <h3>@ViewBag.BorrowedBookCount</h3>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Overdue Books</h6>
-            <h3>@ViewBag.OverdueBookCount</h3>
-        </div>
-    </div>
-   
 </div>
 <div class="row g-4 mt-2">
-    <div class="col-md-6">
+    <div class="col-md-12">
 
         <div class="card p-3 shadow-sm border-0">
             <div class="card-header">
                 <h3 class="card-title">Books List</h3>
-                <a asp-controller="Book" asp-action="AddBook" class="btn-primary">Add Book</a>
+
+                <!--Search-->
+                <div class="d-flex align-items-center">
+                    <form method="get" asp-action="BookManagement" class="d-flex me-2">
+                        <input type="text" name="searchTerm" placeholder="Search by ID or Book Name..." class="form-control" style="width: 250px;" />
+                        <button type="submit" class="btn btn-secondary ms-1">Search</button>
+                    </form>
+                    @if (ViewBag.IsStudentAssistant == false)
+                    {
+                        <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddBookModal()">
+                            <b class="me-1" style="font-size: 1.2rem;">+</b> Add Book
+                        </button>
+                    }
+                </div>
+
             </div>
 
             <div class="table-responsive">
@@ -36,7 +38,7 @@
                             <th>Acc No.</th>
                             <th>Title</th>
                             <th>Author</th>
-                            <th>Date Issued</th>
+                            <th>Availability</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -47,19 +49,39 @@
                                 <td>@book.AccessionId</td>
                                 <td>@book.Title</td>
                                 <td>@book.Author</td>
-                                <td>Date</td>
-                                <td>
-                                    <a asp-action="EditBook" asp-route-id="@book.AccessionId">Edit</a> |
-                                    @if (book.AvailabilityStatus == "Available")// kailangan natin dagdag sa status ung archived
-                                    {
-                                        <a asp-action="ArchiveBook" asp-route-id="@book.AccessionId" class="text-danger">Archive</a>
-                                    }
-                                    else
-                                    {
-                                        <a asp-action="ActivateBook" asp-route-id="@book.AccessionId" class="text-success">Activate</a>
-                                    }
+                                <td>@book.AvailabilityStatus</td>
+                                @if (ViewBag.IsStudentAssistant == false)
+                                {
+                                    <td>
+                                        <button onclick=openEditModal('@book.AccessionId')>Edit</button> |
+                                        @if (book.AvailabilityStatus == "Available")// kailangan natin dagdag sa status ung archived
+                                        {
+                                            <a asp-action="ArchiveBook" asp-route-id="@book.AccessionId" class="text-danger">Archive</a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="ActivateBook" asp-route-id="@book.AccessionId" class="text-success">Activate</a>
+                                        }
 
-                                </td>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <a class="disabled-link">Edit</a> |
+                                        @if (book.AvailabilityStatus == "Available")// kailangan natin dagdag sa status ung archived
+                                        {
+                                            <a class="disabled-link">Archive</a>
+                                        }
+                                        else
+                                        {
+                                            <a class="disabled-link">Activate</a>
+                                        }
+
+                                    </td>
+                                
+                                }
+
                             </tr>
                         }
                     </tbody>
@@ -67,48 +89,248 @@
             </div>
 
             <div class="card-footer">
-                <button class="see-all">See All</button>
+                <!-- 
+                <button class="see-all">See All</button>        #Dont Need Yet
+                -->
             </div>
         </div>
 
     </div>
-    <div class="col-md-6">
-
-        <div class="card p-3 shadow-sm border-0">
-            <div class="card-header">
-                <h3 class="card-title">Current Borrower</h3>
-                <a asp-controller="Book" asp-action="AddBorrower" class="btn-primary">Add Borrower</a>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>Borrow ID</th>
-                            <th>Name</th>
-                            <th>Book Title</th>
-                            <th>Date Borrowed</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var bb in ViewBag.BorrowedBooks)
-                        {
-                            <tr>
-                                <td>@bb.BorrowId</td>
-                                <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
-                                <td>@(bb.Book?.Title ?? "No Title")</td>
-                                <td>@bb.BorrowDate</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="card-footer">
-                <button class="see-all">See All</button>
-            </div>
-        </div>
-
-    </div>
+    
 
 </div>
+
+
+
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Add New Book</h5></div>
+            <div class="modal-body">
+                <label class="small fw-bold">Accession ID</label>
+                <input type="text" id="bookId" class="form-control mb-2" placeholder="Accession ID" />
+
+                <input type="text" id="bookTitle" class="form-control mb-2" placeholder="Book Title" />
+                <input type="text" id="bookAuthor" class="form-control mb-2" placeholder="Book Author" />
+
+                <label class="small fw-bold">Book Availability</label>
+                <select id="bookAvailability" class="form-control mb-2">
+                    <option value="">Select Status</option>
+                    <option value="Available">Available</option>
+                    <option value="Borrowed">Borrowed</option>
+                    <option value="Reserved">Reserved</option>
+                    <option value="Lost">Lost</option>
+                </select>
+
+                <input type="text" id="bookEdition" class="form-control mb-2" placeholder="Book Edition" />
+                <input type="text" id="bookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
+                <input type="text" id="bookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
+
+                <label class="small fw-bold">Book Collection</label>
+                <select id="bookCollection" class="form-control mb-2">
+                    <option value="">Select Collection</option>
+                    <option value="General">General</option>
+                    <option value="Circulation">Circulation</option>
+                    <option value="Reference">Reference</option>
+                </select>
+
+                <input type="text" id="bookLocation" class="form-control mb-2" placeholder="Book Location" />
+                <input type="text" id="bookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
+
+                <label class="small fw-bold">Sourced From</label>
+                <select id="bookSource" class="form-control mb-2">
+                    <option value="">Select Source</option>
+                    <option value="Donation">Donation</option>
+                    <option value="Purchase">Purchase</option>
+                    <option value="Subscription">Subscription</option>
+                </select>
+
+                <input type="number" id="bookPrice" class="form-control mb-2" placeholder="Book Price" />
+                <input type="number" id="bookDiscount" class="form-control mb-2" placeholder="Discount" />
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="AddBook()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Edit Book Details</h5></div>
+            <div class="modal-body">
+                <label class="small fw-bold">Accession ID (Read Only)</label>
+                <input type="text" id="editAccessionId" class="form-control mb-2" readonly />
+
+                <input type="text" id="editBookTitle" class="form-control mb-2" placeholder="Book Title" />
+                <input type="text" id="editBookAuthor" class="form-control mb-2" placeholder="Book Author" />
+
+                <label class="small fw-bold">Book Availability</label>
+                <select id="editAvailability" class="form-control mb-2">
+                    <option value="">Select Status</option>
+                    <option value="Available">Available</option>
+                    <option value="Borrowed">Borrowed</option>
+                    <option value="Reserved">Reserved</option>
+                    <option value="Lost">Lost</option>
+                </select>
+
+                <input type="text" id="editBookEdition" class="form-control mb-2" placeholder="Book Edition" />
+                <input type="text" id="editBookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
+                <input type="text" id="editBookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
+
+                <label class="small fw-bold">Book Collection</label>
+                <select id="editBookCollection" class="form-control mb-2">
+                    <option value="">Select Collection</option>
+                    <option value="General">General</option>
+                    <option value="Circulation">Circulation</option>
+                    <option value="Reference">Reference</option>
+                </select>
+
+                <input type="text" id="editBookLocation" class="form-control mb-2" placeholder="Book Location" />
+                <input type="text" id="editBookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
+
+                <label class="small fw-bold">Sourced From</label>
+                <select id="editBookSource" class="form-control mb-2">
+                    <option value="">Select Source</option>
+                    <option value="Donation">Donation</option>
+                    <option value="Purchase">Purchase</option>
+                    <option value="Subscription">Subscription</option>
+                </select>
+
+                <input type="number" id="editBookPrice" class="form-control mb-2" placeholder="Book Price" />
+                <input type="number" id="editBookDiscount" class="form-control mb-2" placeholder="Discount" />
+                <label class="small fw-bold">Subtotal(Read Only)</label>
+                <input type="number" id="editBookSubtotal" class="form-control mb-2" readonly/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveBook()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        
+        function openAddBookModal() {
+            
+            $('#addModal input').val('');
+            $('#addModal select').val('');
+            new bootstrap.Modal(document.getElementById('addModal')).show();
+        }
+        function AddBook() {
+            // So that we can calculate subtotal
+            const price = parseFloat(document.getElementById('bookPrice').value) || 0;
+            const discount = parseFloat(document.getElementById('bookDiscount').value) || 0;
+
+            const bookData = {
+
+
+                AccessionId: document.getElementById('bookId').value,
+                Title: document.getElementById('bookTitle').value,
+                Author: document.getElementById('bookAuthor').value,
+                AvailabilityStatus: document.getElementById('bookAvailability').value || 'Available',
+                Edition: document.getElementById('bookEdition').value,
+                YearOfPublication: document.getElementById('bookYearPublication').value,
+                Publisher: document.getElementById('bookPublisher').value,
+                Collection: document.getElementById('bookCollection').value,
+                Location: document.getElementById('bookLocation').value,
+                Supplier: document.getElementById('bookSupplier').value,
+                Source: document.getElementById('bookSource').value,
+                Price: price,
+                Discount: discount,
+                Subtotal : price - discount
+            };
+
+            if (!bookData.Title) {
+                Swal.fire("Error", "Please enter a Book Title", "error");
+                return;
+            }
+
+            fetch('/Book/AddBook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire("Saved!", "Book added successfully", "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Error", "Could not save book", "error");
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
+
+        function openEditModal(id) {
+            fetch(`/Book/GetBookDetails?id=${id}`)
+            .then(response => response.json())
+            .then(book => {
+                
+                document.getElementById('editAccessionId').value = book.accessionId; 
+                document.getElementById('editBookTitle').value = book.title;
+                document.getElementById('editBookAuthor').value = book.author;
+                document.getElementById('editAvailability').value = book.availabilityStatus;
+                document.getElementById('editBookEdition').value = book.edition;
+                document.getElementById('editBookYearPublication').value = book.yearOfPublication;
+                document.getElementById('editBookPublisher').value = book.publisher;
+                document.getElementById('editBookCollection').value = book.collection;
+                document.getElementById('editBookLocation').value = book.location;
+                document.getElementById('editBookSupplier').value = book.supplier;
+                document.getElementById('editBookSource').value = book.source;
+                document.getElementById('editBookPrice').value = book.price;
+                document.getElementById('editBookDiscount').value = book.discount;
+                document.getElementById('editBookSubtotal').value = book.subtotal;
+
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            })
+            .catch(err => Swal.fire("Error", "Could not load book data", "error"));
+        }
+
+
+        function saveBook() {
+            const price = parseFloat(document.getElementById('editBookPrice').value) || 0;
+            const discount = parseFloat(document.getElementById('editBookDiscount').value) || 0;
+
+            const bookData = {
+
+                AccessionId: document.getElementById('editAccessionId').value,
+                Title: document.getElementById('editBookTitle').value,
+                Author: document.getElementById('editBookAuthor').value,
+                AvailabilityStatus: document.getElementById('editAvailability').value,
+                Edition: document.getElementById('editBookEdition').value,
+                Publisher: document.getElementById('editBookPublisher').value,
+                Collection: document.getElementById('editBookCollection').value,
+                Location: document.getElementById('editBookLocation').value,
+                Supplier: document.getElementById('editBookSupplier').value,
+                Source: document.getElementById('editBookSource').value,
+                Price: price,
+                Discount: discount,
+                Subtotal: price - discount,
+                YearOfPublication: parseInt(document.getElementById('editBookYearPublication').value)
+            };
+
+            fetch('/Book/UpdateBook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire("Updated!", "Changes saved successfully.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Error", "Update failed.", "error");
+                }
+            })
+            .catch(err => console.error("Update Error:", err));
+        }
+    </script>
+}

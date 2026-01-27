@@ -86,6 +86,15 @@
             color: #6e7a91;
         }
 
+        /*For Disabled <a> tag*/
+        .disabled-link {
+            color: #94a3b8 !important; 
+            pointer-events: none; 
+            cursor: default; 
+            text-decoration: none;
+            opacity: 0.6;
+        }
+
 
         /*For ReportDashboard*/
         #reports-page-container {
@@ -257,6 +266,9 @@
                     <a asp-controller="Book" asp-action="BookManagement">Book Catalog</a>
                 </div>
                 <div class="nav-item">
+                    <a asp-controller="Book" asp-action="BookBorrowers">Manage Borrowers</a>
+                </div>
+                <div class="nav-item">
                     <a asp-controller="Service" asp-action="ManageODDS">Digital Service Requests</a>
                 </div>
                 <div class="nav-item">
@@ -268,7 +280,7 @@
             @if (role == "Student Assistant")
             {
                 <div class="nav-item">
-                    <a asp-controller="Book" asp-action="Index">View Catalog</a>
+                    <a asp-controller="Book" asp-action="BookManagement">View Catalog</a>
                 </div>
                 <div class="nav-item">
                     <a href="#">Help Desk</a>
