@@ -285,7 +285,6 @@
             @* PATRON LINKS *@
             @if (role == "Patron")
             {
-
                 @* Points to BookController *@
                 <div class="nav-item">
                     <a asp-controller="Book" asp-action="Index">📚 Borrow Books</a>
@@ -296,10 +295,27 @@
                     <a asp-controller="Transaction" asp-action="Index">📖 My Borrowings</a>
                 </div>
 
-
                 @* Points to FacilityController (for Seat Reservation) *@
                 <div class="nav-item">
                     <a asp-controller="Facility" asp-action="BookASeat">🪑 Book a Seat</a>
+                </div>
+
+                @* Services Request (Grammarly/Turnitin) *@
+                <div class="nav-item">
+                    <a asp-controller="Request" asp-action="RequestTurnitin">🛡️ Request Turnitin</a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Request" asp-action="RequestGrammarly">✍️ Request Grammarly</a>
+                </div>
+
+                @* ODDS Request (Document Delivery) *@
+                <div class="nav-item">
+                    <a asp-controller="Request" asp-action="Odds">📄 Request Document</a>
+                </div>
+
+                @* Book-A-Librarian (Consultation) *@
+                <div class="nav-item">
+                    <a asp-controller="Facility" asp-action="BookALibrarian">👨‍🏫 Book a Librarian</a>
                 </div>
 
                 @* Points to PatronController (personal records) *@

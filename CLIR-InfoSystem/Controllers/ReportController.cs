@@ -124,9 +124,10 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ODDSReports()
         {
-            var requests = _context.ServiceRequests.Include(r => r.Patron);
+            // Fetches from the 'odds' table using the OddsRequest model
+            var requests = _context.Odds.Include(r => r.Patron).ToList();
 
-            ViewBag.ODDSCount = requests.Count();
+            ViewBag.ODDSCount = requests.Count;
             ViewBag.ODDSCountForCollege = requests.Count(sb => sb.Patron != null && sb.Patron.Department != "SHS");
             ViewBag.ODDSCountForSHS = requests.Count(sb => sb.Patron != null && sb.Patron.Department == "SHS");
 
@@ -135,7 +136,7 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult GrammarlyAndTurnitinReport(string service)
         {
-            var requests = _context.GrammarlyAndTurnitinRequests.Include(r => r.Patron);
+            var requests = _context.Services.Include(r => r.Patron);
 
             ViewBag.CurrentService = string.IsNullOrEmpty(service) ? "Grammarly" : service;
             ViewBag.GATCount = requests.Count(gat => gat.ServiceType == service);

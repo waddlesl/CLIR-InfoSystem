@@ -11,12 +11,12 @@ namespace CLIR_InfoSystem.Data
         public DbSet<Patron> Patrons { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<BookBorrowing> BookBorrowings { get; set; }
-        public DbSet<ServiceRequests> ServiceRequests { get; set; }
+        public DbSet<ServiceRequest> Services { get; set; }
+        public DbSet<OddsRequest> Odds { get; set; }
         public DbSet<SeatBooking> SeatBookings { get; set; }
         public DbSet<LibrarySeat> LibrarySeats { get; set; }
         public DbSet<TimeSlot> TimeSlots { get; set; }
         public DbSet<LibrarianBooking> LibrarianBookings { get; set; }
-        public DbSet<GrammarlyAndTurnitinRequest> GrammarlyAndTurnitinRequests { get; set; }
 
        
        
