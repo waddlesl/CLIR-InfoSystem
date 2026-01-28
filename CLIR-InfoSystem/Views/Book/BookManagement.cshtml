@@ -1,4 +1,5 @@
-﻿<h2>Book Management</h2>
+﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
+<h2>Book Management</h2>
 
 <div class="row g-4 mt-2">
     <div class="col-md-4">
@@ -43,47 +44,92 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var book in Model)
+                        @if (ViewBag.IsStudentAssistant == false)
                         {
-                            <tr>
-                                <td>@book.AccessionId</td>
-                                <td>@book.Title</td>
-                                <td>@book.Author</td>
-                                <td>@book.AvailabilityStatus</td>
-                                @if (ViewBag.IsStudentAssistant == false)
-                                {
+                            @foreach (var book in Model)
+                            {
+                                <tr>
+                                    <td>@book.AccessionId</td>
+                                    <td>@book.Title</td>
+                                    <td>@book.Author</td>
+                                    <td>@book.AvailabilityStatus</td>
+
                                     <td>
-                                        <button onclick=openEditModal('@book.AccessionId')>Edit</button> |
-                                        @if (book.AvailabilityStatus == "Available")// kailangan natin dagdag sa status ung archived
+                                        @if (ViewBag.IsStudentAssistant == false)
                                         {
-                                            <a asp-action="ArchiveBook" asp-route-id="@book.AccessionId" class="text-danger">Archive</a>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('@book.AccessionId')">Edit</button>
+                                            <span> | </span>
+
+                                            @if (book.AvailabilityStatus == "Available" || book.AvailabilityStatus == "Archived")
+                                            {
+                                                var isCurrentlyAvailable = book.AvailabilityStatus == "Available";
+                                                var nextStatus = isCurrentlyAvailable ? "Archived" : "Available";
+                                                var buttonClass = isCurrentlyAvailable ? "text-danger" : "text-success";
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-link p-0 @buttonClass"
+                                                        onclick="confirmToggle('@book.AccessionId', '@nextStatus')">
+                                                    Mark as @nextStatus
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <em class="small text-muted">No status actions</em>
+                                            }
                                         }
                                         else
                                         {
-                                            <a asp-action="ActivateBook" asp-route-id="@book.AccessionId" class="text-success">Activate</a>
+                                            <span class="text-muted" title="Permission Denied">Edit</span>
+                                            <span> | </span>
+                                            <em class="small text-muted">No actions available</em>
                                         }
-
                                     </td>
-                                }
-                                else
-                                {
-                                    <td>
-                                        <a class="disabled-link">Edit</a> |
-                                        @if (book.AvailabilityStatus == "Available")// kailangan natin dagdag sa status ung archived
-                                        {
-                                            <a class="disabled-link">Archive</a>
-                                        }
-                                        else
-                                        {
-                                            <a class="disabled-link">Activate</a>
-                                        }
-
-                                    </td>
-                                
-                                }
-
-                            </tr>
+                                </tr>
+                            }
                         }
+                        else
+                        {
+                            @foreach (var book in Model.Where(b => b.AvailabilityStatus != "Archived"))
+                            {
+                                <tr>
+                                    <td>@book.AccessionId</td>
+                                    <td>@book.Title</td>
+                                    <td>@book.Author</td>
+                                    <td>@book.AvailabilityStatus</td>
+
+                                    <td>
+                                        @if (ViewBag.IsStudentAssistant == false)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('@book.AccessionId')">Edit</button>
+                                            <span> | </span>
+
+                                            @if (book.AvailabilityStatus == "Available" || book.AvailabilityStatus == "Archived")
+                                            {
+                                                var isCurrentlyAvailable = book.AvailabilityStatus == "Available";
+                                                var nextStatus = isCurrentlyAvailable ? "Archived" : "Available";
+                                                var buttonClass = isCurrentlyAvailable ? "text-danger" : "text-success";
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-link p-0 @buttonClass"
+                                                        onclick="confirmToggle('@book.AccessionId', '@nextStatus')">
+                                                    Mark as @nextStatus
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <em class="small text-muted">No status actions</em>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted" title="Permission Denied">Edit</span>
+                                            
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        
                     </tbody>
                 </table>
             </div>
@@ -331,6 +377,22 @@
                 }
             })
             .catch(err => console.error("Update Error:", err));
+        }
+
+                function confirmToggle(id, nextStatus) {
+            Swal.fire({
+                title: 'Change Book Status?',
+                text: `Are you sure you want to mark this book as ${nextStatus}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: nextStatus === 'Available' ? '#198754' : '#dc3545',
+                confirmButtonText: `Yes, make it ${nextStatus}!`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    window.location.href = `/Book/ToggleAvailability?id=${id}&status=${nextStatus}`;
+                }
+            });
         }
     </script>
 }

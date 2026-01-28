@@ -41,7 +41,7 @@ namespace CLIR_InfoSystem.Controllers
             return View(books);
         }
 
-
+        /* MOVED
         public IActionResult BookBorrowers(string searchTerm)
         {
             
@@ -70,7 +70,7 @@ namespace CLIR_InfoSystem.Controllers
             return View(results);
         }
 
-
+        */
 
         [HttpGet]
         public IActionResult AddBook()
@@ -95,6 +95,7 @@ namespace CLIR_InfoSystem.Controllers
             return BadRequest(ModelState);
         }
 
+        /*
         [HttpGet]
         public IActionResult AddBorrower()
         {
@@ -121,7 +122,7 @@ namespace CLIR_InfoSystem.Controllers
             }
             return View(newBorrower);
         }
-
+        */
 
         [HttpGet]
         public IActionResult EditBook(string id)
@@ -231,6 +232,51 @@ namespace CLIR_InfoSystem.Controllers
                 .AsQueryable();
 
             return Ok(query);
+        }
+
+        [HttpGet]
+        public IActionResult ToggleAvailability(string id, string status)
+        {
+            var book = _context.Books.FirstOrDefault(b => b.AccessionId == id);
+            if (book != null)
+            {
+                book.AvailabilityStatus = status;
+                _context.SaveChanges();
+            }
+            return RedirectToAction("BookManagement");
+        }
+        [HttpPost]
+        public IActionResult ReturnBook(int id)
+        {
+            var borrowing = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(b => b.BorrowId == id);
+            if (borrowing != null)
+            {
+                borrowing.Status = "Returned";
+                borrowing.ReturnDate = DateTime.Now;
+
+                // Make the book available again in the Books table
+                if (borrowing.Book != null)
+                {
+                    borrowing.Book.AvailabilityStatus = "Available";
+                }
+
+                _context.SaveChanges();
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+        [HttpPost]
+        public IActionResult ExtendDueDate(int id, DateTime newDate)
+        {
+            var borrowing = _context.BookBorrowings.Find(id);
+            if (borrowing != null)
+            {
+                borrowing.DueDate = newDate;
+                _context.SaveChanges();
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }

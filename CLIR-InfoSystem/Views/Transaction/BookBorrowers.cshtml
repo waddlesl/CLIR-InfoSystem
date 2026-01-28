@@ -15,7 +15,7 @@
     <div class="col-md-4">
         <div class="card p-3 shadow-sm border-0">
             <h6 class="text-muted">Borrow History</h6>
-            <a class="">Button</a>
+            <a asp-controller="Transaction" asp-action="BorrowersHistory" class="">Button</a>
         </div>
     </div>
 </div>
@@ -40,7 +40,8 @@
                 </thead>
                 <tbody>
                     @{
-                        var reservedRequests = Model.Where(bb => bb.Status == "Reserved");
+                        //to get only reserved requests
+                        var reservedRequests = ViewBag.ReservedRequests as IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>;
                     }
 
                     @if (!reservedRequests.Any())

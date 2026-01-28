@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CLIR_InfoSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+275e5f2be3b5983ca025e4c8d3d1f5bd1ed03274")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0a9d26b677f0ce9dea2783123f9f26de4a23fb3")]
 [assembly: System.Reflection.AssemblyProductAttribute("CLIR_InfoSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CLIR_InfoSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
