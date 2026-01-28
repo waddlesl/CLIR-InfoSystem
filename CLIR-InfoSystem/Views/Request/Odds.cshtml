@@ -1,0 +1,79 @@
+﻿@model CLIR_InfoSystem.Models.OddsRequest
+
+<div class="container mt-5">
+    <div style="max-width: 800px; margin: 0 auto;">
+        <h2 class="text-center mb-4 fw-bold">Online Document Delivery Service</h2>
+
+        @* SUCCESS UI: Matches your dashboard feedback style *@
+        @if (ViewBag.AlreadyRequested == true)
+        {
+            <div class="alert alert-success text-center shadow-sm p-4">
+                <h4 class="alert-heading fw-bold">Success!</h4>
+                <p>Your document request has been submitted. Please wait for an email from our staff.</p>
+                <hr>
+                <a href="/Dashboard/PatronDashboard" class="btn btn-success fw-bold px-4">Return to Dashboard</a>
+            </div>
+        }
+        @* ERROR UI: Clean, centered box similar to Grammarly/Turnitin forms *@
+        else if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger text-center shadow-sm p-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p class="mb-0 fw-bold">@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        @* Only show form if request hasn't been successful yet *@
+        @if (ViewBag.AlreadyRequested != true)
+        {
+            <form asp-action="SubmitOdds" method="post" class="shadow p-4 rounded bg-light border">
+                <input type="hidden" asp-for="PatronId" value="@Context.Session.GetString("UserId")" />
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Type of Material</label>
+                        <select class="form-select" asp-for="MaterialType" required>
+                            <option value="E-Book">E-Book</option>
+                            <option value="Journal Article">Journal Article</option>
+                            <option value="Thesis">Thesis</option>
+                            <option value="Conference Paper">Conference Paper</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Type of service</label>
+                        <select class="form-select" asp-for="ServiceType" required>
+                            <option value="Scanning">Scanning</option>
+                            <option value="PDF Delivery">PDF Delivery</option>
+                            <option value="Resource Link">Resource Link</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Book/Material (Optional)</label>
+                    <select class="form-select" asp-for="AccessionId">
+                        <option value="">-- Select Title --</option>
+                        @if (ViewBag.Books != null)
+                        {
+                            foreach (var book in ViewBag.Books)
+                            {
+                                <option value="@book.AccessionId">@book.Title (@book.AccessionId)</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Resource URL</label>
+                    <input type="url" class="form-control" asp-for="ResourceLink" placeholder="https://..." />
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success px-5 py-2 fw-bold">SUBMIT</button>
+                </div>
+            </form>
+        }
+    </div>
+</div>

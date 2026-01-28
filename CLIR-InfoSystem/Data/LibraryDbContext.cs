@@ -16,10 +16,10 @@ namespace CLIR_InfoSystem.Data
         public DbSet<SeatBooking> SeatBookings { get; set; }
         public DbSet<LibrarySeat> LibrarySeats { get; set; }
         public DbSet<TimeSlot> TimeSlots { get; set; }
-        public DbSet<LibrarianBooking> LibrarianBookings { get; set; }
+        public DbSet<BookALibrarian> BookALibrarians { get; set; }
 
-       
-       
+
+
 
     }
 }

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Idneous\\Documents\\GitHub\\CLIR-InfoSystem2\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj": {}
+    "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Idneous\\Documents\\GitHub\\CLIR-InfoSystem2\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj": {
+    "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Idneous\\Documents\\GitHub\\CLIR-InfoSystem2\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj",
+        "projectUniqueName": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj",
         "projectName": "CLIR_InfoSystem",
-        "projectPath": "C:\\Users\\Idneous\\Documents\\GitHub\\CLIR-InfoSystem2\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj",
-        "packagesPath": "C:\\Users\\Idneous\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Idneous\\Documents\\GitHub\\CLIR-InfoSystem2\\CLIR-InfoSystem\\obj\\",
+        "projectPath": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR_InfoSystem.csproj",
+        "packagesPath": "C:\\Users\\Raphael\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Raphael\\source\\repos\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\CLIR-InfoSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "P:\\Program Files (x86)\\Microsoft Visual Studio\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Idneous\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Raphael\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -94,7 +94,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

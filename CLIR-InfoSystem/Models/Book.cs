@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CLIR_InfoSystem.Models
 {
-    [Table("book")] 
+    [Table("book")] // Maps class to the singular 'book' table
     public class Book
     {
         [Key]
-        [Column("accession_id")] 
+        [Column("accession_id")] // Maps property to underscore column
         public string AccessionId { get; set; }
 
         [Column("title")]
@@ -30,18 +30,9 @@ namespace CLIR_InfoSystem.Models
 
         [Column("collection")]
         public string? Collection { get; set; }
-        [Column("library_location")]
-        public string? Location { get; set; }
-
-        [Column("supplier")]
-        public string? Supplier { get; set; }
-        [Column("sourced_from")]
-        public string? Source { get; set; }
 
         [Column("price")]
         public int? Price { get; set; }
-        [Column("discount")]
-        public int? Discount { get; set; }
 
         [Column("subtotal")]
         public int? Subtotal { get; set; }
