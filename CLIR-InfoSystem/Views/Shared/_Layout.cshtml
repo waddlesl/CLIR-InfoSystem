@@ -3,6 +3,7 @@
     // Retrieve the user role from the session
     var role = Context.Session.GetString("UserRole");
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
 }
 
 <!DOCTYPE html>
@@ -84,37 +85,6 @@
             padding: 20px;
             font-size: 0.8rem;
             color: #6e7a91;
-        }
-
-        .acceptbuttons{
-            padding: 2px 4px;
-            text-decoration: none;
-            background-color: #4CAF50; 
-            color: white; 
-            border: none; 
-            border-radius: 5px;
-            font-size: 16px; 
-            text-align: center;
-        }
-
-        .denybuttons {
-            padding: 2px 4px;
-            text-decoration: none;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        /*For Disabled <a> tag*/
-        .disabled-link {
-            color: #94a3b8 !important; 
-            pointer-events: none; 
-            cursor: default; 
-            text-decoration: none;
-            opacity: 0.6;
         }
 
 
@@ -263,7 +233,7 @@
 
     <div class="wrapper">
         <div class="sidebar">
-            <div class="nav-item @(currentAction.Contains("Dashboard") ? "nav-active" : "")"> 
+            <div class="nav-item @(currentAction.Contains("Dashboard") ? "nav-active" : "")">
                 <a asp-controller="Dashboard" asp-action="Index">Home</a>
             </div>
 
@@ -271,15 +241,18 @@
             @if (role == "Admin")
             {
                 <div class="nav-item">
-                    <a asp-controller="Account" asp-action="ManageStaff">Staff Management</a>
+                    <a asp-controller="Account" asp-action="ManageStaff">Manage Staffs</a>
                 </div>
                 <div class="nav-item">
-                    <a asp-controller="Report" asp-action="SystemReport">System Reports</a>
+                    <a asp-controller="#" asp-action="#">Audit Logs</a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="#" asp-action="#">System Reports</a>
                 </div>
             }
 
             @* Librarian / Staff Menu *@
-            @if (role == "Librarian" || role == "Admin")
+            @if (role == "Librarian")
             {
                 <div class="nav-item">
                     <a asp-controller="Patron" asp-action="ManagePatrons">Patron Management</a>
@@ -288,16 +261,13 @@
                     <a asp-controller="Book" asp-action="BookManagement">Book Catalog</a>
                 </div>
                 <div class="nav-item">
-                    <a asp-controller="Transaction" asp-action="BookBorrowers">Manage Borrowers</a>
-                </div>
-                <div class="nav-item">
                     <a asp-controller="Facility" asp-action="ManageBookings">Seat Reservations</a>
                 </div>
                 <div class="nav-item">
                     <a asp-controller="Service" asp-action="ManageODDS">Digital Service Requests</a>
                 </div>
                 <div class="nav-item">
-                    <a asp-controller="Report" asp-action="ReportAndAnalytics">Reports & Analytics</a>
+                    <a asp-controller="Report" asp-action="ReportDashboard">Reports & Analytics</a>
                 </div>
             }
 
@@ -305,7 +275,7 @@
             @if (role == "Student Assistant")
             {
                 <div class="nav-item">
-                    <a asp-controller="Book" asp-action="BookManagement">View Catalog</a>
+                    <a asp-controller="Book" asp-action="Index">View Catalog</a>
                 </div>
                 <div class="nav-item">
                     <a href="#">Help Desk</a>
@@ -315,12 +285,43 @@
             @* PATRON LINKS *@
             @if (role == "Patron")
             {
-                <div class="nav-group-label">Library Services</div>
-                <div class="nav-item"><a href="#">📖 Catalog</a></div>
-                <div class="nav-item"><a href="#">📚 My Loans</a></div>
-                <div class="nav-item"><a href="#">📩 Service Requests</a></div>
-                <div class="nav-item"><a href="#">🪑 Seat Reservation</a></div>
-                <div class="nav-item"><a href="#">👤 My Records</a></div>
+                @* Points to BookController *@
+                <div class="nav-item">
+                    <a asp-controller="Book" asp-action="Index">📚 Borrow Books</a>
+                </div>
+
+                @* Points to TransactionController (for borrowing logic) *@
+                <div class="nav-item">
+                    <a asp-controller="Transaction" asp-action="Index">📖 My Borrowings</a>
+                </div>
+
+                @* Points to FacilityController (for Seat Reservation) *@
+                <div class="nav-item">
+                    <a asp-controller="Facility" asp-action="BookASeat">🪑 Book a Seat</a>
+                </div>
+
+                @* Services Request (Grammarly/Turnitin) *@
+                <div class="nav-item">
+                    <a asp-controller="Request" asp-action="RequestTurnitin">🛡️ Request Turnitin</a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Request" asp-action="RequestGrammarly">✍️ Request Grammarly</a>
+                </div>
+
+                @* ODDS Request (Document Delivery) *@
+                <div class="nav-item">
+                    <a asp-controller="Request" asp-action="Odds">📄 Request Document</a>
+                </div>
+
+                @* Book-A-Librarian (Consultation) *@
+                <div class="nav-item">
+                    <a asp-controller="Facility" asp-action="BookALibrarian">👨‍🏫 Book a Librarian</a>
+                </div>
+
+                @* Points to PatronController (personal records) *@
+                <div class="nav-item">
+                    <a asp-controller="Patron" asp-action="Index">📜 My Activity</a>
+                </div>
             }
 
             <div class="sidebar-footer">

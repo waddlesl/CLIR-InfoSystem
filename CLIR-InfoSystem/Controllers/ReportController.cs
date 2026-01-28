@@ -15,7 +15,7 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
-        public IActionResult ReportAndAnalytics()
+        public IActionResult ReportDashboard()
         {
             // Use .Include to join LibrarySeat and Patron tables
             var bookings = _context.SeatBookings
@@ -32,13 +32,6 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.RBookingTopDepartment = bookings
                 .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.Patron != null)
                 .GroupBy(sb => sb.Patron.Department)
-                .OrderByDescending(g => g.Count())
-                .Select(g => g.Key)
-                .FirstOrDefault() ?? "N/A";
-
-            ViewBag.RBookingPreferedSeat = bookings
-                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building")
-                .GroupBy(sb => sb.LibrarySeat.SeatType)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
@@ -152,13 +145,6 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.GATCount = requests.Count(gat => gat.ServiceType == service);
             ViewBag.GATCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.Department != "SHS" && gat.ServiceType == service);
             ViewBag.GATCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.Department == "SHS" && gat.ServiceType == service);
-
-            ViewBag.GATProgram = requests
-                .Where(sr => sr.Patron != null && sr.ServiceType == service)
-                .GroupBy(sr => sr.Patron.Department)
-                .OrderByDescending(g => g.Count())
-                .Select(g => g.Key)
-                .FirstOrDefault() ?? "N/A";
 
             return View();
         }
