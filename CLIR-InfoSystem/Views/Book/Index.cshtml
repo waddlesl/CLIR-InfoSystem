@@ -1,1 +1,48 @@
-﻿
+﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📚 Library Book Catalog</h2>
+        @if (Context.Session.GetString("UserRole") != "Patron")
+        {
+            <a asp-action="Create" class="btn btn-primary">+ Add New Book</a>
+        }
+    </div>
+
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="searchString" class="form-control" placeholder="Search by title or author..." value="@ViewData["CurrentFilter"]" />
+            <button type="submit" class="btn btn-outline-secondary">Search</button>
+        </div>
+    </form>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">@item.Title</h5>
+                        <p class="card-text"><strong>Author:</strong> @item.Author</p>
+                        <p class="card-text">
+                            <span class="badge @(item.AvailabilityStatus == "Available" ? "bg-success" : "bg-warning")">
+                                @item.AvailabilityStatus
+                            </span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        @if (Context.Session.GetString("UserRole") == "Patron")
+                        {
+                            <button class="btn btn-sm btn-outline-primary w-100">Reserve Book</button>
+                        }
+                        else
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.AccessionId" class="btn btn-sm btn-info text-white">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.AccessionId" class="btn btn-sm btn-secondary">Details</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
