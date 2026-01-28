@@ -1,0 +1,49 @@
+﻿@model CLIR_InfoSystem.Models.BookALibrarian
+
+<div class="container mt-5">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <h2 class="text-center mb-4 fw-bold">Book-A-Librarian</h2>
+
+        @if (ViewBag.Success == true)
+        {
+            <div class="alert alert-success text-center shadow-sm p-4">
+                <h4 class="alert-heading fw-bold">Request Sent!</h4>
+                <p>We have received your consultation request. Please check your email for confirmation.</p>
+                <a href="/Dashboard/PatronDashboard" class="btn btn-success fw-bold px-4">Return to Dashboard</a>
+            </div>
+        }
+        else if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger text-center shadow-sm p-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p class="mb-0 fw-bold">@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        @if (ViewBag.Success != true)
+        {
+            <form asp-action="SubmitBooking" method="post" class="shadow p-4 rounded bg-light border">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Consultation Topic</label>
+                    <input type="text" class="form-control" asp-for="Topic" placeholder="e.g., Thesis Research, Database Search" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Description</label>
+                    <textarea class="form-control" asp-for="Description" rows="3" placeholder="Provide more details about your request..." required></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Preferred Date & Time</label>
+                    <input type="datetime-local" class="form-control" asp-for="SessionDate" required />
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">BOOK SESSION</button>
+                </div>
+            </form>
+        }
+    </div>
+</div>

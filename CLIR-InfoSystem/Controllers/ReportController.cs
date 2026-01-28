@@ -106,9 +106,11 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult BookALibrarianReport()
         {
-            var bookings = _context.LibrarianBookings.Include(b => b.Patron);
+            // 1. Rename 'LibrarianBookings' to 'BookALibrarians'
+            var bookings = _context.BookALibrarians.Include(b => b.Patron).ToList();
 
-            ViewBag.LBookingCount = bookings.Count();
+            // 2. Calculate Stats
+            ViewBag.LBookingCount = bookings.Count;
             ViewBag.LBookingCountForCollege = bookings.Count(sb => sb.Patron != null && sb.Patron.Department != "SHS");
             ViewBag.LBookingCountForSHS = bookings.Count(sb => sb.Patron != null && sb.Patron.Department == "SHS");
 
@@ -119,7 +121,8 @@ namespace CLIR_InfoSystem.Controllers
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
 
-            return View();
+            // 3. Pass the bookings list to the View so the table works
+            return View(bookings);
         }
 
         public IActionResult ODDSReports()

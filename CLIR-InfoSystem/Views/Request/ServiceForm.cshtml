@@ -1,7 +1,9 @@
 ﻿@model CLIR_InfoSystem.Models.ServiceRequest
 
 @{
-    string serviceName = ViewContext.RouteData.Values["id"]?.ToString() ?? "Service";
+    string serviceName = Model?.ServiceType ?? "Service";
+    // Check if the controller flagged this as already requested
+    bool alreadyRequested = ViewBag.AlreadyRequested ?? false;
 }
 
 <style>
@@ -43,27 +45,71 @@
 <div class="request-box">
     <h2 class="text-center mb-5">Request @serviceName Access</h2>
 
-    <form asp-action="SubmitServiceRequest" method="post">
-        <input type="hidden" name="serviceType" value="@serviceName" />
+    @* 1. Show success message if record exists in DB *@
+    <div id="successMessage" class="alert alert-success mt-3 text-center"
+         style="@(alreadyRequested ? "display:block;" : "display:none;")">
+        <h4 class="alert-heading">Success!</h4>
+        <p>Your request for @serviceName has been submitted. Please wait for an email invitation from our staff.</p>
+    </div>
 
-        <div class="form-group">
-            <label>Patron ID</label>
-            <div class="display-field">@Context.Session.GetString("UserId")</div>
-        </div>
+    @* 2. Show form only if no previous request exists *@
+    @if (!alreadyRequested)
+    {
+        <form id="serviceForm">
+            <input type="hidden" name="ServiceType" value="@serviceName" />
+            <input type="hidden" name="PatronId" value="@Context.Session.GetString("UserId")" />
 
-        <div class="form-group">
-            <label>Confirm Email</label>
-            <div class="display-field">@Context.Session.GetString("UserEmail")</div>
-        </div>
+            <div class="form-group">
+                <label>Patron ID</label>
+                <div class="display-field">@Context.Session.GetString("UserId")</div>
+            </div>
 
-        <div class="form-check mt-4 mb-4">
-            <input class="form-check-input" type="checkbox" id="academicCheck" required>
-            <label class="form-check-label" for="academicCheck">
-                I understand access is for academic use only.
-            </label>
-        </div>
+            <div class="form-group">
+                <label>Confirm Email</label>
+                <div class="display-field">@Context.Session.GetString("UserEmail")</div>
+            </div>
 
-        <button type="submit" class="btn btn-submit">SUBMIT</button>
-        <div class="clearfix"></div>
-    </form>
+            <div class="form-check mt-4 mb-4">
+                <input class="form-check-input" type="checkbox" id="academicCheck" required>
+                <label class="form-check-label" for="academicCheck">
+                    I understand access is for academic use only.
+                </label>
+            </div>
+
+            <button type="button" onclick="submitService()" class="btn btn-submit">SUBMIT</button>
+            <div class="clearfix"></div>
+        </form>
+    }
 </div>
+
+<script>
+    function submitService() {
+        const checkbox = document.getElementById('academicCheck');
+        const form = document.getElementById('serviceForm');
+        const successBox = document.getElementById('successMessage');
+
+        if (!checkbox.checked) {
+            alert("Please check the academic use box before submitting.");
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        fetch('/Request/SubmitServiceRequest', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                form.style.display = 'none';
+                successBox.style.display = 'block';
+            } else {
+                alert("Error submitting request. You may already have a pending request.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Network error.");
+        });
+    }
+</script>

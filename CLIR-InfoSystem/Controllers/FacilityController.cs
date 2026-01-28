@@ -18,14 +18,26 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult BookASeat()
         {
-            var currentTime = DateTime.Now.TimeOfDay;
+            string? patronId = HttpContext.Session.GetString("UserId");
 
-            // Initial load: Only show slots that haven't passed yet for today
+            // Check if the patron already has an active reservation
+            var existingBooking = _context.SeatBookings.FirstOrDefault(b =>
+                b.PatronId == patronId && b.Status == "Reserved");
+
+            if (existingBooking != null)
+            {
+                ViewBag.AlreadyBooked = true;
+                return View();
+            }
+
+            // Existing logic for available slots
+            var currentTime = DateTime.Now.TimeOfDay;
             var availableSlots = _context.TimeSlots
                 .Where(s => s.StartTime >= currentTime)
                 .ToList();
 
             ViewBag.TimeSlots = availableSlots;
+            ViewBag.AlreadyBooked = false;
             return View();
         }
 
@@ -125,6 +137,39 @@ namespace CLIR_InfoSystem.Controllers
                 TempData["Info"] = "Booking has been cancelled.";
             }
             return RedirectToAction("ManageBookings");
+        }
+
+        [HttpPost]
+        public IActionResult SubmitBooking(BookALibrarian model)
+        {
+            ModelState.Clear();
+
+            model.SessionId = 0;
+            model.PatronId = HttpContext.Session.GetString("UserId");
+            model.SchoolYear = DateTime.Now.Year;
+
+            if (string.IsNullOrEmpty(model.PatronId)) return RedirectToAction("Login", "Account");
+
+            try
+            {
+                // Change this line to plural:
+                _context.BookALibrarians.Add(model);
+                _context.SaveChanges();
+                return RedirectToAction("BookALibrarian", new { success = true });
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Booking failed: " + ex.InnerException?.Message);
+                return View("BookALibrarian", model);
+            }
+        }
+        public IActionResult BookALibrarian(bool success = false)
+        {
+            if (success)
+            {
+                ViewBag.Success = true;
+            }
+            return View();
         }
     }
 }

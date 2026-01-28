@@ -1,6 +1,171 @@
-﻿@{
-    ViewData["Title"] = "Page Name"; // e.g., "Search Library"
-}
+﻿<style>
+    /* 1. Custom Tab Container */
+    .gray-tab-container {
+        display: flex;
+        gap: 8px;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 0;
+        border-bottom: 2px solid #dee2e6;
+    }
 
-<h1>@ViewData["Title"]</h1>
-<p>This feature is currently under development.</p>
+    /* 2. Custom Tab Button (Neutral Gray) */
+    .gray-tab-btn {
+        padding: 12px 24px;
+        cursor: pointer;
+        background: #f8f9fa !important;
+        color: #6c757d !important;
+        border: 1px solid #dee2e6 !important;
+        border-bottom: none !important;
+        border-radius: 8px 8px 0 0;
+        text-decoration: none !important;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        outline: none !important;
+    }
+
+        /* 3. Hover State (Light Gray - No Blue) */
+        .gray-tab-btn:hover {
+            background: #e9ecef !important;
+            color: #333 !important;
+        }
+
+        /* 4. Active State (Dark Gray - No Red Bar) */
+        .gray-tab-btn.active-gray {
+            background: #6c757d !important;
+            color: white !important;
+            border-color: #6c757d !important;
+            position: relative;
+        }
+
+    /* 5. Custom Status Capsules (Colors Restored) */
+    .capsule-success {
+        background-color: #28a745 !important;
+        color: white !important;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .capsule-primary {
+        background-color: #007bff !important;
+        color: white !important;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .capsule-info {
+        background-color: #17a2b8 !important;
+        color: white !important;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .capsule-secondary {
+        background-color: #6c757d !important;
+        color: white !important;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    /* 6. Content Area Styling */
+    .custom-tab-content {
+        background: white;
+        padding: 25px;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">📜 My Activity History</h2>
+
+    <div class="gray-tab-container" id="activityTab">
+        <button class="gray-tab-btn active-gray" onclick="showTab(event, 'seats')">🪑 Seats</button>
+        <button class="gray-tab-btn" onclick="showTab(event, 'odds')">📄 ODDS</button>
+        <button class="gray-tab-btn" onclick="showTab(event, 'consult')">👨‍🏫 Consultations</button>
+    </div>
+
+    <div class="custom-tab-content">
+        <div id="seats" class="tab-pane-custom">
+            <table class="table table-hover mt-2">
+                <thead class="table-light"><tr><th>Date</th><th>Slot</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var item in ViewBag.SeatHistory)
+                    {
+                        <tr>
+                            <td>@item.BookingDate.ToShortDateString()</td>
+                            <td>@item.TimeSlot?.DisplayText</td>
+                            <td>
+                                @* Conditional colors for seat status *@
+                                <span class="capsule-@(item.Status == "Completed" ? "success" : "primary")">
+                                    @item.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div id="odds" class="tab-pane-custom" style="display:none">
+            <table class="table table-hover mt-2">
+                <thead class="table-light"><tr><th>Material</th><th>Request Date</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var item in ViewBag.OddsHistory)
+                    {
+                        <tr>
+                            <td>@item.MaterialType</td>
+                            <td>@item.RequestDate.ToShortDateString()</td>
+                            <td><span class="capsule-info">@item.RequestStatus</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div id="consult" class="tab-pane-custom" style="display:none">
+            <table class="table table-hover mt-2">
+                <thead class="table-light"><tr><th>Topic</th><th>Session Date</th></tr></thead>
+                <tbody>
+                    @foreach (var item in ViewBag.ConsultationHistory)
+                    {
+                        <tr>
+                            <td>@item.Topic</td>
+                            <td>@item.SessionDate.ToString("MMM dd, yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(evt, tabName) {
+        var i, tabContent, tabBtns;
+        tabContent = document.getElementsByClassName("tab-pane-custom");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+        }
+        tabBtns = document.getElementsByClassName("gray-tab-btn");
+        for (i = 0; i < tabBtns.length; i++) {
+            tabBtns[i].className = tabBtns[i].className.replace(" active-gray", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active-gray";
+    }
+</script>

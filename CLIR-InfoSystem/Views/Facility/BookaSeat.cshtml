@@ -1,44 +1,80 @@
 ﻿@model CLIR_InfoSystem.Models.SeatBooking
 
-<h2>Book a Library Seat</h2>
-<div asp-validation-summary="All" class="text-danger"></div>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
+@{
+    // Retrieve the check from the FacilityController
+    bool alreadyBooked = ViewBag.AlreadyBooked ?? false;
 }
 
-<form asp-action="ConfirmBooking" method="post">
-    <div class="form-group mb-3">
-        <label>Booking Date</label>
-        <input type="date" id="BookingDate" asp-for="BookingDate" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    </div>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Book a Library Seat</h2>
 
-    <div class="form-group mb-3">
-        <label>Building</label>
-        <select id="Building" class="form-control" required disabled>
-            <option value="">-- Select Building --</option>
-            <option value="Rizal Building">Rizal Building</option>
-            <option value="Einstein Building">Einstein Building</option>
-        </select>
-    </div>
+    @* 1. Check for existing active reservation *@
+    @if (alreadyBooked)
+    {
+        @* Boxed and centered wrapper *@
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div class="alert alert-warning text-center shadow-sm p-4">
+                <h4 class="alert-heading fw-bold">Reservation Active</h4>
+                <p>You already have a seat reserved. Please complete your current visit or cancel it before booking a new one.</p>
+                <hr>
+                <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold px-4">Return to Dashboard</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* Boxed form layout *@
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div asp-validation-summary="All" class="text-danger"></div>
 
-    <div class="form-group mb-3">
-        <label>Time Slot</label>
-        <select id="SlotId" asp-for="SlotId" class="form-control" required disabled>
-            <option value="">-- Select Date first --</option>
-        </select>
-    </div>
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
 
-    <div class="form-group mb-3">
-        <label>Available Seats</label>
-        <select id="SeatId" asp-for="SeatId" class="form-control" required disabled>
-            <option value="">-- Select Building and Slot first --</option>
-        </select>
-    </div>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="ConfirmBooking" method="post">
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">Booking Date</label>
+                            <input type="date" id="BookingDate" asp-for="BookingDate" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Confirm Reservation</button>
-</form>
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">Building</label>
+                            <select id="Building" class="form-control" required disabled>
+                                <option value="">-- Select Building --</option>
+                                <option value="Rizal Building">Rizal Building</option>
+                                <option value="Einstein Building">Einstein Building</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">Time Slot</label>
+                            <select id="SlotId" asp-for="SlotId" class="form-control" required disabled>
+                                <option value="">-- Select Date first --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">Available Seats</label>
+                            <select id="SeatId" asp-for="SeatId" class="form-control" required disabled>
+                                <option value="">-- Select Building and Slot first --</option>
+                            </select>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary px-4 mt-3">Confirm Reservation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -49,11 +85,9 @@
             if(selectedDate) {
                 $('#Building').prop('disabled', false);
 
-                // Fetch dynamic slots (Filtering past times for 'Today')
                 $.getJSON('/Facility/GetAvailableSlots', { selectedDate: selectedDate }, function(data) {
                     var items = '<option value="">-- Select Slot --</option>';
                     $.each(data, function(i, slot) {
-                        // Match these property names exactly to your C# TimeSlot model
                         items += "<option value='" + slot.slotId + "'>" + slot.displayText + "</option>";
                     });
                     $('#SlotId').html(items).prop('disabled', false);
@@ -61,7 +95,7 @@
             }
         });
 
-        // 2. When Building changes, reset Slot and Seat selection
+        // 2. When Building changes, reset Seat selection
         $('#Building').change(function() {
             if($(this).val()) {
                 $('#SeatId').val('').prop('disabled', true);
