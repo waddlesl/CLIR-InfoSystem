@@ -58,6 +58,45 @@ namespace CLIR_InfoSystem.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+        public IActionResult BookBorrowers(string searchTerm)
+        {
+
+
+            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count();
+            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
+
+            var role = HttpContext.Session.GetString("UserRole");
+            ViewBag.IsStudentAssistant = role == "Student Assistant";
+
+
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            ViewBag.ReservedRequests = query.Where(bb => bb.Status == "Reserved").ToList();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(p => p.Patron.FirstName.Contains(searchTerm) ||
+                                         p.Patron.LastName.Contains(searchTerm) ||
+                                         p.BorrowId.ToString() == searchTerm);
+            }
+
+
+            var results = query.ToList();
+            return View(results);
+        }
+        
+        public IActionResult BorrowersHistory()
+        {
+            var history = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .ToList();
+
+            return View(history);
+        }
     }
 
 
