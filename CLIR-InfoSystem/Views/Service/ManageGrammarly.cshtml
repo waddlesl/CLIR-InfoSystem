@@ -1,0 +1,175 @@
+﻿
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <h2>Document Delivery Service</h2>
+
+        <div class="d-flex align-items-center">
+            <form method="get" asp-action="ManageODDS" class="d-flex me-2">
+                <input type="text" name="searchTerm" placeholder="Search by ID or Username..." class="form-control" style="width: 250px;" />
+                <button type="submit" class="btn btn-secondary ms-1">Search</button>
+            </form>
+            
+                <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddModal()">
+                <b class="me-1" style="font-size: 1.2rem;">+</b> Add Request
+            </button>
+            
+            
+        </div>
+    </div>
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Patron ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Email</th>
+                <th>Date Access Provided</th>
+                <th>Provided By</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ServiceRequest in Model)
+            {
+                <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
+                    <td>@ServiceRequest.PatronId</td>
+                    <td>@(ServiceRequest.Patron.FirstName + " " + ServiceRequest.Patron.LastName)</td>
+                    <td>@ServiceRequest.Patron.Department</td>
+                    <td>@ServiceRequest.Patron.Email</td>
+                    <td>@ServiceRequest.DateAccessProvided</td>
+                    <td>@ServiceRequest.StaffInCharge</td>
+                    <td>
+                        <span class="badge @(ServiceRequest.RequestStatus == "Active" ? "bg-success" : "bg-secondary")">
+                            @ServiceRequest.RequestStatus
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="addFirst" class="form-control mb-2" placeholder="First Name" />
+                <input type="text" id="addLast" class="form-control mb-2" placeholder="Last Name" />
+                <input type="text" id="addUser" class="form-control mb-2" placeholder="Username" />
+                <input type="password" id="addPass" class="form-control mb-2" placeholder="Password" />
+                <select id="addRole" class="form-select">
+                    <option value="Librarian">Librarian</option>
+                    <option value="Student Assistant">Student Assistant</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="createStaff()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId" />
+                <input type="text" id="editFirst" class="form-control mb-2" placeholder="First Name" />
+                <input type="text" id="editLast" class="form-control mb-2" placeholder="Last Name" />
+                <input type="text" id="editUser" class="form-control mb-2" placeholder="Username" />
+                <select id="editRole" class="form-select">
+                    <option value="Librarian">Librarian</option>
+                    <option value="Student Assistant">Student Assistant</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveStaff()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const SwalStatic = Swal.mixin({
+            showClass: { popup: '', backdrop: '', icon: '' },
+            hideClass: { popup: '', backdrop: '', icon: '' }
+        });
+
+        // Add Modal Functions
+        function openAddModal() {
+            $('#addFirst, #addLast, #addUser, #addPass').val('');
+            new bootstrap.Modal(document.getElementById('addModal')).show();
+        }
+
+        function createODDS() {
+            var staff = {
+                FirstName: $('#addFirst').val(),
+                LastName: $('#addLast').val(),
+                Username: $('#addUser').val(),
+                Password: $('#addPass').val(),
+                TypeOfUser: $('#addRole').val(),
+                Status: 'Active'
+            };
+            $.ajax({
+                url: '/Account/AddStaff',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(staff),
+                success: function(res) { if(res.success) location.reload(); }
+            });
+        }
+
+        // Edit Modal Functions
+                function openEditModal(id) {
+            $.get('/Account/GetStaffDetails/' + id, function(data) {
+                // Try camelCase if PascalCase fails (staffId vs StaffId)
+                $('#editId').val(data.staffId || data.StaffId);
+                $('#editFirst').val(data.firstName || data.FirstName);
+                $('#editLast').val(data.lastName || data.LastName);
+                $('#editUser').val(data.username || data.Username);
+                $('#editRole').val(data.typeOfUser || data.TypeOfUser);
+
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            });
+        }
+
+        function saveStaff() {
+            var staff = {
+                StaffId: parseInt($('#editId').val()),
+                FirstName: $('#editFirst').val(),
+                LastName: $('#editLast').val(),
+                Username: $('#editUser').val(),
+                TypeOfUser: $('#editRole').val()
+            };
+            $.ajax({
+                url: '/Account/UpdateStaff',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(staff),
+                success: function(res) { if(res.success) location.reload(); }
+            });
+        }
+
+        function confirmToggle(id, action) {
+            SwalStatic.fire({
+                title: 'Confirm',
+                text: `Sure you want to ${action}?`,
+                icon: 'question',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) window.location.href = '/Account/ToggleStatus/' + id;
+            });
+        }
+    </script>
+}

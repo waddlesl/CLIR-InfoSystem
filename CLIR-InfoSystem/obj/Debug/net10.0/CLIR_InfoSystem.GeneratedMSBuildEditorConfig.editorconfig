@@ -130,8 +130,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVxdWVzdFxTZXJ2aWNlRm9ybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Service/ManageGrammarly.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZVxNYW5hZ2VHcmFtbWFybHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Service/ManageODDS.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZVxNYW5hZ2VPRERTLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Service/ManageTurnitin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZVxNYW5hZ2VUdXJuaXRpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Idneous/Documents/GitHub/CLIR-InfoSystem2/CLIR-InfoSystem/Views/Shared/Error.cshtml]
