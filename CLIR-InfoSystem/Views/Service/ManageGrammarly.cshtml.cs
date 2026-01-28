@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CLIR_InfoSystem.Views.Account
 {
-    public class ManageODDSModel : PageModel
+    public class ManageGrammarlyModel : PageModel
     {
         public void OnGet()
         {

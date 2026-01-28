@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CLIR_InfoSystem.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Http;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -25,7 +25,7 @@ namespace CLIR_InfoSystem.Controllers
                 "Admin" => RedirectToAction("AdminDashboard"),
                 "Staff" => RedirectToAction("LibrarianDashboard"),
                 "Student Assistant" => RedirectToAction("StudentAssistantDashboard"),
-                "Patron" => RedirectToAction("PatronDashboard"), 
+                "Patron" => RedirectToAction("PatronDashboard"),
                 _ => RedirectToAction("Login", "Account")
             };
         }
@@ -34,25 +34,16 @@ namespace CLIR_InfoSystem.Controllers
         {
             var sessionUserId = HttpContext.Session.GetString("UserId");
 
-            if (!string.IsNullOrEmpty(sessionUserId))
+            if (int.TryParse(sessionUserId, out int patronId))
             {
-                // 1. Get the name from the session (set during login)
-                ViewBag.FirstName = HttpContext.Session.GetString("UserName");
 
-                // 2. Fetch the statistics using the sessionUserId
+                var userId = HttpContext.Session.GetString("UserId");
                 ViewBag.MyLoans = _context.BookBorrowings
-                    .Count(b => b.PatronId == sessionUserId && b.Status != "Returned");
-
-                ViewBag.ActiveSeats = _context.SeatBookings
-                    .Count(b => b.PatronId == sessionUserId && b.Status == "Reserved");
-
-                ViewBag.PendingODDS = _context.Odds
-                    .Count(o => o.PatronId == sessionUserId && o.RequestStatus == "Pending");
+                    .Count(b => b.PatronId == userId && b.Status != "Returned");
             }
             else
             {
-                // Fallback if session is lost
-                return RedirectToAction("Login", "Account");
+                ViewBag.MyLoans = 0;
             }
 
             return View();

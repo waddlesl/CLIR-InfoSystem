@@ -1,7 +1,6 @@
 ﻿using CLIR_InfoSystem.Data;
 using CLIR_InfoSystem.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 public class PatronController : Controller
@@ -11,23 +10,6 @@ public class PatronController : Controller
 
     public IActionResult Index()
     {
-        var userId = HttpContext.Session.GetString("UserId");
-        if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
-
-        // Fetch all related activities
-        ViewBag.SeatHistory = _context.SeatBookings
-            .Include(s => s.TimeSlot)
-            .Where(s => s.PatronId == userId)
-            .OrderByDescending(s => s.BookingDate).ToList();
-
-        ViewBag.OddsHistory = _context.Odds
-            .Where(o => o.PatronId == userId)
-            .OrderByDescending(o => o.RequestDate).ToList();
-
-        ViewBag.ConsultationHistory = _context.BookALibrarians
-            .Where(c => c.PatronId == userId)
-            .OrderByDescending(c => c.SessionDate).ToList();
-
         return View();
     }
 
@@ -95,22 +77,6 @@ public class PatronController : Controller
         {
             return Json(new { success = false, message = ex.InnerException?.Message ?? ex.Message });
         }
-    }
-
-    public IActionResult PatronDashboard()
-    {
-        // 1. Get the ID
-        var userIdString = HttpContext.Session.GetString("UserId");
-
-        // 2. FETCH the patron from DB 
-        // Make sure your Patron ID in the DB is also a string/GUID if that's what's in the session
-        var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == userIdString);
-
-        // 3. SET the name (Fallback to "Patron" if null)
-        ViewBag.PatronName = patron?.FirstName ?? "Dear Patron";
-
-        // 4. Fill your other counts...
-        return View();
     }
 
     // HELPER: Matches your SQL CHECK CONSTRAINT exactly
