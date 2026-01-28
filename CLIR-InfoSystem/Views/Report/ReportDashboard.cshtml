@@ -1,20 +1,20 @@
 ﻿<div id="reports-page-container">
     <div class="report-tabs">
-        <a asp-controller="Report" asp-action="ReportDashboard" class="tab">Book A Seat (Rizal)</a>
+        <a asp-controller="Report" asp-action="ReportDashboard" class="tab active">Book A Seat (Rizal)</a>
         <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
         <a asp-controller="Report" asp-action="BookBorrowingReport" class="tab">Book Borrowing</a>
         <a asp-controller="Report" asp-action="BookALibrarianReport" class="tab">Book a Librarian</a>
-        <a asp-controller="Report" asp-action="ODDSReports" class="tab active">ODDS</a>
+        <a asp-controller="Report" asp-action="ODDSReports" class="tab">ODDS</a>
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="tab @(ViewBag.CurrentService == "Grammarly" ? "active" : "")">Grammarly</a>
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
     </div>
 
-    <h2 class="section-subtitle">Online Document Delivery Service</h2>
+    <h2 class="section-subtitle">Book A Seat (Rizal)</h2>
 
     <div class="stats-row-top">
         <div class="report-card dark-card">
             <p class="card-label">Total Reservations</p>
-            <h1 class="card-value">@ViewBag.ODDSCount</h1>
+            <h1 class="card-value">@ViewBag.RBookingCount</h1>
         </div>
 
         <div class="report-card graph-placeholder">
@@ -36,35 +36,29 @@
         <div class="col-md-6">
             <div class="report-card mini-card">
                 <p class="card-label">College</p>
-                <h2 class="card-value">@ViewBag.ODDSCountForCollege</h2>
+                <h2 class="card-value">@ViewBag.RBookingCountForCollege</h2>
             </div>
         </div>
         <div class="col-md-6">
             <div class="report-card mini-card">
                 <p class="card-label">SHS</p>
-                <h2 class="card-value">@ViewBag.ODDSCountForSHS</h2>
+                <h2 class="card-value">@ViewBag.RBookingCountForSHS</h2>
             </div>
         </div>
     </div>
-        <div class="report-card mini-card">
-            <p class="card-label">Top 5 Programs</p>
-
-            @if (ViewBag.ODDSProgram == null || !Enumerable.Any(ViewBag.ODDSProgram))
-            {
-                <h2 class="card-value">N/A</h2>
-            }
-            else
-            {
-                <ul style="list-style: none; padding: 0;">
-                    @foreach (var book in ViewBag.ODDSProgram)
-                    {
-                    <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                            <strong>@book.Program</strong>
-                            <strong>@book.Count</strong>
-                        </li>
-                    }
-                </ul>
-            }
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="report-card mini-card">
+                <p class="card-label">Most Dept. Utilized</p>
+                <h2 class="card-value">@ViewBag.RBookingTopDepartment</h2>
+            </div>
         </div>
-    
+        <div class="col-md-6">
+            <div class="report-card mini-card">
+                <p class="card-label">Most Utilized Seat</p>
+                <h2 class="card-value">@ViewBag.RBookingPreferedSeat</h2>
+            </div>
+        </div>
+    </div>
+
 </div>

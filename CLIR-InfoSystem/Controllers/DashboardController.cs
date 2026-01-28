@@ -34,16 +34,25 @@ namespace CLIR_InfoSystem.Controllers
         {
             var sessionUserId = HttpContext.Session.GetString("UserId");
 
-            if (int.TryParse(sessionUserId, out int patronId))
+            if (!string.IsNullOrEmpty(sessionUserId))
             {
-               
-                var userId = HttpContext.Session.GetString("UserId"); 
+                // 1. Get the name from the session (set during login)
+                ViewBag.FirstName = HttpContext.Session.GetString("UserName");
+
+                // 2. Fetch the statistics using the sessionUserId
                 ViewBag.MyLoans = _context.BookBorrowings
-                    .Count(b => b.PatronId == userId && b.Status != "Returned");
+                    .Count(b => b.PatronId == sessionUserId && b.Status != "Returned");
+
+                ViewBag.ActiveSeats = _context.SeatBookings
+                    .Count(b => b.PatronId == sessionUserId && b.Status == "Reserved");
+
+                ViewBag.PendingODDS = _context.Odds
+                    .Count(o => o.PatronId == sessionUserId && o.RequestStatus == "Pending");
             }
             else
             {
-                ViewBag.MyLoans = 0;
+                // Fallback if session is lost
+                return RedirectToAction("Login", "Account");
             }
 
             return View();

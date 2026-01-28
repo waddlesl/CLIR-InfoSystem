@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CLIR_InfoSystem.Models
 {
     [Table("odds")]
-    public class OddsRequest
+    public class OddsRequest 
     {
         [Key]
         [Column("request_id")]
@@ -25,24 +25,16 @@ namespace CLIR_InfoSystem.Models
         [Column("accession_id")]
         public string? AccessionId { get; set; }
 
+        [Column("link")]
+        public string? ResourceLink { get; set; }
+
         [Column("date_needed")]
         public DateTime? DateNeeded { get; set; }
 
         [Column("request_status")]
         public string? RequestStatus { get; set; } = "Pending";
 
-        [Column("staff_in_charge")]
-        public string? StaffInCharge { get; set; }
-
-        [Column("due_date_of_viewing")]
-        public DateTime? DueDateofViewing { get; set; }
-
-        [Column("date_of_access_provided")]
-        public DateTime? DateAccessProvided { get; set; }
-
-        [Column("link")]
-        public string? ResourceLink { get; set; }
-
+        // Navigation properties must be nullable to pass validation
         [ForeignKey("PatronId")]
         public virtual Patron? Patron { get; set; }
 
