@@ -70,6 +70,10 @@
               "target": "Package",
               "version": "[9.0.12, )"
             },
+            "Microsoft.Playwright": {
+              "target": "Package",
+              "version": "[1.57.0, )"
+            },
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
               "version": "[9.0.0, )"

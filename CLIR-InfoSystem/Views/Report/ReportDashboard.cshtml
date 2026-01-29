@@ -7,6 +7,7 @@
         <a asp-controller="Report" asp-action="ODDSReports" class="tab">ODDS</a>
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="tab @(ViewBag.CurrentService == "Grammarly" ? "active" : "")">Grammarly</a>
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
+        <a asp-controller="Report" asp-action="DownloadReport" class="tab">Download PDF</a>
     </div>
 
     <h2 class="section-subtitle">Book A Seat (Rizal)</h2>
