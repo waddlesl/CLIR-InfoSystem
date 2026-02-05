@@ -17,7 +17,7 @@ namespace CLIR_InfoSystem.Models
         [Column("staff_id")]
         public int? StaffId { get; set; }
 
-        [Column("request_date")]
+        [Column("request_date", TypeName = "date")] // Matches MySQL DATE
         public DateTime RequestDate { get; set; }
 
         [Column("service_type")]
@@ -28,9 +28,10 @@ namespace CLIR_InfoSystem.Models
 
         // Navigation
         [ForeignKey("PatronId")]
-        public Patron Patron { get; set; }
+        // Add the '?' to these to stop the "Submission Failed" validation error
+        public virtual Patron? Patron { get; set; }
 
         [ForeignKey("StaffId")]
-        public Staff Staff { get; set; }
+        public virtual Staff? Staff { get; set; }
     }
 }

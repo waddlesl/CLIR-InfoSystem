@@ -165,5 +165,50 @@ namespace CLIR_InfoSystem.Controllers
             }
             return RedirectToAction("BookManagement");
         }
+
+
+
+        // 1. Loads the page with available books
+        public IActionResult PatronBorrow()
+        {
+            var availableBooks = _context.Books
+                .Where(b => b.AvailabilityStatus == "Available")
+                .ToList();
+            return View(availableBooks);
+        }
+
+        // 2. Handles the actual borrow request
+        [HttpPost]
+        public IActionResult ProcessBorrow(string patronId, string accessionId)
+        {
+            var book = _context.Books.Find(accessionId);
+            var patronExists = _context.Patrons.Any(p => p.PatronId == patronId);
+
+            // Validation
+            if (book == null || book.AvailabilityStatus != "Available")
+                return Json(new { success = false, message = "Book is no longer available." });
+
+            if (!patronExists)
+                return Json(new { success = false, message = "Invalid Patron ID." });
+
+            // Create Transaction with "Reserved" status
+            var borrowRequest = new BookBorrowing
+            {
+                PatronId = patronId,
+                AccessionId = accessionId,
+                BorrowDate = DateTime.Now,
+                DueDate = DateTime.Now.AddDays(7),
+                Status = "Reserved",               // Matches your SQL ENUM
+                StaffId = null                     // Pending approval
+            };
+
+            // Update Book status so it's hidden from the "Available" list
+            book.AvailabilityStatus = "Reserved";
+
+            _context.BookBorrowings.Add(borrowRequest);
+            _context.SaveChanges();
+
+            return Json(new { success = true, message = "Request submitted! Please proceed to the counter." });
+        }
     }
 }

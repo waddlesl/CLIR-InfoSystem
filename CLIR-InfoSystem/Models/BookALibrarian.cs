@@ -13,11 +13,12 @@ namespace CLIR_InfoSystem.Models
 
         [Column("patron_id")]
         public string PatronId { get; set; }
-        public Patron Patron { get; set; }
+        public virtual Patron Patron { get; set; }
 
         [Column("staff_id")]
-        public int StaffId { get; set; }
-        public Staff Staff { get; set; }
+        // FIX: Added '?' to make it nullable so Pending requests can have no staff assigned yet
+        public int? StaffId { get; set; }
+        public virtual Staff Staff { get; set; }
 
         [Column("school_year")]
         public string SchoolYear { get; set; }
@@ -32,6 +33,6 @@ namespace CLIR_InfoSystem.Models
         public string Description { get; set; }
 
         [Column("status")]
-        public string Status { get; set; }
+        public string Status { get; set; } = "Pending";
     }
 }
