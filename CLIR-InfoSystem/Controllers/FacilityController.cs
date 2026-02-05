@@ -1,7 +1,10 @@
 ﻿using CLIR_InfoSystem.Data;
 using CLIR_InfoSystem.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -68,9 +71,9 @@ namespace CLIR_InfoSystem.Controllers
             booking.PatronId = loggedInId;
             booking.Status = "Reserved";
 
-            // 🚩 FORCE REMOVE these from validation or IsValid will stay FALSE
+            // Remove navigation properties and auto-set fields from validation
             ModelState.Remove("Patron");
-            ModelState.Remove("LibrarySeat"); // Add this
+            ModelState.Remove("LibrarySeat");
             ModelState.Remove("TimeSlot");
             ModelState.Remove("PatronId");
             ModelState.Remove("Status");
@@ -83,7 +86,6 @@ namespace CLIR_InfoSystem.Controllers
                 return RedirectToAction("BookASeat");
             }
 
-            // If it fails, reload the data for the dropdowns
             ViewBag.TimeSlots = _context.TimeSlots.ToList();
             return View("BookASeat", booking);
         }
@@ -92,14 +94,15 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageBookings()
         {
+            // Now including Patron and LibrarySeat so the Librarian can see names and seat details
             var activeBookings = _context.SeatBookings
                 .Include(b => b.TimeSlot)
-                //.Include(b => b.Patron) // Add this line
-                //.Where(b => b.Status == "Reserved")
+                .Include(b => b.Patron)
+                .Include(b => b.LibrarySeat)
+                .OrderByDescending(b => b.BookingDate)
                 .ToList();
 
             return View(activeBookings);
-
         }
 
         [HttpPost]

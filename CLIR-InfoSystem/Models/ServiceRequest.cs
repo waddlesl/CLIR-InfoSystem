@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CLIR_InfoSystem.Models
 {
     [Table("services")]
-    public class ServiceRequest 
+    public class ServiceRequest
     {
         [Key]
         [Column("service_id")]
@@ -12,6 +13,9 @@ namespace CLIR_InfoSystem.Models
 
         [Column("patron_id")]
         public string PatronId { get; set; }
+
+        [Column("staff_id")]
+        public int? StaffId { get; set; }
 
         [Column("request_date")]
         public DateTime RequestDate { get; set; }
@@ -22,7 +26,11 @@ namespace CLIR_InfoSystem.Models
         [Column("request_status")]
         public string RequestStatus { get; set; } = "Pending";
 
+        // Navigation
         [ForeignKey("PatronId")]
-        public virtual Patron? Patron { get; set; }
+        public Patron Patron { get; set; }
+
+        [ForeignKey("StaffId")]
+        public Staff Staff { get; set; }
     }
 }

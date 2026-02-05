@@ -1,46 +1,40 @@
 ﻿using CLIR_InfoSystem.Models;
-using CLIR_InfoSystem.Data; 
+using CLIR_InfoSystem.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    // 1. Inherit from Controller
     public class RequestController : Controller
     {
         private readonly LibraryDbContext _context;
 
-        // 2. Inject the Database Context
         public RequestController(LibraryDbContext context)
         {
             _context = context;
         }
 
-        // 3. GET Action to show the form
-        public IActionResult Services()
-        {
-            return View();
-        }
+        public IActionResult Services() => View();
 
         [HttpPost]
-        public IActionResult SubmitServiceRequest(ServiceRequest model) // Change this to accept the model
+        public IActionResult SubmitServiceRequest(ServiceRequest model)
         {
             string? patronId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
 
-            // Map the details
             model.PatronId = patronId;
-            model.RequestDate = DateTime.Now.Date;
+            model.RequestDate = DateTime.Now;
             model.RequestStatus = "Pending";
 
-            ModelState.Remove("Patron"); // Keep this to avoid validation errors
+            ModelState.Remove("Patron");
 
             if (ModelState.IsValid)
             {
-                _context.Services.Add(model); // 'model' now contains the ServiceType from the hidden input
+                _context.Services.Add(model);
                 _context.SaveChanges();
-
-                // If using AJAX, return Ok instead of Redirect
                 return Ok(new { message = "Success" });
             }
 
@@ -53,8 +47,8 @@ namespace CLIR_InfoSystem.Controllers
         private IActionResult CheckExistingRequest(string type)
         {
             string? patronId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
 
-            // Check if request is Pending or Approved
             var existing = _context.Services.FirstOrDefault(s =>
                 s.PatronId == patronId &&
                 s.ServiceType == type &&
@@ -66,15 +60,11 @@ namespace CLIR_InfoSystem.Controllers
             return View("ServiceForm", model);
         }
 
-
         public IActionResult Odds(bool success = false)
         {
-            if (success) ViewBag.AlreadyRequested = true;
+            if (success) ViewBag.SuccessMessage = "Request submitted successfully!";
 
-            // Fetch books to populate the dropdown
-            ViewBag.Books = _context.Books
-                .Select(b => new { b.AccessionId, b.Title })
-                .ToList();
+            PopulateBooksDropdown();
 
             var model = new OddsRequest
             {
@@ -86,18 +76,19 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult SubmitOdds(OddsRequest model)
         {
-            ModelState.Clear();
             var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
 
             // 1. Limit: Max 5 requests per day
             var todayCount = _context.Odds.Count(o => o.PatronId == userId && o.RequestDate >= DateTime.Today);
             if (todayCount >= 5)
             {
                 ModelState.AddModelError("", "You have reached the limit of 5 requests for today.");
+                PopulateBooksDropdown();
                 return View("Odds", model);
             }
 
-            // 2. Uniqueness: Prevent duplicate requests for the same AccessionId
+            // 2. Uniqueness: Prevent duplicate pending requests for the same AccessionId
             if (!string.IsNullOrEmpty(model.AccessionId))
             {
                 bool exists = _context.Odds.Any(o => o.PatronId == userId &&
@@ -106,31 +97,34 @@ namespace CLIR_InfoSystem.Controllers
                 if (exists)
                 {
                     ModelState.AddModelError("", "You already have a pending request for this specific item.");
+                    PopulateBooksDropdown();
                     return View("Odds", model);
                 }
             }
 
-            // 3. Set Background Data
-            model.RequestId = 0;
             model.PatronId = userId;
             model.RequestDate = DateTime.Now;
             model.RequestStatus = "Pending";
 
-            try
+            ModelState.Remove("Patron");
+            ModelState.Remove("Book");
+
+            if (ModelState.IsValid)
             {
                 _context.Odds.Add(model);
                 _context.SaveChanges();
                 return RedirectToAction("Odds", new { success = true });
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Database Error: " + ex.Message);
-                return View("Odds", model);
-            }
+
+            PopulateBooksDropdown();
+            return View("Odds", model);
         }
 
-
+        private void PopulateBooksDropdown()
+        {
+            ViewBag.Books = _context.Books
+                .Select(b => new { b.AccessionId, b.Title })
+                .ToList();
+        }
     }
-
-
 }

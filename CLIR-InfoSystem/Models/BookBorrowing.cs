@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CLIR_InfoSystem.Models
@@ -11,15 +12,14 @@ namespace CLIR_InfoSystem.Models
         public int BorrowId { get; set; }
 
         [Column("patron_id")]
-        public string? PatronId { get; set; }
+        public string PatronId { get; set; }
 
         [Column("accession_id")]
-        public string? AccessionId { get; set; }
+        public string AccessionId { get; set; }
 
         [Column("borrow_date")]
         public DateTime BorrowDate { get; set; }
 
-        // Added to match your new SQL column
         [Column("due_date")]
         public DateTime? DueDate { get; set; }
 
@@ -27,16 +27,24 @@ namespace CLIR_InfoSystem.Models
         public DateTime? ReturnDate { get; set; }
 
         [Column("status")]
-        public string Status { get; set; } = "Reserved";
+        public string Status { get; set; }
 
-        [Column("staff_in_charge")]
-        public string? StaffInCharge { get; set; }
+        [Column("staff_id")]
+        public int? StaffId { get; set; }
 
-        // Navigation Properties
+        // Navigation
+        [ForeignKey("StaffId")]
+        public Staff Staff { get; set; }
+
         [ForeignKey("AccessionId")]
-        public virtual Book? Book { get; set; }
+        public Book Book { get; set; }
 
         [ForeignKey("PatronId")]
-        public virtual Patron? Patron { get; set; }
+        public Patron Patron { get; set; }
+
+        // For views
+        [NotMapped]
+        public string StaffInCharge =>
+            Staff != null ? $"{Staff.FirstName} {Staff.LastName}" : "N/A";
     }
 }

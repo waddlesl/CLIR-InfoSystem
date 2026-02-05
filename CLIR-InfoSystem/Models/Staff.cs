@@ -23,9 +23,9 @@ namespace CLIR_InfoSystem.Models
         public string Password { get; set; }
 
         [Column("type_of_user")]
-        public string TypeOfUser { get; set; } // Admin, Librarian, Student Assistant
+        public string TypeOfUser { get; set; }
 
         [Column("status")]
-        public string Status { get; set; } // Active, Inactive
+        public string Status { get; set; }
     }
 }

@@ -14,7 +14,6 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
-
         public IActionResult Index()
         {
             var role = HttpContext.Session.GetString("UserRole");
@@ -23,7 +22,7 @@ namespace CLIR_InfoSystem.Controllers
             return role switch
             {
                 "Admin" => RedirectToAction("AdminDashboard"),
-                "Staff" => RedirectToAction("LibrarianDashboard"),
+                "Librarian" => RedirectToAction("LibrarianDashboard"), // Matches AccountController role
                 "Student Assistant" => RedirectToAction("StudentAssistantDashboard"),
                 "Patron" => RedirectToAction("PatronDashboard"),
                 _ => RedirectToAction("Login", "Account")
@@ -32,14 +31,16 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult PatronDashboard()
         {
-            var sessionUserId = HttpContext.Session.GetString("UserId");
+            var userId = HttpContext.Session.GetString("UserId");
 
-            if (int.TryParse(sessionUserId, out int patronId))
+            if (!string.IsNullOrEmpty(userId))
             {
-
-                var userId = HttpContext.Session.GetString("UserId");
+                // Removed int.TryParse because PatronId is a string in your Model
                 ViewBag.MyLoans = _context.BookBorrowings
                     .Count(b => b.PatronId == userId && b.Status != "Returned");
+
+                ViewBag.MyPendingRequests = _context.Services
+                    .Count(s => s.PatronId == userId && s.RequestStatus == "Pending");
             }
             else
             {
@@ -54,6 +55,8 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.StaffCount = _context.Staff.Count();
             ViewBag.BookCount = _context.Books.Count();
             ViewBag.PatronCount = _context.Patrons.Count();
+            ViewBag.ActiveLoans = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
+
             return View();
         }
 
@@ -64,7 +67,9 @@ namespace CLIR_InfoSystem.Controllers
         {
             ViewBag.BookCount = _context.Books.Count();
             ViewBag.PatronCount = _context.Patrons.Count();
-            return View("StaffCommonDashboard"); // Both roles use this same file
+            ViewBag.BorrowedCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
+
+            return View("StaffCommonDashboard");
         }
     }
 }

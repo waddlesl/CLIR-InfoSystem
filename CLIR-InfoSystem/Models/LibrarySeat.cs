@@ -21,9 +21,5 @@ namespace CLIR_InfoSystem.Models
 
         [Column("seat_type")]
         public string SeatType { get; set; }
-
-        [Column("is_available")]
-        public bool IsAvailable { get; set; }
     }
-
 }
