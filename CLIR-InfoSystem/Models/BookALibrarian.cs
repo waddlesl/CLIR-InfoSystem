@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CLIR_InfoSystem.Models
@@ -12,12 +13,18 @@ namespace CLIR_InfoSystem.Models
 
         [Column("patron_id")]
         public string PatronId { get; set; }
+        public virtual Patron Patron { get; set; }
+
+        [Column("staff_id")]
+        // FIX: Added '?' to make it nullable so Pending requests can have no staff assigned yet
+        public int? StaffId { get; set; }
+        public virtual Staff Staff { get; set; }
 
         [Column("school_year")]
-        public int SchoolYear { get; set; } = DateTime.Now.Year;
+        public string SchoolYear { get; set; }
 
-        [Column("session_date")]
-        public DateTime SessionDate { get; set; }
+        [Column("booking_date")]
+        public DateTime BookingDate { get; set; }
 
         [Column("topic")]
         public string Topic { get; set; }
@@ -25,7 +32,7 @@ namespace CLIR_InfoSystem.Models
         [Column("description")]
         public string Description { get; set; }
 
-        [ForeignKey("PatronId")]
-        public virtual Patron? Patron { get; set; }
+        [Column("status")]
+        public string Status { get; set; } = "Pending";
     }
 }

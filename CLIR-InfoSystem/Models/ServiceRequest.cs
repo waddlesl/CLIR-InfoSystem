@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CLIR_InfoSystem.Models
 {
     [Table("services")]
-    public class ServiceRequest 
+    public class ServiceRequest
     {
         [Key]
         [Column("service_id")]
@@ -13,7 +14,10 @@ namespace CLIR_InfoSystem.Models
         [Column("patron_id")]
         public string PatronId { get; set; }
 
-        [Column("request_date")]
+        [Column("staff_id")]
+        public int? StaffId { get; set; }
+
+        [Column("request_date", TypeName = "date")] // Matches MySQL DATE
         public DateTime RequestDate { get; set; }
 
         [Column("service_type")]
@@ -22,7 +26,12 @@ namespace CLIR_InfoSystem.Models
         [Column("request_status")]
         public string RequestStatus { get; set; } = "Pending";
 
+        // Navigation
         [ForeignKey("PatronId")]
+        // Add the '?' to these to stop the "Submission Failed" validation error
         public virtual Patron? Patron { get; set; }
+
+        [ForeignKey("StaffId")]
+        public virtual Staff? Staff { get; set; }
     }
 }

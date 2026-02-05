@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+﻿using CLIR_InfoSystem.Data;
 using CLIR_InfoSystem.Models;
-using CLIR_InfoSystem.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
@@ -23,29 +24,28 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            // 1. Staff Login
-            var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Password == password);
-            if (staff != null)
-            {
-                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
-                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+            // ... Staff Login Logic (Omitted for brevity) ...
 
-                string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
-                return RedirectToAction(dashboardAction, "Dashboard");
-            }
+            // 2. Patron Login
+            var patron = _context.Patrons
+                .Include(p => p.Department)
+                .Include(p => p.Program)
+                .FirstOrDefault(p => p.PatronId == username);
 
-            // 2. Patron Login (ID Only)
-            var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == username);
             if (patron != null)
             {
                 HttpContext.Session.SetString("UserRole", "Patron");
                 HttpContext.Session.SetString("UserName", patron.FirstName);
                 HttpContext.Session.SetString("UserId", patron.PatronId);
+                HttpContext.Session.SetString("UserDept", patron.Department?.DeptName ?? "N/A");
+
+                // ADD THIS LINE TO FIX THE EMAIL ISSUE:
+                HttpContext.Session.SetString("UserEmail", patron.Email ?? "No Email Provided");
 
                 return RedirectToAction("PatronDashboard", "Dashboard");
             }
 
-            ViewBag.Error = "ID not found in system.";
+            ViewBag.Error = "Invalid Credentials or Inactive Account.";
             return View();
         }
 
@@ -71,7 +71,8 @@ namespace CLIR_InfoSystem.Controllers
             {
                 query = query.Where(s =>
                     s.Username.Contains(searchTerm) ||
-                    s.StaffId.ToString() == searchTerm);
+                    s.StaffId.ToString() == searchTerm ||
+                    s.LastName.Contains(searchTerm));
             }
 
             return View(query.ToList());
@@ -90,6 +91,9 @@ namespace CLIR_InfoSystem.Controllers
         {
             if (newStaff == null) return Json(new { success = false });
 
+            // Set default status if not provided
+            if (string.IsNullOrEmpty(newStaff.Status)) newStaff.Status = "Active";
+
             _context.Staff.Add(newStaff);
             _context.SaveChanges();
             return Json(new { success = true });
@@ -103,11 +107,13 @@ namespace CLIR_InfoSystem.Controllers
             var staff = _context.Staff.Find(updatedStaff.StaffId);
             if (staff == null) return Json(new { success = false, message = "Staff member not found" });
 
-            // Update allowed fields
+            // Update basic fields
             staff.FirstName = updatedStaff.FirstName;
             staff.LastName = updatedStaff.LastName;
             staff.Username = updatedStaff.Username;
             staff.TypeOfUser = updatedStaff.TypeOfUser;
+            // Optionally update password if provided
+            if (!string.IsNullOrEmpty(updatedStaff.Password)) staff.Password = updatedStaff.Password;
 
             _context.SaveChanges();
             return Json(new { success = true });

@@ -1,75 +1,27 @@
-﻿<style>
-    .dashboard-container {
-        min-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-    }
-
-    /* Stat Cards */
-    .stat-box {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 10px;
-        padding: 20px;
-        min-width: 180px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    /* Button Grid Styles */
-    .nav-card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-        width: 100%;
-        max-width: 1000px;
-        margin-top: 30px;
-    }
-
-    .nav-card {
-        background-color: #ffffff;
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        padding: 25px;
-        text-decoration: none !important;
-        color: #333 !important;
-        font-weight: 600;
-        font-size: 1.1rem;
-        transition: all 0.2s ease-in-out;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .nav-card:hover {
-            background-color: #f1f3f5;
-            border-color: #adb5bd;
-            transform: translateY(-3px);
-        }
-</style>
-
-<div class="container dashboard-container">
-    <div class="mt-4 text-center">
-        <h1>Welcome back, @ViewBag.FirstName!</h1>
+﻿<div class="container dashboard-container py-5">
+    @* Centered Title *@
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Welcome back, @ViewBag.FirstName!</h1>
+        <p class="text-muted">What would you like to do today?</p>
     </div>
 
+    @* Stat Boxes using lib-label pattern *@
     <div class="d-flex gap-4 justify-content-center flex-wrap mb-5">
         <div class="stat-box text-center">
-            <small class="text-muted d-block text-uppercase">📖 My Borrowings</small>
+            <small class="lib-label">📖 My Borrowings</small>
             <h2 class="fw-bold mb-0">@(ViewBag.MyLoans ?? 0)</h2>
         </div>
         <div class="stat-box text-center">
-            <small class="text-muted d-block text-uppercase">🪑 Reserved Seats</small>
+            <small class="lib-label">🪑 Reserved Seats</small>
             <h2 class="fw-bold mb-0">@(ViewBag.ActiveSeats ?? 0)</h2>
         </div>
         <div class="stat-box text-center">
-            <small class="text-muted d-block text-uppercase">📄 Pending ODDS</small>
+            <small class="lib-label">📄 Pending ODDS</small>
             <h2 class="fw-bold mb-0">@(ViewBag.PendingODDS ?? 0)</h2>
         </div>
     </div>
 
+    @* Navigation Grid - Updated with unified hover colors *@
     <div class="nav-card-grid">
         <a asp-controller="Book" asp-action="Index" class="nav-card">📚 Borrow Books</a>
         <a asp-controller="Transaction" asp-action="Index" class="nav-card">📖 My Borrowings</a>
@@ -81,3 +33,50 @@
         <a asp-controller="Patron" asp-action="Index" class="nav-card">📜 My Activity</a>
     </div>
 </div>
+
+<style>
+    /* Keep only layout-specific styles here */
+    .dashboard-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-box {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        min-width: 180px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .nav-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .nav-card {
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        text-decoration: none !important;
+        color: #333 !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+        /* Using your lib-green variable on hover */
+        .nav-card:hover {
+            border-color: #198754;
+            color: #198754 !important;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.1);
+        }
+</style>

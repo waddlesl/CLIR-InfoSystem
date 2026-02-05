@@ -1,49 +1,103 @@
 ﻿@model CLIR_InfoSystem.Models.BookALibrarian
 
 <div class="container mt-5">
-    <div style="max-width: 700px; margin: 0 auto;">
-        <h2 class="text-center mb-4 fw-bold">Book-A-Librarian</h2>
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Book-A-Librarian</h2>
+        <p class="text-muted small">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</p>
+    </div>
 
-        @if (ViewBag.Success == true)
-        {
-            <div class="alert alert-success text-center shadow-sm p-4">
-                <h4 class="alert-heading fw-bold">Request Sent!</h4>
-                <p>We have received your consultation request. Please check your email for confirmation.</p>
-                <a href="/Dashboard/PatronDashboard" class="btn btn-success fw-bold px-4">Return to Dashboard</a>
-            </div>
-        }
-        else if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger text-center shadow-sm p-3">
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                @if (ViewBag.HasActiveRequest == true)
                 {
-                    <p class="mb-0 fw-bold">@error.ErrorMessage</p>
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 class="fw-bold">Request Already Active</h4>
+                        <p class="text-muted">You cannot book a new session while you have a <b>Pending</b> or <b>Approved</b> request.</p>
+                        <hr />
+                        <a href="/Patron/Index" class="btn btn-outline-secondary btn-sm">View My Activity</a>
+                    </div>
+                }
+                else
+                {
+                    <form id="librarianBookingForm" asp-action="SubmitBooking" method="post">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">CONSULTATION TOPIC</label>
+                            <input type="text" class="form-control" asp-for="Topic" placeholder="e.g., Thesis Research" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">DESCRIPTION</label>
+                            <textarea class="form-control" asp-for="Description" rows="3" placeholder="Details..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">PREFERRED LIBRARIAN (OPTIONAL)</label>
+                            <select class="form-select" asp-for="StaffId">
+                                <option value="">-- Any Available Librarian --</option>
+                                @if (ViewBag.Librarians != null)
+                                {
+                                    foreach (var staff in ViewBag.Librarians)
+                                    {
+                                        <option value="@staff.StaffId">@staff.FirstName @staff.LastName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="small fw-bold text-muted">PREFERRED DATE & TIME (8:00 AM - 5:00 PM)</label>
+                            <input type="datetime-local" id="bookingDateInput" class="form-control" asp-for="BookingDate" required
+                                   min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <small id="timeError" class="text-danger" style="display:none;">Please select a weekday (Mon-Fri) between 8 AM and 5 PM.</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" id="submitBtn" class="btn btn-success fw-bold py-2">BOOK SESSION</button>
+                        </div>
+                    </form>
                 }
             </div>
-        }
-
-        @if (ViewBag.Success != true)
-        {
-            <form asp-action="SubmitBooking" method="post" class="shadow p-4 rounded bg-light border">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Consultation Topic</label>
-                    <input type="text" class="form-control" asp-for="Topic" placeholder="e.g., Thesis Research, Database Search" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Description</label>
-                    <textarea class="form-control" asp-for="Description" rows="3" placeholder="Provide more details about your request..." required></textarea>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Preferred Date & Time</label>
-                    <input type="datetime-local" class="form-control" asp-for="SessionDate" required />
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">BOOK SESSION</button>
-                </div>
-            </form>
-        }
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            // Validation for 8AM - 5PM and Weekdays
+            $('#bookingDateInput').on('change', function () {
+                const date = new Date($(this).val());
+                const hours = date.getHours();
+                const day = date.getDay(); // 0: Sun, 6: Sat
+
+                if (day === 0 || day === 6 || hours < 8 || hours >= 17) {
+                    $('#timeError').show();
+                    $(this).addClass('is-invalid');
+                    $('#submitBtn').prop('disabled', true);
+                } else {
+                    $('#timeError').hide();
+                    $(this).removeClass('is-invalid');
+                    $('#submitBtn').prop('disabled', false);
+                }
+            });
+
+            $('#librarianBookingForm').on('submit', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.post(form.attr('action'), form.serialize(), function (res) {
+                    if (res.success) {
+                        Swal.fire({ title: "Request Sent!", text: res.message, icon: "success" })
+                            .then(() => { window.location.href = '/Patron/Index'; });
+                    } else {
+                        Swal.fire({ title: "Booking Failed", text: res.message, icon: "error" });
+                    }
+                });
+            });
+        });
+    </script>
+}

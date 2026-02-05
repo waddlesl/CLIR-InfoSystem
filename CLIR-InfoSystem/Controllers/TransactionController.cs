@@ -3,16 +3,15 @@ using CLIR_InfoSystem.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
     public class TransactionController : Controller
     {
-        // 1. Declare the context
         private readonly LibraryDbContext _context;
 
-        // 2. Inject the context through the constructor
         public TransactionController(LibraryDbContext context)
         {
             _context = context;
@@ -21,11 +20,11 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult Index()
         {
             var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
 
             var myLoans = _context.BookBorrowings
                 .Include(b => b.Book)
-                // This hides 'Returned' records so the book only appears once in the active list
-                .Where(b => b.PatronId == userId && b.Status != "Returned")
+                .Where(b => b.PatronId == userId && b.Status != "Returned" && b.Status != "Denied")
                 .OrderByDescending(b => b.BorrowDate)
                 .ToList();
 
@@ -38,6 +37,13 @@ namespace CLIR_InfoSystem.Controllers
             var patronId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
 
+            var book = _context.Books.Find(accessionId);
+            if (book == null || book.AvailabilityStatus != "Available")
+            {
+                TempData["Error"] = "Book is currently unavailable.";
+                return RedirectToAction("Index", "Book");
+            }
+
             var request = new BookBorrowing
             {
                 PatronId = patronId,
@@ -46,58 +52,80 @@ namespace CLIR_InfoSystem.Controllers
                 Status = "Reserved"
             };
 
-            // CRITICAL: Ensure the request is added to the database set
+            book.AvailabilityStatus = "Reserved";
             _context.BookBorrowings.Add(request);
-
-            var book = _context.Books.Find(accessionId);
-            if (book != null)
-            {
-                book.AvailabilityStatus = "Reserved";
-            }
-
             _context.SaveChanges();
+
+            TempData["Success"] = "Book requested successfully!";
             return RedirectToAction("Index");
         }
+
         public IActionResult BookBorrowers(string searchTerm)
         {
-
-
-            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count();
+            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
             ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
 
             var role = HttpContext.Session.GetString("UserRole");
             ViewBag.IsStudentAssistant = role == "Student Assistant";
-
 
             var query = _context.BookBorrowings
                 .Include(bb => bb.Book)
                 .Include(bb => bb.Patron)
                 .AsQueryable();
 
-            ViewBag.ReservedRequests = query.Where(bb => bb.Status == "Reserved").ToList();
-
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(p => p.Patron.FirstName.Contains(searchTerm) ||
                                          p.Patron.LastName.Contains(searchTerm) ||
-                                         p.BorrowId.ToString() == searchTerm);
+                                         p.AccessionId.Contains(searchTerm));
             }
 
-
-            var results = query.ToList();
-            return View(results);
+            return View(query.OrderByDescending(b => b.BorrowDate).ToList());
         }
 
-        public IActionResult BorrowersHistory()
+        [HttpPost]
+        public IActionResult ApproveRequest(int id)
         {
-            var history = _context.BookBorrowings
-                .Include(bb => bb.Book)
-                .Include(bb => bb.Patron)
-                .ToList();
+            var request = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(r => r.BorrowId == id);
+            if (request != null && request.Book != null)
+            {
+                request.Status = "Borrowed";
+                request.BorrowDate = DateTime.Now;
+                request.DueDate = DateTime.Now.AddDays(7);
+                request.Book.AvailabilityStatus = "Borrowed"; // Update the book itself
 
-            return View(history);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("BookBorrowers");
+        }
+
+        [HttpPost]
+        public IActionResult ReturnBook(int id)
+        {
+            var request = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(r => r.BorrowId == id);
+            if (request != null && request.Book != null)
+            {
+                request.Status = "Returned";
+                request.ReturnDate = DateTime.Now;
+                request.Book.AvailabilityStatus = "Available"; // Make it available for others
+
+                _context.SaveChanges();
+                TempData["Success"] = "Book returned successfully.";
+            }
+            return RedirectToAction("BookBorrowers");
+        }
+
+        [HttpPost]
+        public IActionResult RejectRequest(int id)
+        {
+            var request = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(r => r.BorrowId == id);
+            if (request != null)
+            {
+                request.Status = "Denied";
+                if (request.Book != null) request.Book.AvailabilityStatus = "Available";
+                _context.SaveChanges();
+            }
+            return RedirectToAction("BookBorrowers");
         }
     }
-
-
 }

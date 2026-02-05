@@ -1,31 +1,35 @@
 ﻿@model CLIR_InfoSystem.Models.SeatBooking
 
 @{
-    // Retrieve the check from the FacilityController
     bool alreadyBooked = ViewBag.AlreadyBooked ?? false;
 }
 
-<div class="container mt-4">
-    <h2 class="text-center mb-4">Book a Library Seat</h2>
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Book a Library Seat</h2>
+        <p class="text-muted small">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</p>
+    </div>
 
-    @* 1. Check for existing active reservation *@
     @if (alreadyBooked)
     {
-        @* Boxed and centered wrapper *@
         <div style="max-width: 600px; margin: 0 auto;">
-            <div class="alert alert-warning text-center shadow-sm p-4">
-                <h4 class="alert-heading fw-bold">Reservation Active</h4>
-                <p>You already have a seat reserved. Please complete your current visit or cancel it before booking a new one.</p>
+            <div class="card shadow-sm border-0 p-4 text-center">
+                <div class="py-3">
+                    <i class="bi bi-calendar-check text-warning" style="font-size: 3rem;"></i>
+                    <h4 class="fw-bold mt-3">Reservation Active</h4>
+                    <p class="text-muted">You already have a seat reserved. Please complete your current visit or cancel it before booking a new one.</p>
+                </div>
                 <hr>
-                <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold px-4">Return to Dashboard</a>
+                <div class="d-grid">
+                    <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold">Return to Dashboard</a>
+                </div>
             </div>
         </div>
     }
     else
     {
-        @* Boxed form layout *@
         <div style="max-width: 600px; margin: 0 auto;">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger small mb-2"></div>
 
             @if (TempData["Success"] != null)
             {
@@ -35,39 +39,40 @@
                 </div>
             }
 
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
                     <form asp-action="ConfirmBooking" method="post">
-                        <div class="form-group mb-3">
-                            <label class="fw-bold">Booking Date</label>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">BOOKING DATE</label>
                             <input type="date" id="BookingDate" asp-for="BookingDate" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold">Building</label>
-                            <select id="Building" class="form-control" required disabled>
-                                <option value="">-- Select Building --</option>
-                                <option value="Rizal Building">Rizal Building</option>
-                                <option value="Einstein Building">Einstein Building</option>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-muted">BUILDING</label>
+                                <select id="Building" class="form-select" required disabled>
+                                    <option value="">-- Select --</option>
+                                    <option value="Rizal Building">Rizal Building</option>
+                                    <option value="Einstein Building">Einstein Building</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-muted">TIME SLOT</label>
+                                <select id="SlotId" asp-for="SlotId" class="form-select" required disabled>
+                                    <option value="">-- Select Date --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="small fw-bold text-muted">AVAILABLE SEATS</label>
+                            <select id="SeatId" asp-for="SeatId" class="form-select" required disabled>
+                                <option value="">-- Complete above fields --</option>
                             </select>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold">Time Slot</label>
-                            <select id="SlotId" asp-for="SlotId" class="form-control" required disabled>
-                                <option value="">-- Select Date first --</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="fw-bold">Available Seats</label>
-                            <select id="SeatId" asp-for="SeatId" class="form-control" required disabled>
-                                <option value="">-- Select Building and Slot first --</option>
-                            </select>
-                        </div>
-
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary px-4 mt-3">Confirm Reservation</button>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success fw-bold py-2">Confirm Reservation</button>
                         </div>
                     </form>
                 </div>
@@ -79,12 +84,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        // 1. When Date changes, enable Building and fetch filtered Time Slots
+        // Updated logic to match the new UI IDs and classes
         $('#BookingDate').change(function() {
             var selectedDate = $(this).val();
             if(selectedDate) {
                 $('#Building').prop('disabled', false);
-
                 $.getJSON('/Facility/GetAvailableSlots', { selectedDate: selectedDate }, function(data) {
                     var items = '<option value="">-- Select Slot --</option>';
                     $.each(data, function(i, slot) {
@@ -95,14 +99,12 @@
             }
         });
 
-        // 2. When Building changes, reset Seat selection
         $('#Building').change(function() {
             if($(this).val()) {
                 $('#SeatId').val('').prop('disabled', true);
             }
         });
 
-        // 3. When everything is selected, fetch available seats
         $('#BookingDate, #Building, #SlotId').change(function() {
             var date = $('#BookingDate').val();
             var bld = $('#Building').val();

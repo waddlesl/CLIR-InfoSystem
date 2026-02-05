@@ -11,39 +11,42 @@ namespace CLIR_InfoSystem.Models
         public string AccessionId { get; set; }
 
         [Column("title")]
-        public string? Title { get; set; }
+        public string Title { get; set; }
 
         [Column("author")]
-        public string? Author { get; set; }
+        public string Author { get; set; }
 
         [Column("availability_status")]
-        public string? AvailabilityStatus { get; set; }
+        public string AvailabilityStatus { get; set; }
 
         [Column("edition")]
-        public string? Edition { get; set; }
+        public string Edition { get; set; }
 
         [Column("year_of_publication")]
-        public int? YearOfPublication { get; set; }
+        public int YearOfPublication { get; set; }
 
         [Column("publisher")]
-        public string? Publisher { get; set; }
+        public string Publisher { get; set; }
 
         [Column("collection")]
-        public string? Collection { get; set; }
+        public string Collection { get; set; }
+
         [Column("library_location")]
-        public string? Location { get; set; }
+        public string LibraryLocation { get; set; }
 
         [Column("supplier")]
-        public string? Supplier { get; set; }
+        public string Supplier { get; set; }
+
         [Column("sourced_from")]
-        public string? Source { get; set; }
+        public string SourcedFrom { get; set; }
 
         [Column("price")]
-        public int? Price { get; set; }
-        [Column("discount")]
-        public int? Discount { get; set; }
+        public decimal Price { get; set; }
 
-        [Column("subtotal")]
-        public int? Subtotal { get; set; }
+        [Column("discount")]
+        public decimal Discount { get; set; }
+
+        [NotMapped]
+        public decimal Subtotal => Price - Discount;
     }
 }

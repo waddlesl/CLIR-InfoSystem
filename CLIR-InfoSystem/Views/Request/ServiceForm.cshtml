@@ -2,86 +2,128 @@
 
 @{
     string serviceName = Model?.ServiceType ?? "Service";
-    // Check if the controller flagged this as already requested
     bool alreadyRequested = ViewBag.AlreadyRequested ?? false;
 }
 
 <style>
-    .request-box {
+    /* Card Container */
+    .request-card {
         max-width: 600px;
         margin: 50px auto;
-        padding: 40px;
         background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: none;
+        overflow: hidden;
     }
 
+    .card-header-custom {
+        padding: 30px 20px 10px;
+        text-align: center;
+    }
+
+    .card-body-custom {
+        padding: 30px 40px 40px;
+    }
+
+    /* Form Styling */
     .form-group label {
-        font-weight: bold;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #6c757d;
         margin-bottom: 8px;
         display: block;
+        letter-spacing: 0.5px;
     }
 
     .display-field {
-        background: #fdfdfd;
-        border: 1px solid #eee;
-        padding: 12px;
-        border-radius: 4px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 12px 15px;
+        border-radius: 8px;
         margin-bottom: 20px;
-        color: #666;
+        color: #333;
+        font-weight: 500;
     }
 
+    /* Submit Button */
     .btn-submit {
-        background-color: #00c853;
+        background-color: #198754;
         color: white;
         border: none;
-        padding: 10px 40px;
-        border-radius: 4px;
+        padding: 12px 0;
+        border-radius: 8px;
         font-weight: bold;
-        float: right;
+        transition: all 0.2s;
+        width: 100%; /* Full width button to match card style */
+    }
+
+        .btn-submit:hover {
+            background-color: #157347;
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.2);
+        }
+
+    /* Custom Alert Styling */
+    .alert-success-custom {
+        background-color: #d1e7dd;
+        border: none;
+        color: #0f5132;
+        border-radius: 10px;
+        padding: 20px;
     }
 </style>
 
-<div class="request-box">
-    <h2 class="text-center mb-5">Request @serviceName Access</h2>
+<div class="container">
+    <div class="request-card">
+        <div class="card-header-custom">
+            <h2 class="fw-bold mb-0">Request @serviceName Access</h2>
+            
+        </div>
 
-    @* 1. Show success message if record exists in DB *@
-    <div id="successMessage" class="alert alert-success mt-3 text-center"
-         style="@(alreadyRequested ? "display:block;" : "display:none;")">
-        <h4 class="alert-heading">Success!</h4>
-        <p>Your request for @serviceName has been submitted. Please wait for an email invitation from our staff.</p>
+        <div class="card-body-custom">
+            @* 1. Success Message Case *@
+            <div id="successMessage" class="alert-success-custom text-center"
+                 style="@(alreadyRequested ? "display:block;" : "display:none;")">
+                <i class="bi bi-check-circle-fill d-block mb-2" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold">Request Submitted!</h5>
+                <p class="small mb-0">Your request for <strong>@serviceName</strong> is being processed. Please check your email (@Context.Session.GetString("UserEmail")) for the invitation link shortly.</p>
+                <hr>
+                <a href="/Patron/Index" class="btn btn-sm btn-outline-success border-0 fw-bold">Return to Dashboard</a>
+            </div>
+
+            @* 2. Form Case *@
+            @if (!alreadyRequested)
+            {
+                <form id="serviceForm">
+                    <input type="hidden" name="ServiceType" value="@serviceName" />
+                    <input type="hidden" name="PatronId" value="@Context.Session.GetString("UserId")" />
+
+                    <div class="form-group">
+                        <label>Patron Identification</label>
+                        <div class="display-field">@Context.Session.GetString("UserId")</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirmation Email</label>
+                        <div class="display-field">@Context.Session.GetString("UserEmail")</div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="academicCheck" required>
+                        <label class="form-check-label small text-muted" for="academicCheck">
+                            I understand that this access is granted for <strong>academic and research use only</strong>.
+                        </label>
+                    </div>
+
+                    <button type="button" onclick="submitService()" class="btn btn-submit">SUBMIT REQUEST</button>
+                </form>
+            }
+        </div>
     </div>
-
-    @* 2. Show form only if no previous request exists *@
-    @if (!alreadyRequested)
-    {
-        <form id="serviceForm">
-            <input type="hidden" name="ServiceType" value="@serviceName" />
-            <input type="hidden" name="PatronId" value="@Context.Session.GetString("UserId")" />
-
-            <div class="form-group">
-                <label>Patron ID</label>
-                <div class="display-field">@Context.Session.GetString("UserId")</div>
-            </div>
-
-            <div class="form-group">
-                <label>Confirm Email</label>
-                <div class="display-field">@Context.Session.GetString("UserEmail")</div>
-            </div>
-
-            <div class="form-check mt-4 mb-4">
-                <input class="form-check-input" type="checkbox" id="academicCheck" required>
-                <label class="form-check-label" for="academicCheck">
-                    I understand access is for academic use only.
-                </label>
-            </div>
-
-            <button type="button" onclick="submitService()" class="btn btn-submit">SUBMIT</button>
-            <div class="clearfix"></div>
-        </form>
-    }
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function submitService() {
         const checkbox = document.getElementById('academicCheck');
@@ -89,27 +131,47 @@
         const successBox = document.getElementById('successMessage');
 
         if (!checkbox.checked) {
-            alert("Please check the academic use box before submitting.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Terms Required',
+                text: 'Please check the academic use box to proceed.',
+                confirmButtonColor: '#198754'
+            });
             return;
         }
 
         const formData = new FormData(form);
 
-        fetch('/Request/SubmitServiceRequest', {
-            method: 'POST',
-            body: formData
-        })
+            fetch('/Request/SubmitServiceRequest', {
+        method: 'POST',
+        body: formData
+    })
         .then(response => {
             if (response.ok) {
                 form.style.display = 'none';
                 successBox.style.display = 'block';
+                // Trigger a nice success toast
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Submitted!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             } else {
-                alert("Error submitting request. You may already have a pending request.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission Failed',
+                    text: 'You may already have a pending request for this service.',
+                    confirmButtonColor: '#dc3545'
+                });
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert("Network error.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Network Error',
+                text: 'Could not connect to the server.'
+            });
         });
     }
 </script>
