@@ -35,36 +35,28 @@
                         <th>Borrow ID</th>
                         <th>Name</th>
                         <th>Book Title</th>
-                        <th>Date Borrowed</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
-                        var reservedRequests = Model.Where(bb => bb.Status == "Reserved");
+                        var reservedRequests = Model?.Where(bb => bb.Status == "Reserved").ToList()
+                        ?? new List<CLIR_InfoSystem.Models.BookBorrowing>();
                     }
 
-                    @if (!reservedRequests.Any())
-                    {
-                        <tr>
-                            <td>
-                                <em>No borrower requests found.</em>
-                            </td>
-                        </tr>
-                    }
-                    else{
-                        foreach (var bb in reservedRequests)
-                        {
+                    
+                        @foreach (var bb in reservedRequests)
+                        {   
                             <tr>
                                 <td>@bb.BorrowId</td>
                                 <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
                                 <td>@(bb.Book?.Title ?? "No Title")</td>
-                                <td>@bb.BorrowDate</td>
+                                <td>@bb.BorrowDate.ToString("yyyy-MM-dd")</td>
                                 @if (ViewBag.IsStudentAssistant == false)
                                 {
                                     <td>
                                         <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
-                                        <button class="denybuttons" onclick="denyReques('@bb.BorrowId')">Deny</button>
+                                        <button class="denybuttons" onclick="denyRequest('@bb.BorrowId')">Deny</button>
                                     </td>
                                 }
                                 else
@@ -76,7 +68,7 @@
                             </tr>
                         }
                     
-                    }
+                    
                     
                 </tbody>
             </table>
@@ -112,10 +104,6 @@
                 
             </div>
 
-
-            
-           
-            
         </div>
 
         <div class="table-responsive">
@@ -131,19 +119,11 @@
                 </thead>
                 <tbody>
                     @{
-                        var allRequests = Model.Where(bb => bb.Status != "Reserved");
+                        var currentBorrowers = Model?.Where(bb => bb.Status == "Borrowed" || bb.Status == "Overdue").ToList()
+                        ?? new List<CLIR_InfoSystem.Models.BookBorrowing>();
                     }
 
-                    @if (!allRequests.Any())
-                    {
-                        <tr>
-                            <td>
-                                <em>No book borrowers found.</em>
-                            </td>
-                        </tr>
-                    }
-                    else{
-                    foreach (var bb in allRequests)
+                        @foreach (var bb in currentBorrowers)
                     {
                         <tr>
                             <td>@bb.BorrowId</td>
@@ -167,7 +147,7 @@
                                 </td>
                             }
                         </tr>
-                    }
+                    
                     }
                 </tbody>
             </table>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -60,8 +61,34 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult BorrowersHistory()
+        {
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+            var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
+
+            return View(results);
+ 
+        }
+
         public IActionResult BookBorrowers(string searchTerm)
         {
+            var today = DateTime.Now;
+            var overdueBooks = _context.BookBorrowings
+                .Where(b => b.Status == "Borrowed" && b.DueDate < today)
+                .ToList();
+
+            if (overdueBooks.Any())
+            {
+                foreach (var loan in overdueBooks)
+                {
+                    loan.Status = "Overdue";
+                }
+                _context.SaveChanges(); 
+            }
+
             ViewBag.BorrowedBookCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
             ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
 
@@ -77,10 +104,14 @@ namespace CLIR_InfoSystem.Controllers
             {
                 query = query.Where(p => p.Patron.FirstName.Contains(searchTerm) ||
                                          p.Patron.LastName.Contains(searchTerm) ||
-                                         p.AccessionId.Contains(searchTerm));
+                                         p.BorrowId.ToString().Contains(searchTerm) ||
+                                         (p.Book != null && p.Book.Title.Contains(searchTerm)));
             }
 
-            return View(query.OrderByDescending(b => b.BorrowDate).ToList());
+            var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
+
+            return View(results);
+            
         }
 
         [HttpPost]

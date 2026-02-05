@@ -20,6 +20,7 @@ namespace CLIR_InfoSystem.Controllers
         {
             var odds = _context.Odds
                 .Include(s => s.Patron)
+                .ThenInclude(p => p.Department)
                 .Include(s => s.Book) // Added to show which book is being requested
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
@@ -34,6 +35,11 @@ namespace CLIR_InfoSystem.Controllers
             if (request == null) return NotFound();
 
             request.RequestStatus = status;
+            if (status == "Fulfilled")
+            {
+                request.DateOfAccessProvided = DateTime.Now;
+            }
+
             _context.SaveChanges();
 
             return RedirectToAction("ManageODDS");

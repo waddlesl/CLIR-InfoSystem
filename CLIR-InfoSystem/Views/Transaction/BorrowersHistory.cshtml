@@ -16,21 +16,21 @@
                         <th>Borrow ID</th>
                         <th>Name</th>
                         <th>Book Title</th>
-                        <th>Date Borrowed</th>
+                        <th>Date Requested</th>
                         <th>Date Returned</th>
-                        <th>Staff In Charge</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
-                        var allRequests = Model.Where(BookBorrowing => BookBorrowing.Status == "Returned");
+                        var allRequests = Model.Where(BookBorrowing => BookBorrowing.Status == "Returned" || BookBorrowing.Status == "Denied");
                     }
 
 
                     @if (!allRequests.Any())
                     {
                         <tr>
-                            <td>
+                            <td colspan="6">
                                 <em>No borrower requests found.</em>
                             </td>
                         </tr>
@@ -43,9 +43,19 @@
                                 <td>@bb.BorrowId</td>
                                 <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
                                 <td>@(bb.Book?.Title ?? "No Title")</td>
-                                <td>@bb.BorrowDate</td>
-                                <td>@bb.ReturnDate</td>
-                                <td>@bb.StaffInCharge</td>
+                                <td>@(bb.BorrowDate.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                                <td>@(bb.ReturnDate?.ToString("yyyy-MM-dd")?? "N/A")</td>
+                                <td>
+                                    @{
+                                        string badgeClass = bb.Status switch
+                                        {
+                                            "Returned" => "bg-success",
+                                            "Denied" => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@bb.Status</span>
+                                    </td>
                             </tr>
                         }
 

@@ -148,6 +148,7 @@ namespace CLIR_InfoSystem.Controllers
             if (borrowing != null)
             {
                 borrowing.DueDate = newDate;
+                borrowing.Status = "Borrowed" ;
                 _context.SaveChanges();
                 return Ok();
             }

@@ -34,14 +34,13 @@
                         <th>Borrow ID</th>
                         <th>Name</th>
                         <th>Book Title</th>
-                        <th>Date Borrowed</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
                         //to get only reserved requests
-                        var reservedRequests = ViewBag.ReservedRequests as IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>;
+                        var reservedRequests = Model.Where(bb => bb.Status == "Reserved");
                     }
 
                     @if (!reservedRequests.Any())
@@ -59,18 +58,39 @@
                                 <td>@bb.BorrowId</td>
                                 <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
                                 <td>@(bb.Book?.Title ?? "No Title")</td>
-                                <td>@bb.BorrowDate</td>
                                 @if (ViewBag.IsStudentAssistant == false)
                                 {
                                     <td>
-                                        <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
-                                        <button class="denybuttons" onclick="denyReques('@bb.BorrowId')">Deny</button>
+                                        <div class="d-flex gap-2 justify-content-center align-items-center">
+                                            <form asp-action="ApproveRequest" method="post">
+                                                <input type="hidden" name="id" value="@bb.BorrowId" />
+                                                <button type="submit" class="btn btn-sm btn-success">Fulfilled</button>
+                                            </form>
+
+                                            <form asp-action="DenyRequest" method="post">
+                                                <input type="hidden" name="id" value="@bb.BorrowId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                            </form>
+                                        </div>
                                     </td>
+                                    
                                 }
                                 else
                                 {
                                     <td>
-                                        <a class="disabled-link">Confirm</a> | <a class="disabled-link">Deny</a>
+                                        <div class="d-flex gap-2 justify-content-center align-items-center">
+                                            <form asp-action="UpdateOddsStatus" method="post">
+                                                <input type="hidden" name="requestId" value="@bb.BorrowId" />
+                                                <input type="hidden" name="status" value="Fulfilled" />
+                                                <button type="submit" class="btn btn-secondary btn-lg disabled">Fulfilled</button>
+                                            </form>
+
+                                            <form asp-action="UpdateOddsStatus" method="post">
+                                                <input type="hidden" name="requestId" value="@bb.BorrowId" />
+                                                <input type="hidden" name="status" value="Cancelled" />
+                                                <button type="submit" class="btn btn-secondary btn-lg disabled">Cancel</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 }
                             </tr>
@@ -126,12 +146,14 @@
                         <th>Name</th>
                         <th>Book Title</th>
                         <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Fee</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
-                        var allRequests = Model.Where(bb => bb.Status != "Reserved");
+                        var allRequests = Model.Where(bb => bb.Status == "Borrowed" || bb.Status == "Overdue");
                     }
 
                     @if (!allRequests.Any())
@@ -149,12 +171,24 @@
                             <td>@bb.BorrowId</td>
                             <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
                             <td>@(bb.Book?.Title ?? "No Title")</td>
-                            <td>@bb.DueDate</td>
+                            <td>@bb.DueDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@bb.Status</td>
+                            <td>
+                                @if(bb.Status == "Overdue")
+                                {
+                                    <span class="text-danger">P@(bb.Book?.Subtotal+50 ?? 0)</span>
+                                }
+                                else
+                                {
+                                    <span>P@(bb.Book?.Subtotal ?? 0)</span>
+                                }
+
+
+                            </td>
                             @if (ViewBag.IsStudentAssistant == false)
                             {
                                 <td>
                                         <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
-
                                         <button class="btn btn-sm btn-outline-primary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')">Extend</button>
                                 </td>
                             }
@@ -162,7 +196,6 @@
                             {
                                 <td>
                                         <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
-
                                         <button class="btn btn-sm btn-outline-primary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')" disabled>Extend</button>
                                 </td>
                             }

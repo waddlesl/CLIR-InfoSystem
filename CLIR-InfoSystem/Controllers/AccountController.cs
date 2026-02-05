@@ -24,7 +24,23 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            // ... Staff Login Logic (Omitted for brevity) ...
+            // 1. Staff Login - Checks for Username, Password, and Active status
+            var staff = _context.Staff.FirstOrDefault(u =>
+                u.Username == username &&
+                u.Password == password &&
+                u.Status == "Active");
+
+            if (staff != null)
+            {
+                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
+                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+                HttpContext.Session.SetString("UserName", staff.FirstName);
+
+                // Dynamically routes based on role (e.g., LibrarianDashboard, AdminDashboard)
+                string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
+                return RedirectToAction(dashboardAction, "Dashboard");
+            }
+
 
             // 2. Patron Login
             var patron = _context.Patrons

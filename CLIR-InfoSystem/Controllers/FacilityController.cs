@@ -80,6 +80,18 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.Librarians = _context.Staff.ToList();
             return View();
         }
+        public IActionResult ManageBookings()
+        {
+            var activeBookings = _context.SeatBookings
+                .Include(b => b.TimeSlot)
+                //.Include(b => b.Patron) 
+                //.Where(b => b.Status == "Reserved")
+                .ToList();
+
+            return View(activeBookings);
+
+        }
+
 
         [HttpPost]
         public IActionResult SubmitBooking(BookALibrarian model)
