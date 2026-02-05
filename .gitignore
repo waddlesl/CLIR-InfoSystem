@@ -1,2 +1,23 @@
-/.vs
-*.v2
+# Build Folders
+bin/
+obj/
+*.user
+*.suo
+*.vscode/
+
+# Visual Studio
+.vs/
+*.ncb
+*.sdf
+*.cache
+*.log
+*.suo
+*.pdb
+
+# Rider / JetBrains
+.idea/
+
+# Others
+*.DS_Store
+*.db
+*.sqlite
