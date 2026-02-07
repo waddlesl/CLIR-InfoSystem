@@ -32,8 +32,8 @@
                     <td>@p.PatronId</td>
                     <td>@p.FirstName @p.LastName</td>
                     <td>@p.Email</td>
-                    <td>@p.Department</td>
-                    <td>@p.Program</td>
+                    <td> @(p.Department?.DeptCode ?? "N/A")</td>
+                    <td>@(p.Program?.ProgramCode ?? "N/A")</td>
                     <td>
                         <button class="btn btn-sm btn-link p-0" onclick="openEditModal('@p.PatronId')">Edit</button>
                     </td>
@@ -53,18 +53,24 @@
                 <input type="text" id="addLast" class="form-control mb-2" placeholder="Last Name" />
                 <input type="email" id="addEmail" class="form-control mb-2" placeholder="Email" />
 
+                <label class="small fw-bold">Patron Type</label>
+                <select id="addType" class="form-control mb-2" onchange="toggleStudentFields('#addType', '#addDept', '#addProg')">
+                    <option value="Student">Student</option>
+                    <option value="NonStudent">Faculty/Staff</option>
+                </select>
+
                 <label class="small fw-bold">Department</label>
                 <select id="addDept" class="form-control mb-2">
                     <option value="">Select Department</option>
-                    <option value="CAS">CAS</option>
-                    <option value="CCIS">CCIS</option>
-                    <option value="CHS">CHS</option>
-                    <option value="CN">CN</option>
-                    <option value="ETYCB">ETYCB</option>
-                    <option value="MITL">MITL</option>
-                    <option value="MIA">MIA</option>
-                    <option value="CMET">CMET</option>
-                    <option value="SHS">SHS</option>
+                    <option value=1>CAS</option>
+                    <option value=2>CCIS</option>
+                    <option value=3>CHS</option>
+                    <option value=4>CN</option>
+                    <option value=5>ETYCB</option>
+                    <option value=6>MITL</option>
+                    <option value=7>MIA</option>
+                    <option value=8>CMET</option>
+                    <option value=9>SHS</option>
                 </select>
 
                 <label class="small fw-bold">Program</label>
@@ -92,17 +98,23 @@
                 <label class="small fw-bold">Email</label>
                 <input type="email" id="editEmail" class="form-control mb-2" />
 
+                <label class="small fw-bold">Patron Type</label>
+                <select id="editType" class="form-control mb-2" onchange="toggleStudentFields('#editType', '#editDept', '#editProg')">
+                    <option value="Student">Student</option>
+                    <option value="NonStudent">Faculty/Staff</option>
+                </select>
+
                 <label class="small fw-bold">Department</label>
                 <select id="editDept" class="form-control mb-2">
-                    <option value="CAS">CAS</option>
-                    <option value="CCIS">CCIS</option>
-                    <option value="CHS">CHS</option>
-                    <option value="CN">CN</option>
-                    <option value="ETYCB">ETYCB</option>
-                    <option value="MITL">MITL</option>
-                    <option value="MIA">MIA</option>
-                    <option value="CMET">CMET</option>
-                    <option value="SHS">SHS</option>
+                    <option value=1>CAS</option>
+                    <option value=2>CCIS</option>
+                    <option value=3>CHS</option>
+                    <option value=4>CN</option>
+                    <option value=5>ETYCB</option>
+                    <option value=6>MITL</option>
+                    <option value=7>MIA</option>
+                    <option value=8>CMET</option>
+                    <option value=9>SHS</option>
                 </select>
 
                 <label class="small fw-bold">Program</label>
@@ -118,39 +130,87 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function toggleStudentFields(typeSelector, deptSelector, progSelector) {
+            const isStudent = $(typeSelector).val() === "Student";
+            if (isStudent) {
+                $(deptSelector).prop('disabled', false);
+                $(progSelector).prop('disabled', false);
+            } else {
+                $(deptSelector).prop('disabled', true).val("");
+                $(progSelector).empty().append('<option value="">N/A</option>').prop('disabled', true);
+            }
+        }
+
+
         const SwalStatic = Swal.mixin({
             showClass: { popup: '', backdrop: '', icon: '' },
             hideClass: { popup: '', backdrop: '', icon: '' }
         });
 
         const programMap = {
-            'CAS': ['BACOMM', 'BMMA'],
-            'CCIS': ['BSCS', 'BSIT'],
-            'CHS': ['BSBIO', 'BSMEDTECH', 'BSPHAR', 'BSPT', 'BSPSY'],
-            'CN': ['BSN'],
-            'ETYCB': ['BSA', 'BSAIS', 'BSBA', 'BSHM', 'BSTM', 'BSGM', 'BSBIA'],
-            'MITL': ['BSARC', 'BSCE', 'BSCHE', 'BSCPE', 'BSEE', 'BSECE', 'BSIE', 'BSME'],
-            'MIA': ['BSAE', 'BSAVM'],
-            'CMET': ['BSMARE', 'BSMT'],
-            'SHS': ['STEM', 'ABM', 'HUMSS', 'ICT']
+            1: [
+                { id: 1, name: 'BACOMM' }, 
+                { id: 2, name: 'BMMA' }],
+            2: [
+                { id: 3, name: 'BSCS' }, 
+                { id: 4, name: 'BSIT' }],
+            3: [
+                { id: 5, name: 'BSBIO' },
+                { id: 6, name: 'BSMEDTECH' },
+                { id: 7, name: 'BSPHAR' },
+                { id: 8, name: 'BSPT' },
+                { id: 9, name: 'BSPSY' }
+            ],
+            4: [
+                { id: 10, name: 'BSN' }],
+            5: [
+                { id: 11, name: 'BSA' },
+                { id: 12, name: 'BSAIS' },
+                { id: 13, name: 'BSBA' },
+                { id: 14, name: 'BSHM' },
+                { id: 15, name: 'BSTM' },
+                { id: 16, name: 'BSGM' },
+                { id: 17, name: 'BSBIA' }
+            ],
+            6: [
+                { id: 18, name: 'BSARC' },
+                { id: 19, name: 'BSCE' },
+                { id: 20, name: 'BSCHE' },
+                { id: 21, name: 'BSCPE' },
+                { id: 22, name: 'BSEE' },
+                { id: 23, name: 'BSECE' },
+                { id: 24, name: 'BSIE' },
+                { id: 25, name: 'BSME' }
+            ],
+            7: [
+                { id: 26, name: 'BSAE' }, 
+                { id: 27, name: 'BSAVM' }],
+            8: [
+                { id: 28, name: 'BSMARE' }, 
+                { id: 29, name: 'BSMT' }],
+            9: [
+                { id: 30, name: 'STEM' },
+                { id: 31, name: 'ABM' },
+                { id: 32, name: 'HUMSS' },
+                { id: 33, name: 'ICT' }
+            ]
         };
 
         // Helper function to fill program dropdowns
-        function updateProgramDropdown(deptSelector, progSelector, selectedProg = "") {
-            const dept = $(deptSelector).val();
-            const $progDropdown = $(progSelector);
-            $progDropdown.empty().append('<option value="">Select Program</option>');
+        function updateProgramDropdown(deptSelector, progSelector, selectedProgId = 0) {
+                const deptId = $(deptSelector).val();
+                const $progDropdown = $(progSelector);
+                $progDropdown.empty().append('<option value="">Select Program</option>');
 
-            if (programMap[dept]) {
-                programMap[dept].forEach(prog => {
-                    const isSelected = prog === selectedProg ? "selected" : "";
-                    $progDropdown.append(`<option value="${prog}" ${isSelected}>${prog}</option>`);
+            if (programMap[deptId]) {
+                programMap[deptId].forEach(prog => {
+                    const isSelected = prog.id == selectedProgId ? "selected" : "";
+                    $progDropdown.append(`<option value="${prog.id}" ${isSelected}>${prog.name}</option>`);
                 });
             }
         }
 
         $(document).ready(function() {
-            // Listeners for dropdown changes
             $('#addDept').change(function() { updateProgramDropdown('#addDept', '#addProg'); });
             $('#editDept').change(function() { updateProgramDropdown('#editDept', '#editProg'); });
         });
@@ -161,24 +221,29 @@
             new bootstrap.Modal(document.getElementById('addModal')).show();
         }
 
+               function toggleStudentFields(typeSelector, deptSelector, progSelector) {
+            const isStudent = $(typeSelector).val() === "Student";
+            if (isStudent) {
+                $(deptSelector).prop('disabled', false);
+                $(progSelector).prop('disabled', false);
+            } else {
+                $(deptSelector).prop('disabled', true).val("");
+                $(progSelector).empty().append('<option value="">N/A</option>').prop('disabled', true);
+            }
+        }
+
+        // Logic for Adding
         function createPatron() {
-            const id = $('#addId').val();
-            if (id.length === 0 || id.length > 10) {
-                SwalStatic.fire('Error', 'ID must be 1-10 characters.', 'error');
-                return;
-            }
-            if ($('#addDept').val() === "" || $('#addProg').val() === "") {
-                SwalStatic.fire('Error', 'Select Department and Program.', 'error');
-                return;
-            }
+            const isStudent = $('#addType').val() === "Student";
 
             var patron = {
-                PatronId: id,
+                PatronId: $('#addId').val(),
                 FirstName: $('#addFirst').val(),
                 LastName: $('#addLast').val(),
                 Email: $('#addEmail').val(),
-                Department: $('#addDept').val(),
-                Program: $('#addProg').val()
+                
+                DeptId: isStudent ? parseInt($('#addDept').val()) : null,
+                ProgramId: isStudent ? parseInt($('#addProg').val()) : null
             };
 
             $.ajax({
@@ -188,11 +253,12 @@
                 data: JSON.stringify(patron),
                 success: function(res) {
                     if(res.success) location.reload();
-                    else SwalStatic.fire('Error', res.message, 'error');
+                    else Swal.fire('Error', res.message, 'error');
                 }
             });
         }
 
+    
         function openEditModal(id) {
             $.get('/Patron/GetPatronDetails/' + id, function(data) {
                 if (data) {
@@ -200,25 +266,36 @@
                     $('#editFirst').val(data.firstName);
                     $('#editLast').val(data.lastName);
                     $('#editEmail').val(data.email);
-                    $('#editDept').val(data.department);
 
-                    // Sync the program dropdown before showing
-                    updateProgramDropdown('#editDept', '#editProg', data.program);
-
+                    
+                    if (data.deptId) {
+                        $('#editType').val("Student");
+                        $('#editDept').val(data.deptId).prop('disabled', false);
+                        updateProgramDropdown('#editDept', '#editProg', data.programId);
+                        $('#editProg').prop('disabled', false);
+                    } else {
+                        $('#editType').val("NonStudent");
+                        $('#editDept').val("").prop('disabled', true);
+                        $('#editProg').empty().append('<option value="">N/A</option>').prop('disabled', true);
+                    }
                     new bootstrap.Modal(document.getElementById('editModal')).show();
                 }
             });
         }
 
+       
         function savePatron() {
+            const isStudent = $('#editType').val() === "Student";
+
             var data = {
                 PatronId: $('#editId').val(),
                 FirstName: $('#editFirst').val(),
                 LastName: $('#editLast').val(),
                 Email: $('#editEmail').val(),
-                Department: $('#editDept').val(),
-                Program: $('#editProg').val()
+                DeptId: isStudent ? parseInt($('#editDept').val()) : null,
+                ProgramId: isStudent ? parseInt($('#editProg').val()) : null
             };
+
             $.ajax({
                 url: '/Patron/UpdatePatron',
                 type: 'POST',
@@ -226,7 +303,7 @@
                 data: JSON.stringify(data),
                 success: function(res) {
                     if(res.success) location.reload();
-                    else alert(res.message || "Update failed.");
+                    else Swal.fire('Error', res.message, 'error');
                 }
             });
         }

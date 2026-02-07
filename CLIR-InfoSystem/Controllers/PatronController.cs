@@ -38,6 +38,23 @@ namespace CLIR_InfoSystem.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult GetPatronDetails(string id)
+        {
+            var p = _context.Patrons.Find(id);
+            if (p == null) return NotFound();
+
+            return Json(new
+            {
+                patronId = p.PatronId,
+                firstName = p.FirstName,
+                lastName = p.LastName,
+                email = p.Email,
+                deptId = p.DeptId,
+                programId = p.ProgramId
+            });
+        }
+
         public IActionResult ManagePatrons(string searchTerm)
         {
             var query = _context.Patrons
@@ -54,6 +71,7 @@ namespace CLIR_InfoSystem.Controllers
             return View(query.ToList());
         }
 
+
         [HttpPost]
         public IActionResult AddPatron([FromBody] Patron p)
         {
@@ -68,6 +86,7 @@ namespace CLIR_InfoSystem.Controllers
             return Json(new { success = true });
         }
 
+
         [HttpPost]
         public IActionResult UpdatePatron([FromBody] Patron updatedPatron)
         {
@@ -76,17 +95,14 @@ namespace CLIR_InfoSystem.Controllers
             var patron = _context.Patrons.Find(updatedPatron.PatronId);
             if (patron == null) return Json(new { success = false, message = "Patron not found" });
 
-            if (!IsValidDeptProgById(updatedPatron.DeptId, updatedPatron.ProgramId))
+        if (!IsValidDeptProgById(updatedPatron.DeptId, updatedPatron.ProgramId))
                 return Json(new { success = false, message = "Invalid Department and Program combination." });
 
             patron.FirstName = updatedPatron.FirstName;
             patron.LastName = updatedPatron.LastName;
-            patron.MiddleName = updatedPatron.MiddleName;
+            patron.Email = updatedPatron.Email;
             patron.DeptId = updatedPatron.DeptId;
             patron.ProgramId = updatedPatron.ProgramId;
-            patron.Email = updatedPatron.Email;
-            patron.YearLevel = updatedPatron.YearLevel;
-            patron.PatronType = updatedPatron.PatronType;
 
             _context.SaveChanges();
             return Json(new { success = true });
@@ -109,7 +125,11 @@ namespace CLIR_InfoSystem.Controllers
         // HELPER: Accept nullable int? to fix CS1503
         private bool IsValidDeptProgById(int? deptId, int? progId)
         {
+            /* Edited hehehe
             if (!deptId.HasValue || !progId.HasValue) return false;
+            return _context.Programs.Any(p => p.ProgramId == progId.Value && p.DeptId == deptId.Value);*/
+            if (deptId == null) return true;
+            if (progId == null) return false;
             return _context.Programs.Any(p => p.ProgramId == progId.Value && p.DeptId == deptId.Value);
         }
     }
