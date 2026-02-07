@@ -11,8 +11,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CLIR System</title>
+    <title>CLIR Library Management System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="icon" type="image/x-icon" href="~/images/clirlogo.png" />
     <style>
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
@@ -20,7 +21,8 @@
         .top-banner {
             background-color: #1a2035;
             color: white;
-            padding: 12px 25px;
+            padding: 20px;
+            padding-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -29,7 +31,7 @@
             z-index: 1000;
         }
 
-        .brand-text { font-size: 0.85rem; line-height: 1.2; font-weight: bold; }
+        .brand-text { font-size: 15px; line-height: 1.2; font-weight: bold; }
         .logout-link { color: white; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
         .logout-link:hover { opacity: 0.7; color: #ff4d4d; }
 
@@ -75,7 +77,7 @@
 
         .main-content {
             flex: 1;
-            padding: 30px;
+            padding: 60px;
             background: #f8f9fa;
             min-height: calc(100vh - 58px);
         }
@@ -90,7 +92,6 @@
 
         /*For ReportDashboard*/
         #reports-page-container {
-            padding: 2rem;
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
@@ -218,11 +219,18 @@
             color: #1e293b;
         }
 
+        .logo{
+            width: 60px;
+            height: auto;
+            margin-right: 5px;
+        }
+
     </style>
 </head>
 <body>
     <div class="top-banner">
         <div class="d-flex align-items-center">
+            <img src="~/images/clirlogo.png" alt="Logo" class="logo"/>
             <div class="brand-text">
                 CENTER FOR LEARNING AND INFORMATION RESOURCES<br />
                 <small style="font-weight: normal; opacity: 0.8;">MAPÚA MALAYAN COLLEGES LAGUNA</small>
