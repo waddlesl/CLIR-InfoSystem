@@ -261,18 +261,19 @@ namespace CLIR_InfoSystem.Controllers
         private string GetHtmlContent(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
         {
             //patrons
-            var patrons = _context.Patrons.ToList();
+            var patrons = _context.Patrons
+                .Include(p => p.Program) // MUST include this to access ProgramName
+                .ToList();
 
             var PatronTotal = patrons.Count();
             var PatronSHS = patrons.Count(p => p.DeptId == 9);
             var PatronCollege = patrons.Count(p => p.DeptId != 9);
 
             var PatronTopProgram = patrons
-                .GroupBy(p => p.Program.ProgramName)
+                .GroupBy(p => p.Program.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault();
-
 
             // for requests
             var requests = _context.Services.Include(r => r.Patron).Where(x => x.RequestDate >= startDate && x.RequestDate <= endDate);
@@ -295,9 +296,8 @@ namespace CLIR_InfoSystem.Controllers
             var BookBorrowCountForSHS = borrowings.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
 
             var TopProgram = borrowings
-                
-                .Where(bb => bb.Patron != null)
-                .GroupBy(bb => bb.Patron.Program.ProgramName)
+                .Where(bb => bb.Patron != null && bb.Patron.Program != null)
+                .GroupBy(bb => bb.Patron.Program.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault();
