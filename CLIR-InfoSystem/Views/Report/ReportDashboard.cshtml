@@ -10,7 +10,18 @@
     </div>
 
     <h2 class="section-subtitle">Book A Seat (Rizal)</h2>
-
+    <form method="get">
+        <select id="yearDropdown" name="selectedYear" class="form-control mb-2">
+        </select>
+        <select id="termDropdown" name="selectedTerm" class="form-control mb-2">
+            <option value="">Select Term</option>
+            <option value="1">1st Term</option>
+            <option value="2">2nd Term</option>
+            <option value="3">3rd Term</option>
+        </select>
+        <button type="submit" asp-controller="Report" asp-action="ReportDashboard" class="btn-red mt-3">Filter</button>
+        <button type="submit" asp-controller="Report" asp-action="DownloadReport" class="btn-red mt-3">Download PDF</button>
+    </form>
     <div class="stats-row-top">
         <div class="report-card dark-card">
             <p class="card-label">Total Reservations</p>
@@ -62,3 +73,33 @@
     </div>
 
 </div>
+
+
+<script>
+
+    //script to get years for dropdown
+    const currentYear = new Date().getFullYear();
+    const selectElement = document.getElementById('yearDropdown');
+    const yearsToInclude = 5;
+
+
+    for (let i = 0; i <= yearsToInclude; i++) {
+      const year = currentYear - i;
+      const option = document.createElement('option');
+      option.value = year;
+      option.text = year;
+
+      if (i === 0) option.selected = true;
+
+      selectElement.appendChild(option);
+    }
+
+    const updateLink = () => {
+        const yr = document.getElementById('yearDropdown').value;
+        const tm = document.getElementById('termDropdown').value;
+        document.getElementById('downloadBtn').href = `/download-stats?selectedYear=${yr}&selectedTerm=${tm}`;
+    };
+    document.getElementById('yearDropdown').addEventListener('change', updateLink);
+    document.getElementById('termDropdown').addEventListener('change', updateLink);
+    updateLink();
+</script>
