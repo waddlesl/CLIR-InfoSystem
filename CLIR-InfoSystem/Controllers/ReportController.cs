@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Playwright;
 using System.Linq;
+using System.Text.Json;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -17,108 +18,155 @@ namespace CLIR_InfoSystem.Controllers
             _context = context;
         }
 
-
-
-        public IActionResult ReportDashboard(int selectedYear, int selectedTerm)
+        //repeatable filter
+        private (DateTime Start, DateTime End, int Year) GetTermDates(int selectedYear, int selectedTerm)
         {
-            DateTime startDate = DateTime.MinValue;
-            DateTime endDate = DateTime.MaxValue;
+            // Default to current Academic Year if none selected
             if (selectedYear == 0)
             {
                 selectedYear = (DateTime.Now.Month >= 8) ? DateTime.Now.Year : DateTime.Now.Year - 1;
             }
 
-            int reportYear = selectedYear;
+            DateTime startDate;
+            DateTime endDate;
 
-            
-            if (selectedTerm == 1)
+            switch (selectedTerm)
             {
-                startDate = new DateTime(reportYear, 8, 1);
-                endDate = new DateTime(reportYear, 11, 30);
+                case 1:
+                    startDate = new DateTime(selectedYear, 8, 1);
+                    endDate = new DateTime(selectedYear, 11, 30);
+                    break;
+                case 2:
+                    startDate = new DateTime(selectedYear, 12, 1);
+                    endDate = new DateTime(selectedYear + 1, 3, 31);
+                    break;
+                case 3:
+                    startDate = new DateTime(selectedYear + 1, 5, 1);
+                    endDate = new DateTime(selectedYear + 1, 7, 31);
+                    break;
+                default: //Full year
+                    startDate = new DateTime(selectedYear, 8, 1);
+                    endDate = new DateTime(selectedYear + 1, 7, 31);
+                    break;
             }
-            else if (selectedTerm == 2)
-            {
-                startDate = new DateTime(reportYear, 12, 1);
-                endDate = new DateTime(reportYear + 1, 3, 31);
-            }
-            else if (selectedTerm == 3)
-            {
-                startDate = new DateTime(reportYear + 1, 5, 1);
-                endDate = new DateTime(reportYear + 1, 7, 31);
-            }
-            else
-            {
-                startDate = new DateTime(reportYear, 8, 1);
-                endDate = new DateTime(reportYear + 1, 7, 31);
-            }
+
+            return (startDate, endDate, selectedYear);
+        }
+
+
+
+
+        public IActionResult ReportDashboard(int selectedYear, int selectedTerm)
+        {
+            var dateRange = GetTermDates(selectedYear, selectedTerm);
+
+            var dailyCounts = _context.SeatBookings
+                .Include(s => s.LibrarySeat)
+                .Where(s => s.BookingDate >= dateRange.Start && s.BookingDate <= dateRange.End &&
+                            (int)s.BookingDate.DayOfWeek >= 1 && (int)s.BookingDate.DayOfWeek <= 6 &&
+                            s.LibrarySeat.Building == "Rizal Building")
+                .GroupBy(s => new { s.BookingDate.Date, s.BookingDate.DayOfWeek })
+                .Select(g => new {
+                    DayName = g.Key.DayOfWeek,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var averageVisitors = dailyCounts
+                .GroupBy(g => g.DayName)
+                .Select(g => new {
+                    Day = g.Key.ToString(),
+                    Average = Math.Round(g.Average(x => x.Count), 0), // 0 for whole numbers
+                    Order = (int)g.Key
+                })
+                .OrderBy(g => g.Order)
+                .ToList();
+
+            ViewBag.VisitorLabels = JsonSerializer.Serialize(averageVisitors.Select(v => v.Day));
+            ViewBag.VisitorData = JsonSerializer.Serialize(averageVisitors.Select(v => v.Average));
 
             var bookings = _context.SeatBookings
                 .Include(s => s.LibrarySeat)
-                .Include(s => s.Patron)
-                    .ThenInclude(p => p.Department)
-                .Where(s => s.BookingDate >= startDate && s.BookingDate <= endDate);
+                .Include(s => s.Patron).ThenInclude(p => p.Department)
+                .Where(s => s.BookingDate >= dateRange.Start && s.BookingDate <= dateRange.End);
+            ViewBag.RBookingCount = bookings.Count(sb => sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
+            ViewBag.RBookingCountForCollege = bookings.Count(sb =>sb.Patron.DeptId != 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
+            ViewBag.RBookingCountForSHS = bookings.Count(sb => sb.Patron.DeptId == 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
 
-            ViewBag.RBookingCount = bookings
-                .Count(s => s.LibrarySeat != null && s.LibrarySeat.Building == "Rizal Building");
 
-            ViewBag.RBookingCountForCollege = bookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId != 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building");
-
-            var TopDept = bookings
-                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.Patron != null)
+            var topDept = bookings
+                .Where(sb => sb.LibrarySeat.Building == "Rizal Building" && sb.Patron != null && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End)
                 .GroupBy(sb => sb.Patron.Department.DeptCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault();
 
-            ViewBag.RBookingTopDepartment = TopDept?.ToString() ?? "N/A";
+            ViewBag.RBookingTopDepartment = topDept ?? "N/A";
+            ViewBag.Term = $"AY {dateRange.Year}-{dateRange.Year + 1} - T{selectedTerm}";
 
-            ViewBag.Term = $"AY {reportYear}-{reportYear + 1} - T{selectedTerm}";
             return View();
         }
+  
 
-        public IActionResult BookASeatEinstienReport(int year, int term)
+        public IActionResult BookASeatEinstienReport(int selectedYear, int selectedTerm)
         {
-            var bookings = _context.SeatBookings
+            var dateRange = GetTermDates(selectedYear, selectedTerm);
+
+            var dailyCounts = _context.SeatBookings
                 .Include(s => s.LibrarySeat)
-                .Include(s => s.Patron);
+                .Where(s => s.BookingDate >= dateRange.Start && s.BookingDate <= dateRange.End &&
+                            (int)s.BookingDate.DayOfWeek >= 1 && (int)s.BookingDate.DayOfWeek <= 6 &&
+                            s.LibrarySeat.Building == "Einstein Building")
+                .GroupBy(s => new { s.BookingDate.Date, s.BookingDate.DayOfWeek })
+                .Select(g => new {
+                    DayName = g.Key.DayOfWeek,
+                    Count = g.Count()
+                })
+                .ToList();
 
-            ViewBag.EBookingCount = bookings
-                .Count(s => s.LibrarySeat != null && s.LibrarySeat.Building == "Einstein Building");
+            var averageVisitors = dailyCounts
+                .GroupBy(g => g.DayName)
+                .Select(g => new {
+                    Day = g.Key.ToString(),
+                    Average = Math.Round(g.Average(x => x.Count), 0), // 0 for whole numbers
+                    Order = (int)g.Key
+                })
+                .OrderBy(g => g.Order)
+                .ToList();
 
-            ViewBag.EBookingCountForCollege = bookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId != 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building");
+            ViewBag.VisitorLabels = JsonSerializer.Serialize(averageVisitors.Select(v => v.Day));
+            ViewBag.VisitorData = JsonSerializer.Serialize(averageVisitors.Select(v => v.Average));
 
-            ViewBag.EBookingCountForSHS = bookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId == 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building");
 
-            ViewBag.EBookingTopDepartment = bookings
-                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building" && sb.Patron != null)
-                .GroupBy(sb => sb.Patron.DeptId)
+            var bookings = _context.SeatBookings
+               .Include(s => s.LibrarySeat)
+               .Include(s => s.Patron).ThenInclude(p => p.Department)
+               .Where(s => s.BookingDate >= dateRange.Start && s.BookingDate <= dateRange.End);
+            ViewBag.EBookingCount = bookings.Count(sb => sb.LibrarySeat.Building == "Einstein Building");
+            ViewBag.EBookingCountForCollege = bookings.Count(sb => sb.Patron.DeptId != 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
+            ViewBag.EBookingCountForSHS = bookings.Count(sb => sb.Patron.DeptId == 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
+
+
+            var topDept = bookings
+                .Where(sb => sb.LibrarySeat.Building == "Einstein Building" && sb.Patron != null)
+                .GroupBy(sb => sb.Patron.Department.DeptCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault();
 
-            ViewBag.EBookingPreferedSeat = bookings
-                .Where(sb => sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building")
-                .GroupBy(sb => sb.LibrarySeat.SeatType)
-                .OrderByDescending(g => g.Count())
-                .Select(g => g.Key)
-                .FirstOrDefault() ?? "N/A";
-
-            ViewBag.Term = "AY 2024-2025 - T1";
+            ViewBag.EBookingTopDepartment = topDept ?? "N/A";
+            ViewBag.Term = $"AY {dateRange.Year}-{dateRange.Year + 1} - T{selectedTerm}";
             return View();
         }
 
-        public IActionResult BookBorrowingReport(int year, int term)
+        public IActionResult BookBorrowingReport(int selectedYear, int selectedTerm)
         {
+            var dateRange = GetTermDates(selectedYear, selectedTerm);
             var borrowings = _context.BookBorrowings
                 .Include(b => b.Patron)
                 .ThenInclude(p => p.Program)
-                .Include(b => b.Book);
+                .Include(b => b.Book)
+                .Where(s => s.ReturnDate >= dateRange.Start && s.ReturnDate <= dateRange.End);
 
             ViewBag.BookBorrowCount = borrowings.Count();
             ViewBag.BookBorrowCountForCollege = borrowings.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
@@ -126,14 +174,14 @@ namespace CLIR_InfoSystem.Controllers
 
             ViewBag.BookTopProgram = borrowings
                 .Where(bb => bb.Patron != null)
-                .GroupBy(bb => bb.Patron.Program.ProgramName)
+                .GroupBy(bb => bb.Patron.Program.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault();
 
             var currentYear = DateTime.Now.Year;
             ViewBag.BookTopBooks = borrowings
-                .Where(bb => bb.Book != null && bb.BorrowDate.Year == currentYear)
+                .Where(bb => bb.Book != null)
                 .GroupBy(bb => bb.Book.Title)
                 .OrderByDescending(g => g.Count())
                 .Take(5)
@@ -143,10 +191,10 @@ namespace CLIR_InfoSystem.Controllers
             return View();
         }
 
-        public IActionResult BookALibrarianReport(int year, int term)
+        public IActionResult BookALibrarianReport(int selectedYear, int selectedTerm)
         {
-
-            var bookings = _context.BookALibrarians.Include(b => b.Patron).ToList();
+            var dateRange = GetTermDates(selectedYear, selectedTerm);
+            var bookings = _context.BookALibrarians.Include(b => b.Patron).ThenInclude(p => p.Program).ThenInclude(p => p.Department).Where(s => s.BookingDate >= dateRange.Start && s.BookingDate <= dateRange.End).ToList();
 
 
             ViewBag.LBookingCount = bookings.Count;
@@ -155,36 +203,63 @@ namespace CLIR_InfoSystem.Controllers
 
             ViewBag.LBookingTopDepartment = bookings
                 .Where(bb => bb.Patron != null)
-                .GroupBy(bb => bb.Patron.DeptId)
+                .GroupBy(bb => bb.Patron.Department.DeptCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault();
+
+            var currentYear = DateTime.Now.Year;
+            ViewBag.LBookingTopProgram = bookings
+                .Where(bb => bb.BookingDate.Year == currentYear)
+                .GroupBy(bb => bb.Patron.Program.ProgramCode)
+                .OrderByDescending(g => g.Count())
+                .Take(5)
+                .Select(g => new { Program = g.Key, Count = g.Count() })
+                .ToList();
 
 
             return View(bookings);
         }
 
-        public IActionResult ODDSReports(int year, int term)
+        public IActionResult ODDSReports(int selectedYear, int selectedTerm)
         {
-
-            var requests = _context.Odds.Include(r => r.Patron).ToList();
+            var dateRange = GetTermDates(selectedYear, selectedTerm);
+            var requests = _context.Odds.Include(b => b.Patron).ThenInclude(p => p.Program).ThenInclude(p => p.Department).Where(s => s.RequestDate >= dateRange.Start && s.RequestDate <= dateRange.End).ToList();
 
             ViewBag.ODDSCount = requests.Count;
             ViewBag.ODDSCountForCollege = requests.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
             ViewBag.ODDSCountForSHS = requests.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
 
+            var currentYear = DateTime.Now.Year;
+            ViewBag.ODDSProgram = requests
+                .Where(bb => bb.RequestDate.Year == currentYear)
+                .GroupBy(bb => bb.Patron.Program.ProgramCode)
+                .OrderByDescending(g => g.Count())
+                .Take(5)
+                .Select(g => new { Program = g.Key, Count = g.Count() })
+                .ToList();
+
+
             return View();
         }
 
-        public IActionResult GrammarlyAndTurnitinReport(string service, int year, int term)
+        public IActionResult GrammarlyAndTurnitinReport(string service, int selectedYear, int selectedTerm)
         {
-            var requests = _context.Services.Include(r => r.Patron);
+            string activeService = string.IsNullOrEmpty(service) ? "Grammarly" : service;
+            ViewBag.CurrentService = activeService;
+            var dateRange = GetTermDates(selectedYear, selectedTerm);
+            var requests = _context.Services.Include(b => b.Patron).ThenInclude(p => p.Program).ThenInclude(p => p.Department).Where(s => s.RequestDate >= dateRange.Start && s.RequestDate <= dateRange.End && s.ServiceType == activeService).ToList();
 
-            ViewBag.CurrentService = string.IsNullOrEmpty(service) ? "Grammarly" : service;
-            ViewBag.GATCount = requests.Count(gat => gat.ServiceType == service);
-            ViewBag.GATCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId != 9 && gat.ServiceType == service);
-            ViewBag.GATCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId == 9 && gat.ServiceType == service);
 
+            ViewBag.GATCount = requests.Count();
+            ViewBag.GATCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId != 9);
+            ViewBag.GATCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId == 9);
+            ViewBag.GATMostDept = requests
+                .Where(bb => bb.Patron != null)
+                .GroupBy(bb => bb.Patron.Department.DeptCode)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key)
+                .FirstOrDefault();
             return View();
         }
 
@@ -270,6 +345,7 @@ namespace CLIR_InfoSystem.Controllers
             var PatronCollege = patrons.Count(p => p.DeptId != 9);
 
             var PatronTopProgram = patrons
+                .Where(p => p.Program != null)
                 .GroupBy(p => p.Program.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)

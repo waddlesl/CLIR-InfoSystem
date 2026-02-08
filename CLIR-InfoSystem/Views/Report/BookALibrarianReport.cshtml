@@ -12,6 +12,8 @@
 
     <h2 class="section-subtitle">Book A Librarian</h2>
 
+    <partial name="_ReportFilter" /> <!--BRUHHH-->
+
     <div class="stats-row-top">
         <div class="report-card dark-card">
             <p class="card-label">Total Reservations</p>
@@ -44,16 +46,16 @@
     <div class="report-card mini-card">
         <p class="card-label">Top 5 Programs</p>
                 
-        @if (ViewBag.LBookProgram == null || !Enumerable.Any(ViewBag.LBookProgram))
+        @if (ViewBag.LBookingTopProgram == null || !Enumerable.Any(ViewBag.LBookingTopProgram))
         {
             <h2 class="card-value">N/A</h2>
         }
         else{
             <ul style="list-style: none; padding: 0;">
-            @foreach (var book in ViewBag.LBookProgram)
+                @foreach (var book in ViewBag.LBookingTopProgram)
             {
                 <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                    <strong>@book.Program</strong>
+                        <strong>@book.Program</strong>
                     <strong>@book.Count</strong>
                 </li>
             }

@@ -11,27 +11,22 @@
     </div>
 
     <h2 class="section-subtitle">Book A Seat (Einstein)</h2>
-
+    <partial name="_ReportFilter" />
+  
     <div class="stats-row-top">
         <div class="report-card dark-card">
             <p class="card-label">Total Reservations</p>
             <h1 class="card-value">@ViewBag.EBookingCount</h1>
         </div>
 
-        <div class="report-card graph-placeholder">
-            <p class="card-label">Volume per hour</p>
-            <div class="graph-box">
-                <p>Graph Data Placeholder</p>
-                <div class="simple-bar-container">
-                    <div class="bar" style="height: 40%"></div>
-                    <div class="bar" style="height: 70%"></div>
-                    <div class="bar" style="height: 50%"></div>
-                    <div class="bar" style="height: 90%"></div>
-                    <div class="bar" style="height: 30%"></div>
-                </div>
+        <div class="report-card" style="flex: 2;">
+            <p class="card-label">Average Volume (Mon-Sat)</p>
+            <div class="graph-box" style="height: 200px; position: relative;">
+                <canvas id="visitorChart"></canvas>
             </div>
         </div>
     </div>
+
     <div class="row g-4 mt-2">
         <div class="col-md-6">
             <div class="report-card mini-card">
@@ -47,18 +42,95 @@
         </div>
     </div>
     <div class="row g-4 mt-2">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="report-card mini-card">
                 <p class="card-label">Most Dept. Utilized</p>
                 <h2 class="card-value">@ViewBag.EBookingTopDepartment</h2>
             </div>
         </div>
-        <div class="col-md-6">
+        <!--<div class="col-md-6">
             <div class="report-card mini-card">
                 <p class="card-label">Most Utilized Seat</p>
-                <h2 class="card-value">@ViewBag.EBookingPreferedSeat</h2>
+                <h2 class="card-value">@ViewBag.RBookingPreferedSeat</h2>
             </div>
-        </div>
+        </div>-->
     </div>
+
    
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    //script to get years for dropdown
+    const currentYear = new Date().getFullYear();
+    const selectElement = document.getElementById('yearDropdown');
+    const yearsToInclude = 5;
+
+
+    for (let i = 0; i <= yearsToInclude; i++) {
+      const year = currentYear - i;
+      const option = document.createElement('option');
+      option.value = year;
+      option.text = year;
+
+      if (i === 0) option.selected = true;
+
+      selectElement.appendChild(option);
+    }
+
+    const updateLink = () => {
+        const yr = document.getElementById('yearDropdown').value;
+        const tm = document.getElementById('termDropdown').value;
+        document.getElementById('downloadBtn').href = `/download-stats?selectedYear=${yr}&selectedTerm=${tm}`;
+    };
+    document.getElementById('yearDropdown').addEventListener('change', updateLink);
+    document.getElementById('termDropdown').addEventListener('change', updateLink);
+    updateLink();
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('visitorChart').getContext('2d');
+
+        const labels = @Html.Raw(ViewBag.VisitorLabels);
+        const dataValues = @Html.Raw(ViewBag.VisitorData);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Avg Visitors(Per Day)',
+                    data: dataValues,
+                    backgroundColor: '#CC0000',
+                    borderRadius: 5,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 10 },
+                        //to show whole numbers para mas maganda tignan
+                        stepSize: 1,
+                        callback: function(value) {
+                            if (value % 1 === 0) { return value; }
+                            }
+                        }
+                    },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    });
+</script>

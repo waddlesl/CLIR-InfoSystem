@@ -11,25 +11,13 @@
     </div>
 
     <h2 class="section-subtitle">Online Document Delivery Service</h2>
+    <partial name="_ReportFilter" />
+
 
     <div class="stats-row-top">
         <div class="report-card dark-card">
             <p class="card-label">Total Reservations</p>
             <h1 class="card-value">@ViewBag.ODDSCount</h1>
-        </div>
-
-        <div class="report-card graph-placeholder">
-            <p class="card-label">Volume per hour</p>
-            <div class="graph-box">
-                <p>Graph Data Placeholder</p>
-                <div class="simple-bar-container">
-                    <div class="bar" style="height: 40%"></div>
-                    <div class="bar" style="height: 70%"></div>
-                    <div class="bar" style="height: 50%"></div>
-                    <div class="bar" style="height: 90%"></div>
-                    <div class="bar" style="height: 30%"></div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -47,25 +35,29 @@
             </div>
         </div>
     </div>
-        <div class="report-card mini-card">
-            <p class="card-label">Top 5 Programs</p>
+        
+    <div class="row g-4 mt-2">
+    <div class="report-card mini-card">
+        <p class="card-label">Top 5 Programs</p>
 
-            @if (ViewBag.ODDSProgram == null || !Enumerable.Any(ViewBag.ODDSProgram))
-            {
-                <h2 class="card-value">N/A</h2>
-            }
-            else
-            {
-                <ul style="list-style: none; padding: 0;">
-                    @foreach (var book in ViewBag.ODDSProgram)
-                    {
+        @if (ViewBag.ODDSProgram == null || !Enumerable.Any(ViewBag.ODDSProgram))
+        {
+            <h2 class="card-value">N/A</h2>
+        }
+        else
+        {
+            <ul style="list-style: none; padding: 0;">
+                @foreach (var book in ViewBag.ODDSProgram)
+                {
                     <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                            <strong>@book.Program</strong>
-                            <strong>@book.Count</strong>
-                        </li>
-                    }
-                </ul>
-            }
-        </div>
-    
+                        <strong>@book.Program</strong>
+                        <strong>@book.Count</strong>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+    </div>
 </div>
+
+
