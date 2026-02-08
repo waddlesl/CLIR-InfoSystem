@@ -8,14 +8,10 @@ using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class FacilityController : Controller
+    // Inherit from BaseController to use shared _context and LogAction helper
+    public class FacilityController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public FacilityController(LibraryDbContext context)
-        {
-            _context = context;
-        }
+        public FacilityController(LibraryDbContext context) : base(context) { }
 
         // --- SEAT BOOKING LOGIC ---
 
@@ -35,7 +31,6 @@ namespace CLIR_InfoSystem.Controllers
         {
             string? loggedInId = HttpContext.Session.GetString("UserId");
 
-            // 1. PREVENT THE CRASH: Manual check for the UNIQUE constraint
             bool isAlreadyTaken = _context.SeatBookings.Any(s =>
                 s.SeatId == booking.SeatId &&
                 s.SlotId == booking.SlotId &&
@@ -50,7 +45,6 @@ namespace CLIR_InfoSystem.Controllers
             booking.PatronId = loggedInId;
             booking.Status = "Reserved";
 
-            // 2. FIX "BOOKING FAILED": Remove navigation properties from validation
             ModelState.Remove("Patron");
             ModelState.Remove("LibrarySeat");
             ModelState.Remove("TimeSlot");
@@ -60,6 +54,10 @@ namespace CLIR_InfoSystem.Controllers
             if (ModelState.IsValid)
             {
                 _context.SeatBookings.Add(booking);
+
+                // AUDIT: Log seat reservation
+                LogAction($"Reserved Seat ID: {booking.SeatId} for {booking.BookingDate.ToShortDateString()}", "book_a_seat");
+
                 _context.SaveChanges();
                 return Json(new { success = true, message = "Seat reserved successfully!" });
             }
@@ -72,7 +70,6 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult BookALibrarian()
         {
             string? loggedInId = HttpContext.Session.GetString("UserId");
-            // Check if user is blocked from booking
             ViewBag.HasActiveRequest = _context.BookALibrarians.Any(b =>
                 b.PatronId == loggedInId &&
                 (b.Status == "Pending" || b.Status == "Approved"));
@@ -80,20 +77,18 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.Librarians = _context.Staff.ToList();
             return View();
         }
+
         public IActionResult ManageBookings()
         {
             var activeBookings = _context.SeatBookings
                 .Include(b => b.TimeSlot)
-                //.Include(b => b.Patron) 
-                //.Where(b => b.Status == "Reserved")
                 .ToList();
 
             return View(activeBookings);
-
         }
+
         public IActionResult ManageBookaLibrarian()
         {
-            //check if expired
             var today = DateTime.Now;
             var completedRequest = _context.BookALibrarians
                 .Where(b => b.Status == "Approved" && today > b.BookingDate)
@@ -117,31 +112,23 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.BookingDate)
                 .ToList();
 
-
             return View(librarian);
         }
-
 
         [HttpPost]
         public IActionResult SubmitBooking(BookALibrarian model)
         {
             string? loggedInId = HttpContext.Session.GetString("UserId");
 
-            // 1. DUPLICATE CHECK: Check if the user already has an active or pending request
             var existingRequest = _context.BookALibrarians.FirstOrDefault(b =>
                 b.PatronId == loggedInId &&
                 (b.Status == "Pending" || b.Status == "Approved"));
 
             if (existingRequest != null)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "You already have an active or pending consultation request."
-                });
+                return Json(new { success = false, message = "You already have an active request." });
             }
 
-            // Time Validation: Check if between 8am and 5pm
             var hour = model.BookingDate.Hour;
             var day = model.BookingDate.DayOfWeek;
 
@@ -150,14 +137,11 @@ namespace CLIR_InfoSystem.Controllers
                 return Json(new { success = false, message = "Please select a weekday between 8:00 AM and 5:00 PM." });
             }
 
-
-            // 2. Set defaults
             model.PatronId = loggedInId;
             model.Status = "Pending";
             model.SchoolYear = "2025-2026";
             if (model.StaffId == 0) model.StaffId = null;
 
-            // 3. Validation Cleanup
             ModelState.Remove("Patron");
             ModelState.Remove("Staff");
             ModelState.Remove("SchoolYear");
@@ -167,6 +151,10 @@ namespace CLIR_InfoSystem.Controllers
             if (ModelState.IsValid)
             {
                 _context.BookALibrarians.Add(model);
+
+                // AUDIT: Log librarian request
+                LogAction($"Requested librarian consultation for {model.BookingDate}", "book_a_librarian");
+
                 _context.SaveChanges();
                 return Json(new { success = true, message = "Request sent successfully!" });
             }
@@ -207,6 +195,7 @@ namespace CLIR_InfoSystem.Controllers
             if (booking != null)
             {
                 booking.Status = "Completed";
+                LogAction($"Checked in patron for Seat Booking #{bookingId}", "book_a_seat");
                 _context.SaveChanges();
                 TempData["Success"] = "Patron checked in successfully.";
             }
@@ -220,6 +209,7 @@ namespace CLIR_InfoSystem.Controllers
             if (booking != null)
             {
                 booking.Status = "Cancelled";
+                LogAction($"Cancelled Seat Booking #{bookingId}", "book_a_seat");
                 _context.SaveChanges();
                 TempData["Info"] = "Booking has been cancelled.";
             }
@@ -233,6 +223,7 @@ namespace CLIR_InfoSystem.Controllers
             if (booking != null)
             {
                 booking.Status = "Approved";
+                LogAction($"Approved Librarian Consultation #{sessionId}", "book_a_librarian");
                 _context.SaveChanges();
                 TempData["Success"] = "Patron checked in successfully.";
             }
@@ -246,6 +237,7 @@ namespace CLIR_InfoSystem.Controllers
             if (booking != null)
             {
                 booking.Status = "Cancelled";
+                LogAction($"Cancelled Librarian Consultation #{sessionId}", "book_a_librarian");
                 _context.SaveChanges();
                 TempData["Info"] = "Booking has been cancelled.";
             }

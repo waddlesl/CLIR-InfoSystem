@@ -4,15 +4,17 @@
     bool alreadyBooked = ViewBag.AlreadyBooked ?? false;
 }
 
-<div class="container mt-5">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">Book a Library Seat</h2>
-        <p class="text-muted small">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</p>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if (alreadyBooked)
-    {
-        <div style="max-width: 600px; margin: 0 auto;">
+<div class="container mt-5">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-center">Book a Library Seat</h2>
+            <p class="text-muted small">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</p>
+        </div>
+
+        @if (alreadyBooked)
+        {
             <div class="card shadow-sm border-0 p-4 text-center">
                 <div class="py-3">
                     <i class="bi bi-calendar-check text-warning" style="font-size: 3rem;"></i>
@@ -24,24 +26,12 @@
                     <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold">Return to Dashboard</a>
                 </div>
             </div>
-        </div>
-    }
-    else
-    {
-        <div style="max-width: 600px; margin: 0 auto;">
-            <div asp-validation-summary="All" class="text-danger small mb-2"></div>
-
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
+        }
+        else
+        {
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <form asp-action="ConfirmBooking" method="post">
+                    <form id="bookingForm">
                         <div class="mb-3">
                             <label class="small fw-bold text-muted">BOOKING DATE</label>
                             <input type="date" id="BookingDate" asp-for="BookingDate" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
@@ -77,14 +67,41 @@
                     </form>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Updated logic to match the new UI IDs and classes
+        // --- SWEETALERT2 AJAX SUBMISSION ---
+        $('#bookingForm').submit(function (e) {
+            e.preventDefault();
+
+            $.post('/Facility/ConfirmBooking', $(this).serialize(), function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Reserved!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonColor: '#198754'
+                    }).then(() => {
+                        window.location.href = '/Dashboard/PatronDashboard';
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Unavailable',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            }).fail(function() {
+                Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
+            });
+        });
+
+        // --- CASCADING DROPDOWNS ---
         $('#BookingDate').change(function() {
             var selectedDate = $(this).val();
             if(selectedDate) {

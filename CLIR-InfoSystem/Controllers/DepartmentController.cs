@@ -5,14 +5,10 @@ using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class DepartmentController : Controller
+    // Inherit from BaseController to use shared _context and LogAction
+    public class DepartmentController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public DepartmentController(LibraryDbContext context)
-        {
-            _context = context;
-        }
+        public DepartmentController(LibraryDbContext context) : base(context) { }
 
         // List all departments
         public IActionResult Index()
@@ -21,7 +17,7 @@ namespace CLIR_InfoSystem.Controllers
             return View(departments);
         }
 
-        // API for Modals/Dropdowns (returns JSON for the Patron Registration)
+        // API for Modals/Dropdowns
         [HttpGet]
         public IActionResult GetDepartments()
         {
@@ -37,6 +33,10 @@ namespace CLIR_InfoSystem.Controllers
             if (dept == null) return BadRequest();
 
             _context.Departments.Add(dept);
+
+            // Log the addition
+            LogAction($"Added new department: {dept.DeptName}", "departments");
+
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -47,12 +47,17 @@ namespace CLIR_InfoSystem.Controllers
             var dept = _context.Departments.Find(id);
             if (dept == null) return NotFound();
 
-            // Check if any programs are linked to this department before deleting
+            // Check if any programs are linked
             bool hasLinkedPrograms = _context.Programs.Any(p => p.DeptId == id);
             if (hasLinkedPrograms)
                 return Json(new { success = false, message = "Cannot delete department with linked programs." });
 
+            string deptName = dept.DeptName; // Capture name for log
             _context.Departments.Remove(dept);
+
+            // Log the deletion
+            LogAction($"Deleted department: {deptName}", "departments");
+
             _context.SaveChanges();
             return Json(new { success = true });
         }

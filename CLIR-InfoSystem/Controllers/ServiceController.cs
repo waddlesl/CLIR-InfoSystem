@@ -1,17 +1,15 @@
 ﻿using CLIR_InfoSystem.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class ServiceController : Controller
+    public class ServiceController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public ServiceController(LibraryDbContext context)
+        public ServiceController(LibraryDbContext context) : base(context)
         {
-            _context = context;
         }
 
         // --- ODDS MANAGEMENT ---
@@ -21,7 +19,7 @@ namespace CLIR_InfoSystem.Controllers
             var odds = _context.Odds
                 .Include(s => s.Patron)
                 .ThenInclude(p => p.Department)
-                .Include(s => s.Book) // Added to show which book is being requested
+                .Include(s => s.Book)
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
@@ -30,7 +28,6 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageServices()
         {
-            //check if expired
             var today = DateTime.Now;
             var expiredRequest = _context.Services
                 .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(7))
@@ -41,11 +38,12 @@ namespace CLIR_InfoSystem.Controllers
                 foreach (var service in expiredRequest)
                 {
                     service.RequestStatus = "Expired";
+                    // AUDIT LOG (Internal System Action)
+                    LogAction($"Service Request #{service.ServiceId} automatically expired.", "System");
                 }
                 _context.SaveChanges();
             }
 
-            
             var services = _context.Services
                 .Include(s => s.Patron)
                     .ThenInclude(p => p.Department)
@@ -70,6 +68,9 @@ namespace CLIR_InfoSystem.Controllers
 
             _context.SaveChanges();
 
+            // AUDIT LOG
+            LogAction($"Updated ODDS Request #{requestId} status to: {status}", "Services");
+
             return RedirectToAction("ManageODDS");
         }
 
@@ -93,6 +94,9 @@ namespace CLIR_InfoSystem.Controllers
 
             request.RequestStatus = status;
             _context.SaveChanges();
+
+            // AUDIT LOG
+            LogAction($"Updated Service Request #{requestId} ({request.ServiceType}) status to: {status}", "Services");
 
             return RedirectToAction("ManageServices");
         }

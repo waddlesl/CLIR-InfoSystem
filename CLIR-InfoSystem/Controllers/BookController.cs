@@ -8,14 +8,10 @@ using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class BookController : Controller
+    // Inherit from BaseController to enable universal logging
+    public class BookController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public BookController(LibraryDbContext context)
-        {
-            _context = context;
-        }
+        public BookController(LibraryDbContext context) : base(context) { }
 
         public IActionResult BookManagement(string searchTerm)
         {
@@ -30,8 +26,9 @@ namespace CLIR_InfoSystem.Controllers
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                query = query.Where(p => p.Title.Contains(searchTerm) ||
-                                         p.Author.Contains(searchTerm) ||
+                // Safety: Handling potential NULL values in the database for string search
+                query = query.Where(p => (p.Title != null && p.Title.Contains(searchTerm)) ||
+                                         (p.Author != null && p.Author.Contains(searchTerm)) ||
                                          p.AccessionId == searchTerm);
             }
 
@@ -53,6 +50,7 @@ namespace CLIR_InfoSystem.Controllers
             if (ModelState.IsValid)
             {
                 _context.Books.Add(newBook);
+                LogAction($"Added new book: {newBook.Title}", "book");
                 _context.SaveChanges();
                 return Ok();
             }
@@ -76,6 +74,7 @@ namespace CLIR_InfoSystem.Controllers
                 try
                 {
                     _context.Books.Update(updatedBook);
+                    LogAction($"Edited book: {updatedBook.AccessionId}", "book");
                     _context.SaveChanges();
                     return RedirectToAction("BookManagement", "Book");
                 }
@@ -103,7 +102,6 @@ namespace CLIR_InfoSystem.Controllers
             var existingBook = _context.Books.Find(updatedBook.AccessionId);
             if (existingBook == null) return NotFound();
 
-            // Mapping updated fields to the existing entity
             existingBook.Title = updatedBook.Title;
             existingBook.Author = updatedBook.Author;
             existingBook.AvailabilityStatus = updatedBook.AvailabilityStatus;
@@ -117,6 +115,7 @@ namespace CLIR_InfoSystem.Controllers
             existingBook.Price = updatedBook.Price;
             existingBook.Discount = updatedBook.Discount;
 
+            LogAction($"Updated book via Management UI: {updatedBook.AccessionId}", "book");
             _context.SaveChanges();
             return Ok();
         }
@@ -135,6 +134,7 @@ namespace CLIR_InfoSystem.Controllers
                     borrowing.Book.AvailabilityStatus = "Available";
                 }
 
+                LogAction($"Processed Return for BorrowId: {id}", "book_borrowing");
                 _context.SaveChanges();
                 return Ok();
             }
@@ -148,7 +148,9 @@ namespace CLIR_InfoSystem.Controllers
             if (borrowing != null)
             {
                 borrowing.DueDate = newDate;
-                borrowing.Status = "Borrowed" ;
+                borrowing.Status = "Borrowed";
+
+                LogAction($"Extended due date for BorrowId: {id} to {newDate.ToShortDateString()}", "book_borrowing");
                 _context.SaveChanges();
                 return Ok();
             }
@@ -162,14 +164,12 @@ namespace CLIR_InfoSystem.Controllers
             if (book != null)
             {
                 book.AvailabilityStatus = status;
+                LogAction($"Toggled availability of {id} to {status}", "book");
                 _context.SaveChanges();
             }
             return RedirectToAction("BookManagement");
         }
 
-
-
-        // 1. Loads the page with available books
         public IActionResult PatronBorrow()
         {
             var availableBooks = _context.Books
@@ -178,35 +178,32 @@ namespace CLIR_InfoSystem.Controllers
             return View(availableBooks);
         }
 
-        // 2. Handles the actual borrow request
         [HttpPost]
         public IActionResult ProcessBorrow(string patronId, string accessionId)
         {
             var book = _context.Books.Find(accessionId);
             var patronExists = _context.Patrons.Any(p => p.PatronId == patronId);
 
-            // Validation
             if (book == null || book.AvailabilityStatus != "Available")
                 return Json(new { success = false, message = "Book is no longer available." });
 
             if (!patronExists)
                 return Json(new { success = false, message = "Invalid Patron ID." });
 
-            // Create Transaction with "Reserved" status
             var borrowRequest = new BookBorrowing
             {
                 PatronId = patronId,
                 AccessionId = accessionId,
                 BorrowDate = DateTime.Now,
                 DueDate = DateTime.Now.AddDays(7),
-                Status = "Reserved",               // Matches your SQL ENUM
-                StaffId = null                     // Pending approval
+                Status = "Reserved",
+                StaffId = null
             };
 
-            // Update Book status so it's hidden from the "Available" list
             book.AvailabilityStatus = "Reserved";
 
             _context.BookBorrowings.Add(borrowRequest);
+            LogAction($"Patron {patronId} requested borrow for {accessionId}", "book_borrowing");
             _context.SaveChanges();
 
             return Json(new { success = true, message = "Request submitted! Please proceed to the counter." });

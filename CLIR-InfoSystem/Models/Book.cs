@@ -8,45 +8,45 @@ namespace CLIR_InfoSystem.Models
     {
         [Key]
         [Column("accession_id")]
-        public string AccessionId { get; set; }
+        public string AccessionId { get; set; } = string.Empty;
 
         [Column("title")]
-        public string Title { get; set; }
+        public string? Title { get; set; } // Added ?
 
         [Column("author")]
-        public string Author { get; set; }
+        public string? Author { get; set; } // Added ?
 
         [Column("availability_status")]
-        public string AvailabilityStatus { get; set; }
+        public string? AvailabilityStatus { get; set; } // Added ?
 
         [Column("edition")]
-        public string Edition { get; set; }
+        public string? Edition { get; set; } // Added ?
 
         [Column("year_of_publication")]
-        public int YearOfPublication { get; set; }
+        public int? YearOfPublication { get; set; } // Added ? to int
 
         [Column("publisher")]
-        public string Publisher { get; set; }
+        public string? Publisher { get; set; } // Added ?
 
         [Column("collection")]
-        public string Collection { get; set; }
+        public string? Collection { get; set; } // Added ?
 
         [Column("library_location")]
-        public string LibraryLocation { get; set; }
+        public string? LibraryLocation { get; set; } // Added ?
 
         [Column("supplier")]
-        public string Supplier { get; set; }
+        public string? Supplier { get; set; } // Added ?
 
         [Column("sourced_from")]
-        public string SourcedFrom { get; set; }
+        public string? SourcedFrom { get; set; } // Added ?
 
         [Column("price")]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; } // Added ?
 
         [Column("discount")]
-        public decimal Discount { get; set; }
+        public decimal? Discount { get; set; } // Added ?
 
         [NotMapped]
-        public decimal Subtotal => Price - Discount;
+        public decimal Subtotal => (Price ?? 0) - (Discount ?? 0);
     }
 }
