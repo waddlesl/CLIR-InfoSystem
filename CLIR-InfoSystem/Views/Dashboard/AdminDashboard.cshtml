@@ -1,15 +1,104 @@
-﻿<h2>Admin Control Center</h2>
-<div class="row g-4 mt-2">
-    <div class="col-md-4">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Total Staff Users</h6>
-            <h3>@ViewBag.StaffCount</h3>
-        </div>
+﻿<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color: #1a2035;">Admin Control Center</h2>
+        <p class="text-muted">Security Oversight & System Management</p>
     </div>
-    <div class="col-md-8">
-        <div class="row g-3">
-            <div class="col-6"><div class="dash-card bg-red">Manage Staff Accounts</div></div>
-            <div class="col-6"><div class="dash-card bg-orange">System Audit Logs</div></div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 shadow-sm border-0 text-center" style="background-color: #ffffff; border-top: 5px solid #1a2035 !important;">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="fw-bold mb-3" style="color: #6e7a91; letter-spacing: 1px;">TOTAL STAFF USERS</h6>
+                    <h1 class="display-3 fw-bold" style="color: #1a2035;">@ViewBag.StaffCount</h1>
+                    <div class="mt-3">
+                        <span class="badge px-3 py-2" style="background-color: #1a2035;">System Operational</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="row g-3">
+                <div class="col-12">
+                    <a asp-controller="Account" asp-action="ManageStaff" class="text-decoration-none">
+                        <div class="dash-card bg-clir-red shadow-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box me-3">👨‍💼</div>
+                                <h5 class="fw-bold mb-0 text-white">Manage Staff Accounts</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-12">
+                    <a asp-controller="Account" asp-action="AuditLogs" class="text-decoration-none">
+                        <div class="dash-card bg-clir-red shadow-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box me-3">🛡️</div>
+                                <h5 class="fw-bold mb-0 text-white">System Audit Logs</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-12">
+                    <a asp-controller="Account" asp-action="SystemReports" class="text-decoration-none">
+                        <div class="dash-card bg-clir-red shadow-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box me-3">📊</div>
+                                <h5 class="fw-bold mb-0 text-white">System Reports</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* CLIR Color Palette */
+    .bg-clir-red {
+        background-color: #1a2035 !important;
+    }
+
+    .bg-clir-blue {
+        background-color: #1a2035 !important;
+    }
+
+    .dash-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        min-height: 90px;
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        cursor: pointer;
+        border-left: 0 solid white;
+    }
+
+    .icon-box {
+        font-size: 1.5rem;
+        background: rgba(255,255,255,0.2);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .dash-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 20px rgba(217, 45, 32, 0.2) !important;
+        border-left: 8px solid #1a2035; /* Blue accent on hover */
+    }
+
+    .card {
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+</style>

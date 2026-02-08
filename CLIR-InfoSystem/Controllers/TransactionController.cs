@@ -4,19 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class TransactionController : Controller
+    public class TransactionController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public TransactionController(LibraryDbContext context)
-        {
-            _context = context;
-        }
+        public TransactionController(LibraryDbContext context) : base(context) { }
 
         public IActionResult Index()
         {
@@ -57,6 +52,9 @@ namespace CLIR_InfoSystem.Controllers
             _context.BookBorrowings.Add(request);
             _context.SaveChanges();
 
+            // AUDIT LOG
+            LogAction($"Requested book: {book.Title} (Acc# {accessionId})", "Transactions");
+
             TempData["Success"] = "Book requested successfully!";
             return RedirectToAction("Index");
         }
@@ -70,7 +68,6 @@ namespace CLIR_InfoSystem.Controllers
             var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
 
             return View(results);
- 
         }
 
         public IActionResult BookBorrowers(string searchTerm)
@@ -86,7 +83,7 @@ namespace CLIR_InfoSystem.Controllers
                 {
                     loan.Status = "Overdue";
                 }
-                _context.SaveChanges(); 
+                _context.SaveChanges();
             }
 
             ViewBag.BorrowedBookCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
@@ -111,21 +108,23 @@ namespace CLIR_InfoSystem.Controllers
             var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
 
             return View(results);
-            
         }
 
         [HttpPost]
         public IActionResult ApproveRequest(int id)
         {
-            var request = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(r => r.BorrowId == id);
+            var request = _context.BookBorrowings.Include(b => b.Book).Include(b => b.Patron).FirstOrDefault(r => r.BorrowId == id);
             if (request != null && request.Book != null)
             {
                 request.Status = "Borrowed";
                 request.BorrowDate = DateTime.Now;
                 request.DueDate = DateTime.Now.AddDays(7);
-                request.Book.AvailabilityStatus = "Borrowed"; // Update the book itself
+                request.Book.AvailabilityStatus = "Borrowed";
 
                 _context.SaveChanges();
+
+                // AUDIT LOG
+                LogAction($"Approved borrowing request #{id} for {request.Patron?.FirstName} {request.Patron?.LastName}", "Transactions");
             }
             return RedirectToAction("BookBorrowers");
         }
@@ -138,23 +137,31 @@ namespace CLIR_InfoSystem.Controllers
             {
                 request.Status = "Returned";
                 request.ReturnDate = DateTime.Now;
-                request.Book.AvailabilityStatus = "Available"; // Make it available for others
+                request.Book.AvailabilityStatus = "Available";
 
                 _context.SaveChanges();
+
+                // AUDIT LOG
+                LogAction($"Processed return for book: {request.Book.Title} (BorrowID: {id})", "Transactions");
+
                 TempData["Success"] = "Book returned successfully.";
             }
             return RedirectToAction("BookBorrowers");
         }
 
         [HttpPost]
-        public IActionResult RejectRequest(int id)
+        public IActionResult DenyRequest(int id)
         {
             var request = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(r => r.BorrowId == id);
             if (request != null)
             {
                 request.Status = "Denied";
                 if (request.Book != null) request.Book.AvailabilityStatus = "Available";
+
                 _context.SaveChanges();
+
+                // AUDIT LOG
+                LogAction($"Rejected borrowing request #{id}", "Transactions");
             }
             return RedirectToAction("BookBorrowers");
         }

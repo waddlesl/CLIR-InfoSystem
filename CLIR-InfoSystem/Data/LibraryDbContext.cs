@@ -22,6 +22,8 @@ namespace CLIR_InfoSystem.Data
         public DbSet<LibrarySeat> LibrarySeats { get; set; }
         public DbSet<TimeSlot> TimeSlots { get; set; }
         public DbSet<BookALibrarian> BookALibrarians { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -3,18 +3,15 @@ using CLIR_InfoSystem.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class AccountController : Controller
+    // Inherit from BaseController to use _context and LogAction
+    public class AccountController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public AccountController(LibraryDbContext context)
-        {
-            _context = context;
-        }
+        public AccountController(LibraryDbContext context) : base(context) { }
 
         #region Authentication
 
@@ -24,7 +21,7 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            // 1. Staff Login - Checks for Username, Password, and Active status
+            // 1. Staff Login
             var staff = _context.Staff.FirstOrDefault(u =>
                 u.Username == username &&
                 u.Password == password &&
@@ -34,13 +31,15 @@ namespace CLIR_InfoSystem.Controllers
             {
                 HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
                 HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+                HttpContext.Session.SetInt32("StaffId", staff.StaffId); // For LogAction
                 HttpContext.Session.SetString("UserName", staff.FirstName);
 
-                // Dynamically routes based on role (e.g., LibrarianDashboard, AdminDashboard)
+                LogAction("Logged into the system", "staff");
+                _context.SaveChanges();
+
                 string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
                 return RedirectToAction(dashboardAction, "Dashboard");
             }
-
 
             // 2. Patron Login
             var patron = _context.Patrons
@@ -53,10 +52,12 @@ namespace CLIR_InfoSystem.Controllers
                 HttpContext.Session.SetString("UserRole", "Patron");
                 HttpContext.Session.SetString("UserName", patron.FirstName);
                 HttpContext.Session.SetString("UserId", patron.PatronId);
+                HttpContext.Session.SetString("PatronId", patron.PatronId); // For LogAction
                 HttpContext.Session.SetString("UserDept", patron.Department?.DeptName ?? "N/A");
-
-                // ADD THIS LINE TO FIX THE EMAIL ISSUE:
                 HttpContext.Session.SetString("UserEmail", patron.Email ?? "No Email Provided");
+
+                LogAction("Logged into the system", "patron");
+                _context.SaveChanges();
 
                 return RedirectToAction("PatronDashboard", "Dashboard");
             }
@@ -67,6 +68,8 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult Logout()
         {
+            LogAction("Logged out", "session");
+            _context.SaveChanges();
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
@@ -94,23 +97,15 @@ namespace CLIR_InfoSystem.Controllers
             return View(query.ToList());
         }
 
-        [HttpGet]
-        public IActionResult GetStaffDetails(int id)
-        {
-            var staff = _context.Staff.Find(id);
-            if (staff == null) return NotFound();
-            return Json(staff);
-        }
-
         [HttpPost]
         public IActionResult AddStaff([FromBody] Staff newStaff)
         {
             if (newStaff == null) return Json(new { success = false });
 
-            // Set default status if not provided
             if (string.IsNullOrEmpty(newStaff.Status)) newStaff.Status = "Active";
 
             _context.Staff.Add(newStaff);
+            LogAction($"Added new staff: {newStaff.Username}", "staff");
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -118,19 +113,16 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult UpdateStaff([FromBody] Staff updatedStaff)
         {
-            if (updatedStaff == null) return Json(new { success = false, message = "No data received" });
-
             var staff = _context.Staff.Find(updatedStaff.StaffId);
-            if (staff == null) return Json(new { success = false, message = "Staff member not found" });
+            if (staff == null) return Json(new { success = false, message = "Not found" });
 
-            // Update basic fields
             staff.FirstName = updatedStaff.FirstName;
             staff.LastName = updatedStaff.LastName;
             staff.Username = updatedStaff.Username;
             staff.TypeOfUser = updatedStaff.TypeOfUser;
-            // Optionally update password if provided
             if (!string.IsNullOrEmpty(updatedStaff.Password)) staff.Password = updatedStaff.Password;
 
+            LogAction($"Updated staff profile: {staff.Username}", "staff");
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -141,10 +133,70 @@ namespace CLIR_InfoSystem.Controllers
             if (staff != null)
             {
                 staff.Status = (staff.Status == "Active") ? "Inactive" : "Active";
+                LogAction($"Changed staff status to {staff.Status} for {staff.Username}", "staff");
                 _context.SaveChanges();
                 TempData["AlertMessage"] = $"Staff member is now {staff.Status}.";
             }
             return RedirectToAction("ManageStaff");
+        }
+
+        [HttpGet]
+        public IActionResult GetStaffDetails(int id)
+        {
+            var staff = _context.Staff.Find(id);
+            if (staff == null) return NotFound();
+
+            // Returning the object as JSON so the JS function can populate the modal fields
+            return Json(new
+            {
+                staffId = staff.StaffId,
+                firstName = staff.FirstName,
+                lastName = staff.LastName,
+                username = staff.Username,
+                typeOfUser = staff.TypeOfUser
+            });
+        }
+
+        #endregion
+
+        #region Admin Features
+
+        public IActionResult AuditLogs()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Admin")
+                return Unauthorized();
+
+            var allLogs = _context.AuditLogs
+                .Include(l => l.Staff)
+                .Include(l => l.Patron)
+                .OrderByDescending(l => l.LogDate)
+                .ToList();
+
+            ViewBag.StaffLogs = allLogs.Where(l => l.StaffId != null).ToList();
+            ViewBag.PatronLogs = allLogs.Where(l => l.PatronId != null).ToList();
+
+            return View();
+        }
+
+        public IActionResult SystemReports()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Admin")
+                return Unauthorized();
+
+            ViewBag.TotalBooks = _context.Books.Count();
+            ViewBag.ActivePatrons = _context.Patrons.Count();
+            ViewBag.TotalOdds = _context.Odds.Count();
+            ViewBag.InventoryValue = _context.Books.Sum(b => (b.Price ?? 0) - (b.Discount ?? 0));
+
+            // Fixed Staff Performance Query
+            ViewBag.StaffPerformance = _context.Odds
+                .Include(o => o.Staff)
+                .Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null && o.Staff.FirstName != null)
+                .GroupBy(o => o.Staff.FirstName)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .ToDictionary(k => k.Name, v => v.Count);
+
+            return View();
         }
 
         #endregion

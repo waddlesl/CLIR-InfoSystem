@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.AuditLog>
+
+<div class="container mt-4">
+    <h2 class="text-center fw-bold mb-4">System Audit Logs</h2>
+
+    <div class="card shadow-sm mx-auto mb-5" style="max-width: 95%; border-radius: 15px;">
+        <div class="card-body">
+            <h4 class="fw-bold text-primary"><i class="bi bi-person-badge"></i> Staff Activity</h4>
+            <hr />
+            <table class="table table-hover mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Staff Member</th>
+                        <th>Action Performed</th>
+                        <th>Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in (List<CLIR_InfoSystem.Models.AuditLog>)ViewBag.StaffLogs)
+                    {
+                        <tr>
+                            <td>@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                            <td><strong>@log.Staff?.FirstName @log.Staff?.LastName</strong></td>
+                            <td>@log.ActionPerformed</td>
+                            <td><span class="badge bg-info text-dark">@log.TableAffected</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mx-auto" style="max-width: 95%; border-radius: 15px;">
+        <div class="card-body">
+            <h4 class="fw-bold text-success"><i class="bi bi-people"></i> Patron Activity</h4>
+            <hr />
+            <table class="table table-hover mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Patron Name</th>
+                        <th>Action Performed</th>
+                        <th>Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in (List<CLIR_InfoSystem.Models.AuditLog>)ViewBag.PatronLogs)
+                    {
+                        <tr>
+                            <td>@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                            <td><strong>@log.Patron?.FirstName @log.Patron?.LastName</strong> <small class="text-muted">(@log.PatronId)</small></td>
+                            <td>@log.ActionPerformed</td>
+                            <td><span class="badge bg-secondary">@log.TableAffected</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CLIR_InfoSystem.Data;
+using CLIR_InfoSystem.Models;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    public class DashboardController : Controller
+    // Inherit from BaseController to use shared _context and LogAction
+    public class DashboardController : BaseController
     {
-        private readonly LibraryDbContext _context;
-
-        public DashboardController(LibraryDbContext context)
-        {
-            _context = context;
-        }
+        public DashboardController(LibraryDbContext context) : base(context) { }
 
         public IActionResult Index()
         {
@@ -22,7 +19,7 @@ namespace CLIR_InfoSystem.Controllers
             return role switch
             {
                 "Admin" => RedirectToAction("AdminDashboard"),
-                "Librarian" => RedirectToAction("LibrarianDashboard"), // Matches AccountController role
+                "Librarian" => RedirectToAction("LibrarianDashboard"),
                 "Student Assistant" => RedirectToAction("StudentAssistantDashboard"),
                 "Patron" => RedirectToAction("PatronDashboard"),
                 _ => RedirectToAction("Login", "Account")
@@ -35,12 +32,15 @@ namespace CLIR_InfoSystem.Controllers
 
             if (!string.IsNullOrEmpty(userId))
             {
-                // Removed int.TryParse because PatronId is a string in your Model
                 ViewBag.MyLoans = _context.BookBorrowings
                     .Count(b => b.PatronId == userId && b.Status != "Returned");
 
                 ViewBag.MyPendingRequests = _context.Services
                     .Count(s => s.PatronId == userId && s.RequestStatus == "Pending");
+
+                // Log view access if desired
+                LogAction("Viewed Patron Dashboard", "dashboard");
+                _context.SaveChanges();
             }
             else
             {
@@ -52,22 +52,30 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult AdminDashboard()
         {
+            if (HttpContext.Session.GetString("UserRole") != "Admin") return Unauthorized();
+
             ViewBag.StaffCount = _context.Staff.Count();
             ViewBag.BookCount = _context.Books.Count();
             ViewBag.PatronCount = _context.Patrons.Count();
             ViewBag.ActiveLoans = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
 
+            LogAction("Viewed Admin Dashboard", "dashboard");
+            _context.SaveChanges();
+
             return View();
         }
 
-        public IActionResult LibrarianDashboard() => StaffCommonView();
-        public IActionResult StudentAssistantDashboard() => StaffCommonView();
+        public IActionResult LibrarianDashboard() => StaffCommonView("Librarian");
+        public IActionResult StudentAssistantDashboard() => StaffCommonView("Student Assistant");
 
-        private IActionResult StaffCommonView()
+        private IActionResult StaffCommonView(string staffType)
         {
             ViewBag.BookCount = _context.Books.Count();
             ViewBag.PatronCount = _context.Patrons.Count();
             ViewBag.BorrowedCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
+
+            LogAction($"Viewed {staffType} Dashboard", "dashboard");
+            _context.SaveChanges();
 
             return View("StaffCommonDashboard");
         }
