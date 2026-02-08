@@ -1,0 +1,98 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.ServiceRequest>
+<div id="bm-page-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Library Services</h2>
+    </div>
+
+    <div class="card p-3 shadow-sm border-0">
+        <h3>Pending Requests</h3>
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Patron ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th>Service Type</th>
+                    <th>Request Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus == "Pending"))
+                {
+                    <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
+                        <td>@ServiceRequest.PatronId</td>
+                        <td>@(ServiceRequest.Patron.FirstName + " " + ServiceRequest.Patron.LastName)</td>
+                        <td>@ServiceRequest.Patron.Department.DeptCode</td>
+                        <td>@ServiceRequest.Patron.Email</td>
+                        <td>@ServiceRequest.ServiceType</td>
+                        <td>@ServiceRequest.RequestDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <span class="badge @(ServiceRequest.RequestStatus == "Approved" ? "bg-success" : "bg-secondary")">
+                                @ServiceRequest.RequestStatus
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center align-items-center">
+                                <form asp-action="UpdateServiceStatus" method="post">
+                                    <input type="hidden" name="requestId" value="@ServiceRequest.ServiceId" />
+                                    <input type="hidden" name="status" value="Approved" />
+                                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                </form>
+
+                                <form asp-action="UpdateServiceStatus" method="post">
+                                    <input type="hidden" name="requestId" value="@ServiceRequest.ServiceId" />
+                                    <input type="hidden" name="status" value="Rejected" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+    <br />
+    <div class="card p-3 shadow-sm border-0">
+        <h3>Requests History</h3>
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Patron ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th>Service Type</th>
+                    <th>Request Date</th>
+                    <th>Status</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus != "Pending"))
+                {
+                    <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
+                        <td>@ServiceRequest.PatronId</td>
+                        <td>@(ServiceRequest.Patron.FirstName + " " + ServiceRequest.Patron.LastName)</td>
+                        <td>@ServiceRequest.Patron.Department.DeptCode</td>
+                        <td>@ServiceRequest.Patron.Email</td>
+                        <td>@ServiceRequest.ServiceType</td>
+                        <td>@ServiceRequest.RequestDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <span class="badge @(ServiceRequest.RequestStatus == "Approved" ? "bg-success" : "bg-secondary")">
+                                @ServiceRequest.RequestStatus
+                            </span>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

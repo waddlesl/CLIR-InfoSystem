@@ -28,6 +28,34 @@ namespace CLIR_InfoSystem.Controllers
             return View(odds);
         }
 
+        public IActionResult ManageServices()
+        {
+            //check if expired
+            var today = DateTime.Now;
+            var expiredRequest = _context.Services
+                .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(7))
+                .ToList();
+
+            if (expiredRequest.Any())
+            {
+                foreach (var service in expiredRequest)
+                {
+                    service.RequestStatus = "Expired";
+                }
+                _context.SaveChanges();
+            }
+
+            
+            var services = _context.Services
+                .Include(s => s.Patron)
+                    .ThenInclude(p => p.Department)
+                .Include(s => s.Staff)
+                .OrderByDescending(o => o.RequestDate)
+                .ToList();
+
+            return View(services);
+        }
+
         [HttpPost]
         public IActionResult UpdateOddsStatus(int requestId, string status)
         {
@@ -58,15 +86,15 @@ namespace CLIR_InfoSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateServiceStatus(int serviceId, string status)
+        public IActionResult UpdateServiceStatus(int requestId, string status)
         {
-            var request = _context.Services.Find(serviceId);
+            var request = _context.Services.Find(requestId);
             if (request == null) return NotFound();
 
             request.RequestStatus = status;
             _context.SaveChanges();
 
-            return RedirectToAction("ManageServiceRequests");
+            return RedirectToAction("ManageServices");
         }
     }
 }

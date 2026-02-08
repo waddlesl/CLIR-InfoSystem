@@ -91,6 +91,35 @@ namespace CLIR_InfoSystem.Controllers
             return View(activeBookings);
 
         }
+        public IActionResult ManageBookaLibrarian()
+        {
+            //check if expired
+            var today = DateTime.Now;
+            var completedRequest = _context.BookALibrarians
+                .Where(b => b.Status == "Approved" && today > b.BookingDate)
+                .ToList();
+
+            if (completedRequest.Any())
+            {
+                foreach (var service in completedRequest)
+                {
+                    service.Status = "Completed";
+                }
+                _context.SaveChanges();
+            }
+
+            string userId = HttpContext.Session.GetString("UserId");
+            var librarian = _context.BookALibrarians
+                .Include(s => s.Patron)
+                    .ThenInclude(p => p.Department)
+                .Include(s => s.Staff)
+                .Where(s => s.Staff.StaffId == Convert.ToInt32(userId))
+                .OrderByDescending(o => o.BookingDate)
+                .ToList();
+
+
+            return View(librarian);
+        }
 
 
         [HttpPost]
@@ -169,6 +198,58 @@ namespace CLIR_InfoSystem.Controllers
                 .Select(s => new { id = s.Id, name = $"{s.SeatName} ({s.SeatType})" }).ToList();
 
             return Json(seats);
+        }
+
+        [HttpPost]
+        public IActionResult CheckIn(int bookingId)
+        {
+            var booking = _context.SeatBookings.Find(bookingId);
+            if (booking != null)
+            {
+                booking.Status = "Completed";
+                _context.SaveChanges();
+                TempData["Success"] = "Patron checked in successfully.";
+            }
+            return RedirectToAction("ManageBookings");
+        }
+
+        [HttpPost]
+        public IActionResult CancelBooking(int bookingId)
+        {
+            var booking = _context.SeatBookings.Find(bookingId);
+            if (booking != null)
+            {
+                booking.Status = "Cancelled";
+                _context.SaveChanges();
+                TempData["Info"] = "Booking has been cancelled.";
+            }
+            return RedirectToAction("ManageBookings");
+        }
+
+        [HttpPost]
+        public IActionResult LibrarianCheckIn(int sessionId)
+        {
+            var booking = _context.BookALibrarians.Find(sessionId);
+            if (booking != null)
+            {
+                booking.Status = "Approved";
+                _context.SaveChanges();
+                TempData["Success"] = "Patron checked in successfully.";
+            }
+            return RedirectToAction("ManageBookaLibrarian");
+        }
+
+        [HttpPost]
+        public IActionResult CancelLibrarianBooking(int sessionId)
+        {
+            var booking = _context.BookALibrarians.Find(sessionId);
+            if (booking != null)
+            {
+                booking.Status = "Cancelled";
+                _context.SaveChanges();
+                TempData["Info"] = "Booking has been cancelled.";
+            }
+            return RedirectToAction("ManageBookaLibrarian");
         }
     }
 }

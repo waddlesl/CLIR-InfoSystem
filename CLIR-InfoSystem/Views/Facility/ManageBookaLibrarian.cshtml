@@ -1,0 +1,141 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.BookALibrarian>
+
+<h2>Manage Seat Bookings</h2>
+
+<div id="bm-page-container">
+    <div class="card p-3 shadow-sm border-0">
+        <div class="card-header">
+            <h3 class="card-title">Book A Librarian Requests</h3>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle text-center">
+                <thead>
+                <tr>
+                    
+                    <th>Patron ID</th>
+                    <th>Booking Date</th>
+                    <th>Topic</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var librarian in Model.Where(sb => sb.Status == "Pending"))
+                {
+                    <tr>
+                        
+                        <td>@librarian.PatronId</td>
+                        <td>@librarian.BookingDate.ToShortDateString()</td>
+                        <td>@librarian.Topic</td>
+                        <td>@librarian.Description</td>
+                        <td>
+                            @{
+                                string badgeClass = librarian.Status switch
+                                {
+                                    "Reserved" => "bg-primary",
+                                    "Completed" => "bg-success",
+                                    "Cancelled" => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">@librarian.Status</span>
+                        </td>
+                        <td>
+                             @if (librarian.Status == "Pending")
+                            {
+                            <div class="d-flex gap-2 justify-content-center align-items-center">
+                                        <form asp-action="LibrarianCheckIn" method="post">
+                                    <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                </form>
+
+                                <form asp-action="CancelLibrarianBooking" method="post">
+                                    <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            </div>
+                            }
+                            else
+                            {
+                                <small class="text-muted">No actions available</small>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br />
+    <div class="card p-3 shadow-sm border-0">
+        <div class="card-header">
+            <h3 class="card-title">Bookings</h3>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle text-center">
+                <thead>
+                    <tr>
+                        
+                        <th>Patron ID</th>
+                        <th>Booking Date</th>
+                        <th>Topic</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var librarian in Model.Where(sb => sb.Status != "Pending"))
+                    {
+                        <tr>
+                            
+                            <td>@librarian.PatronId</td>
+                            <td>@librarian.BookingDate.ToShortDateString()</td>
+                            <td>@librarian.Topic</td>
+                            <td>@librarian.Description</td>
+                            <td>
+                                @{
+                                    // Dynamic badge colors based on status
+                                    string badgeClass = librarian.Status switch
+                                    {
+                                        "Reserved" => "bg-primary",
+                                        "Completed" => "bg-success",
+                                        "Cancelled" => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@librarian.Status</span>
+                            </td>
+                            <td>
+                                @if (librarian.Status == "Reserved")
+                                {
+                                    <div class="d-flex gap-2 justify-content-center align-items-center">
+                                        <form asp-action="LibrarianCheckIn" method="post">
+                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                            <button type="submit" class="btn btn-sm btn-success">Mark Completed</button>
+                                        </form>
+
+                                        @* Optional: Add a Cancel button *@
+                                        <form asp-action="CancelLibrarianBooking" method="post">
+                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                        </form>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">No actions available</small>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
