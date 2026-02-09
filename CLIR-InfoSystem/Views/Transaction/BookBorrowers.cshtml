@@ -79,16 +79,14 @@
                                 {
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center align-items-center">
-                                            <form asp-action="UpdateOddsStatus" method="post">
-                                                <input type="hidden" name="requestId" value="@bb.BorrowId" />
-                                                <input type="hidden" name="status" value="Fulfilled" />
-                                                <button type="submit" class="btn btn-secondary btn-lg disabled">Fulfilled</button>
+                                            <form asp-action="ApproveRequest" method="post">
+                                                <input type="hidden" name="id" value="@bb.BorrowId" />
+                                                <button type="submit" class="btn btn-sm btn-secondary" disabled>Fulfilled</button>
                                             </form>
 
-                                            <form asp-action="UpdateOddsStatus" method="post">
-                                                <input type="hidden" name="requestId" value="@bb.BorrowId" />
-                                                <input type="hidden" name="status" value="Cancelled" />
-                                                <button type="submit" class="btn btn-secondary btn-lg disabled">Cancel</button>
+                                            <form asp-action="DenyRequest" method="post">
+                                                <input type="hidden" name="id" value="@bb.BorrowId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" disabled>Cancel</button>
                                             </form>
                                         </div>
                                     </td>
@@ -196,7 +194,7 @@
                             {
                                 <td>
                                         <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')" disabled>Extend</button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')" disabled>Extend</button>
                                 </td>
                             }
                         </tr>

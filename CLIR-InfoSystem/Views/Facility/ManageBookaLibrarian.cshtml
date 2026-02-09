@@ -112,10 +112,10 @@
                                 <span class="badge @badgeClass">@librarian.Status</span>
                             </td>
                             <td>
-                                @if (librarian.Status == "Reserved")
+                                @if (librarian.Status == "Approved")
                                 {
                                     <div class="d-flex gap-2 justify-content-center align-items-center">
-                                        <form asp-action="LibrarianCheckIn" method="post">
+                                        <form asp-action="LibrarianComplete" method="post">
                                             <input type="hidden" name="sessionId" value="@librarian.SessionId" />
                                             <button type="submit" class="btn btn-sm btn-success">Mark Completed</button>
                                         </form>

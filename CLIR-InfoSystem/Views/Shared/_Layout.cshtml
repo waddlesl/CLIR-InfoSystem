@@ -183,7 +183,10 @@
             @if (role == "Student Assistant")
             {
                 <div class="nav-group-label">Assistant</div>
-                <div class="nav-item"><a asp-controller="Book" asp-action="Index">📖 View Catalog</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons">👤 Patron Management</a></div>
+                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement">📖 View Catalog</a></div>
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers">🤝 View Borrowers</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings">🪑 View Reservations</a></div>
                 <div class="nav-item"><a href="#">❓ Help Desk</a></div>
             }
 
