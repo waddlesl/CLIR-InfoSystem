@@ -1,25 +1,223 @@
 ﻿@{
     ViewData["Title"] = "Librarian Dashboard";
+    var role = Context.Session.GetString("UserRole");
 }
 
-<style>
-    .dash-card { height: 140px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; padding: 15px; cursor: pointer; transition: 0.3s; }
-    .dash-card:hover { filter: brightness(1.1); }
-    .bg-green { background-color: #2ec4b6; }
-    .bg-orange { background-color: #ff9f1c; }
-    .bg-blue { background-color: #008bf8; }
-</style>
+<div class="container-fluid px-4 mt-4">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color: #1a2035;">Librarian Command Center</h2>
+        <p class="text-muted">Real-time Operations & System Monitoring</p>
+        <hr class="mx-auto" style="width: 60px; height: 4px; background: #EE1D24; opacity: 1; border-radius: 2px;">
+    </div>
 
-<h2>Welcome, Librarian!</h2>
-<div class="row g-4 mt-4">
-    <div class="col-md-3"><div class="dash-card bg-green">Issue/Return Book</div></div>
-    <div class="col-md-3"><div class="dash-card bg-orange">Register New Patron</div></div>
-    <div class="col-md-3"><div class="dash-card bg-blue">Approve Grammarly</div></div>
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm border-0" style="height: 140px;">
-            <h6 class="text-muted">Current Stats</h6>
-            <p class="mb-0">Books: <strong>@ViewBag.BookCount</strong></p>
-            <p>Patrons: <strong>@ViewBag.PatronCount</strong></p>
+    <div class="row g-3 mb-5">
+        <div class="col-md-3">
+            <div class="stat-card bg-primary text-white p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="display-6 fw-bold">@ViewBag.BookCount</div>
+                        <small class="text-uppercase ls-1">Total Books</small>
+                    </div>
+                    <div class="fs-1 opacity-25">📚</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-success text-white p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="display-6 fw-bold">@ViewBag.BorrowedCount</div>
+                        <small class="text-uppercase ls-1">Active Loans</small>
+                    </div>
+                    <div class="fs-1 opacity-25">📖</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-purple text-white p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="display-6 fw-bold">@ViewBag.PatronCount</div>
+                        <small class="text-uppercase ls-1">Total Patrons</small>
+                    </div>
+                    <div class="fs-1 opacity-25">👥</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-danger text-white p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="display-6 fw-bold">@ViewBag.OverdueCount</div>
+                        <small class="text-uppercase ls-1">Overdue</small>
+                    </div>
+                    <div class="fs-1 opacity-25">⚠️</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h6 class="fw-bold mb-0 text-clir">RECENT ACTIVITY LOG</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="small text-muted text-uppercase">
+                                    <th class="ps-4">Patron ID</th>
+                                    <th>Status</th>
+                                    <th class="pe-4">Date Issued</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.RecentTransactions)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-bold text-clir">@item.PatronId</td>
+                                        <td>
+                                            <span class="badge @(item.Status == "Borrowed" ? "bg-primary-soft text-primary" : "bg-success-soft text-success") px-3">
+                                                @item.Status
+                                            </span>
+                                        </td>
+                                        <td class="small pe-4">@item.BorrowDate.ToString("MMM dd, yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h6 class="fw-bold mb-0 text-clir">ACTION REQUIRED</h6>
+                </div>
+                <div class="card-body">
+                    @* Overdue Alert *@
+                    @if (ViewBag.OverdueCount > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 text-danger p-3 bg-danger-soft">
+                            <div class="fs-4 me-3">🚨</div>
+                            <div>
+                                <div class="fw-bold small">Overdue Detected</div>
+                                <p class="mb-0 small">@ViewBag.OverdueCount items are past due.</p>
+                            </div>
+                        </div>
+                    }
+
+                    @* Librarian Consultations *@
+                    @if (ViewBag.PendingConsultations > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 text-primary p-3 bg-primary-soft">
+                            <div class="fs-4 me-3">👨‍🏫</div>
+                            <div>
+                                <div class="fw-bold small">Librarian Bookings</div>
+                                <p class="mb-0 small">@ViewBag.PendingConsultations pending research sessions.</p>
+                            </div>
+                        </div>
+                    }
+
+                    @* Digital Requests (ODDS + Services) *@
+                    @if (ViewBag.DigitalQueue > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 text-warning p-3 bg-warning-soft">
+                            <div class="fs-4 me-3">📩</div>
+                            <div>
+                                <div class="fw-bold small">Digital Requests</div>
+                                <p class="mb-0 small">@ViewBag.DigitalQueue pending ODDS/Service requests.</p>
+                            </div>
+                        </div>
+                    }
+
+                    @* Seat Traffic (Always shows today's count) *@
+                    <div class="alert-item d-flex align-items-center mb-3 text-info p-3 bg-info-soft">
+                        <div class="fs-4 me-3">🪑</div>
+                        <div>
+                            <div class="fw-bold small">Today's Seat Traffic</div>
+                            <p class="mb-0 small">@ViewBag.TodaySeats active reservations for today.</p>
+                        </div>
+                    </div>
+
+                    @if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                    {
+                        <div class="alert-item d-flex align-items-center text-secondary p-3 bg-light border">
+                            <div class="fs-4 me-3">📋</div>
+                            <div>
+                                <div class="fw-bold small">Weekly Audit</div>
+                                <p class="mb-0 small">Inventory check scheduled for today.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .text-clir {
+        color: #1a2035;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+        font-size: 0.7rem;
+    }
+
+    .stat-card {
+        border-radius: 12px;
+        border: none;
+        transition: transform 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .bg-purple {
+        background-color: #6f42c1;
+    }
+
+    .bg-primary-soft {
+        background-color: #eef2ff;
+        border-radius: 10px;
+    }
+
+    .bg-success-soft {
+        background-color: #ecfdf5;
+    }
+
+    .bg-danger-soft {
+        background-color: #fff1f2;
+        border-radius: 10px;
+    }
+
+    .bg-warning-soft {
+        background-color: #fffbeb;
+        border-radius: 10px;
+    }
+
+    .bg-info-soft {
+        background-color: #e0f2fe;
+        border-radius: 10px;
+        color: #0369a1;
+    }
+
+    .table thead th {
+        border-bottom: none;
+    }
+
+    .alert-item {
+        border-radius: 10px;
+    }
+</style>

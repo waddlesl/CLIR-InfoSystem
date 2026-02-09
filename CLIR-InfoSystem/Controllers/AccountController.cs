@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    // Inherit from BaseController to use _context and LogAction
     public class AccountController : BaseController
     {
         public AccountController(LibraryDbContext context) : base(context) { }
@@ -16,7 +15,17 @@ namespace CLIR_InfoSystem.Controllers
         #region Authentication
 
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            // If already logged in, skip the login page
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                var role = HttpContext.Session.GetString("UserRole");
+                if (role == "Patron") return RedirectToAction("PatronDashboard", "Dashboard");
+                return RedirectToAction(role.Replace(" ", "") + "Dashboard", "Dashboard");
+            }
+            return View();
+        }
 
         [HttpPost]
         public IActionResult Login(string username, string password)
@@ -31,7 +40,7 @@ namespace CLIR_InfoSystem.Controllers
             {
                 HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
                 HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
-                HttpContext.Session.SetInt32("StaffId", staff.StaffId); // For LogAction
+                HttpContext.Session.SetInt32("StaffId", staff.StaffId);
                 HttpContext.Session.SetString("UserName", staff.FirstName);
 
                 LogAction("Logged into the system", "staff");
@@ -41,28 +50,25 @@ namespace CLIR_InfoSystem.Controllers
                 return RedirectToAction(dashboardAction, "Dashboard");
             }
 
-            // 2. Patron Login
+            // 2. Patron Login (ID + Last Name)
             var patron = _context.Patrons
                 .Include(p => p.Department)
                 .Include(p => p.Program)
                 .FirstOrDefault(p => p.PatronId == username);
 
-            if (patron != null)
+            if (patron != null && patron.LastName.ToLower() == password.ToLower())
             {
                 HttpContext.Session.SetString("UserRole", "Patron");
                 HttpContext.Session.SetString("UserName", patron.FirstName);
                 HttpContext.Session.SetString("UserId", patron.PatronId);
-                HttpContext.Session.SetString("PatronId", patron.PatronId); // For LogAction
-                HttpContext.Session.SetString("UserDept", patron.Department?.DeptName ?? "N/A");
-                HttpContext.Session.SetString("UserEmail", patron.Email ?? "No Email Provided");
 
-                LogAction("Logged into the system", "patron");
+                LogAction("Logged into Kiosk", "patron");
                 _context.SaveChanges();
 
                 return RedirectToAction("PatronDashboard", "Dashboard");
             }
 
-            ViewBag.Error = "Invalid Credentials or Inactive Account.";
+            ViewBag.Error = "Invalid ID or Surname. Please try again.";
             return View();
         }
 
@@ -80,8 +86,8 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageStaff(string searchTerm)
         {
-            if (HttpContext.Session.GetString("UserRole") != "Admin")
-                return Unauthorized();
+            // Use the BaseController helper to restrict access
+            if (!IsAuthorized("Admin")) return Unauthorized();
 
             var query = _context.Staff
                 .Where(s => s.TypeOfUser == "Librarian" || s.TypeOfUser == "Student Assistant");
@@ -100,6 +106,7 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult AddStaff([FromBody] Staff newStaff)
         {
+            if (!IsAuthorized("Admin")) return Unauthorized();
             if (newStaff == null) return Json(new { success = false });
 
             if (string.IsNullOrEmpty(newStaff.Status)) newStaff.Status = "Active";
@@ -113,6 +120,8 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult UpdateStaff([FromBody] Staff updatedStaff)
         {
+            if (!IsAuthorized("Admin")) return Unauthorized();
+
             var staff = _context.Staff.Find(updatedStaff.StaffId);
             if (staff == null) return Json(new { success = false, message = "Not found" });
 
@@ -129,6 +138,8 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ToggleStatus(int id)
         {
+            if (!IsAuthorized("Admin")) return Unauthorized();
+
             var staff = _context.Staff.Find(id);
             if (staff != null)
             {
@@ -143,10 +154,11 @@ namespace CLIR_InfoSystem.Controllers
         [HttpGet]
         public IActionResult GetStaffDetails(int id)
         {
+            if (!IsAuthorized("Admin")) return Unauthorized();
+
             var staff = _context.Staff.Find(id);
             if (staff == null) return NotFound();
 
-            // Returning the object as JSON so the JS function can populate the modal fields
             return Json(new
             {
                 staffId = staff.StaffId,
@@ -163,8 +175,7 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult AuditLogs()
         {
-            if (HttpContext.Session.GetString("UserRole") != "Admin")
-                return Unauthorized();
+            if (!IsAuthorized("Admin")) return Unauthorized();
 
             var allLogs = _context.AuditLogs
                 .Include(l => l.Staff)
@@ -180,18 +191,16 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult SystemReports()
         {
-            if (HttpContext.Session.GetString("UserRole") != "Admin")
-                return Unauthorized();
+            if (!IsAuthorized("Admin")) return Unauthorized();
 
             ViewBag.TotalBooks = _context.Books.Count();
             ViewBag.ActivePatrons = _context.Patrons.Count();
             ViewBag.TotalOdds = _context.Odds.Count();
             ViewBag.InventoryValue = _context.Books.Sum(b => (b.Price ?? 0) - (b.Discount ?? 0));
 
-            // Fixed Staff Performance Query
             ViewBag.StaffPerformance = _context.Odds
                 .Include(o => o.Staff)
-                .Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null && o.Staff.FirstName != null)
+                .Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null)
                 .GroupBy(o => o.Staff.FirstName)
                 .Select(g => new { Name = g.Key, Count = g.Count() })
                 .ToDictionary(k => k.Name, v => v.Count);
