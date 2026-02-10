@@ -64,6 +64,7 @@ wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\css\site.css
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\favicon.ico
+C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\js\site.js
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -123,4 +124,3 @@ C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\jquery\d
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\lib\jquery\LICENSE.txt
-C:\Users\wilva\Source\Repos\CLIR-InfoSystem\CLIR-InfoSystem\wwwroot\js\site.js
