@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CLIR_InfoSystem.Data;
-using MySqlConnector;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -74,4 +70,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
-app.Run();
+// ✅ BIND TO PORT FROM ENVIRONMENT
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Run($"http://0.0.0.0:{port}");
