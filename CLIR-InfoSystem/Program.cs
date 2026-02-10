@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using CLIR_InfoSystem.Data;
+using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +15,41 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Database Connection Setup
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// ================= DATABASE CONNECTION SETUP =================
+
+// Get MYSQL_URL from Render (Railway provides this)
+var mysqlUrl = Environment.GetEnvironmentVariable("MYSQL_URL");
+
+MySqlConnectionStringBuilder connBuilder;
+
+if (!string.IsNullOrEmpty(mysqlUrl))
+{
+    // Running on Render → use Railway MySQL
+    var uri = new Uri(mysqlUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    connBuilder = new MySqlConnectionStringBuilder
+    {
+        Server = uri.Host,
+        Port = (uint)uri.Port,
+        UserID = userInfo[0],
+        Password = userInfo[1],
+        Database = uri.AbsolutePath.TrimStart('/'),
+        SslMode = MySqlSslMode.Required
+    };
+}
+else
+{
+    // Running locally → use appsettings.json
+    connBuilder = new MySqlConnectionStringBuilder(
+        builder.Configuration.GetConnectionString("DefaultConnection"));
+}
+
 builder.Services.AddDbContext<LibraryDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 0))));
+    options.UseMySql(connBuilder.ConnectionString,
+        ServerVersion.AutoDetect(connBuilder.ConnectionString)));
+
+// =============================================================
 
 var app = builder.Build();
 
