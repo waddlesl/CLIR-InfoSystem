@@ -1,82 +1,168 @@
-﻿<div class="container dashboard-container py-5">
+﻿@{
+    ViewData["Title"] = "Patron Dashboard";
+}
+
+<div class="container py-5">
     @* Centered Title *@
     <div class="text-center mb-5">
-        <h1 class="fw-bold">Welcome back, @ViewBag.FirstName!</h1>
-        <p class="text-muted">What would you like to do today?</p>
+        <h2 class="fw-bold text-clir">Library Service Hub</h2>
+        <p class="text-muted">A quick glance at your latest library updates</p>
+        <hr class="mx-auto" style="width: 50px; height: 4px; background: #198754; opacity: 1; border-radius: 2px;">
     </div>
 
-    @* Stat Boxes using lib-label pattern *@
-    <div class="d-flex gap-4 justify-content-center flex-wrap mb-5">
-        <div class="stat-box text-center">
-            <small class="lib-label">📖 My Borrowings</small>
-            <h2 class="fw-bold mb-0">@(ViewBag.MyLoans ?? 0)</h2>
-        </div>
-        <div class="stat-box text-center">
-            <small class="lib-label">🪑 Reserved Seats</small>
-            <h2 class="fw-bold mb-0">@(ViewBag.ActiveSeats ?? 0)</h2>
-        </div>
-        <div class="stat-box text-center">
-            <small class="lib-label">📄 Pending ODDS</small>
-            <h2 class="fw-bold mb-0">@(ViewBag.PendingODDS ?? 0)</h2>
-        </div>
-    </div>
+    @* Separated Capsules with Equal Height *@
+    <div class="row g-4 justify-content-center d-flex align-items-stretch" style="max-width: 1000px; margin: 0 auto;">
 
-    @* Navigation Grid - Updated with unified hover colors *@
-    <div class="nav-card-grid">
-        <a asp-controller="Book" asp-action="Index" class="nav-card">📚 Borrow Books</a>
-        <a asp-controller="Transaction" asp-action="Index" class="nav-card">📖 My Borrowings</a>
-        <a asp-controller="Facility" asp-action="BookASeat" class="nav-card">🪑 Book a Seat</a>
-        <a asp-controller="Request" asp-action="RequestTurnitin" class="nav-card">🛡️ Request Turnitin</a>
-        <a asp-controller="Request" asp-action="RequestGrammarly" class="nav-card">✍️ Request Grammarly</a>
-        <a asp-controller="Request" asp-action="Odds" class="nav-card">📄 Request Document</a>
-        <a asp-controller="Facility" asp-action="BookALibrarian" class="nav-card">👨‍🏫 Book a Librarian</a>
-        <a asp-controller="Patron" asp-action="Index" class="nav-card">📜 My Activity</a>
+        @* Left Capsule: Comprehensive Stats *@
+        <div class="col-md-4">
+            <div class="capsule-card bg-clir text-white h-100 p-4 shadow-sm">
+                <div class="text-center mb-4">
+                    <h6 class="text-uppercase tracking-wider small opacity-75">Account Standing</h6>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="stat-pill">
+                        <span class="small opacity-75">Active Loans</span>
+                        <span class="fw-bold fs-5">@(ViewBag.MyLoans ?? 0)</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="small opacity-75">Seat Bookings</span>
+                        <span class="fw-bold fs-5">@(ViewBag.ActiveSeats ?? 0)</span>
+                    </div>
+                    @* This now correctly counts Pending ODDS, Services, Consultations, and Reserved Books *@
+                    <div class="stat-pill border border-warning border-opacity-25">
+                        <span class="small text-warning fw-bold">Total Pending</span>
+                        <span class="fw-bold fs-5 text-warning">@(ViewBag.MyPendingRequests ?? 0)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Right Capsule: Integrated Notification Feed *@
+        <div class="col-md-7">
+            <div class="capsule-card bg-white h-100 p-4 shadow-sm border">
+                <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                    <h6 class="fw-bold text-clir mb-0 small text-uppercase tracking-wider">Recent Activity</h6>
+                    <a href="@Url.Action("Index", "Patron")" class="btn-link-custom">
+                        View History <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    @if (ViewBag.AllActivities == null || ViewBag.AllActivities.Count == 0)
+                    {
+                        <div class="text-center py-5 text-muted small italic">
+                            <i class="bi bi-inbox d-block fs-2 mb-2 opacity-50"></i>
+                            No recent updates found.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var activity in ((IEnumerable<dynamic>)ViewBag.AllActivities).Take(3))
+                        {
+                            <div class="notif-pill">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-clir" style="font-size: 0.85rem;">@activity.ServiceType</span>
+                                    <span class="badge @activity.StatusClass rounded-pill" style="font-size: 0.65rem;">@activity.Status</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted small text-truncate me-2">@activity.Description</span>
+                                    <span class="text-muted" style="font-size: 0.7rem;">@activity.Date.ToString("MMM dd")</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
-    /* Keep only layout-specific styles here */
-    .dashboard-container {
-        min-height: 80vh;
+    body {
+        background-color: #f8fafb;
+    }
+
+    .bg-clir {
+        background-color: #1a2035;
+    }
+
+    .text-clir {
+        color: #1a2035;
+    }
+
+    .capsule-card {
+        border-radius: 25px;
+        transition: transform 0.2s ease;
+    }
+
+        .capsule-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .stat-pill {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px 20px;
+        border-radius: 18px;
         display: flex;
-        flex-direction: column;
+        justify-content: space-between;
         align-items: center;
     }
 
-    .stat-box {
+    .notif-pill {
+        padding: 12px 16px;
+        border-radius: 18px;
         background: #ffffff;
-        border: 1px solid #dee2e6;
-        border-radius: 12px;
-        padding: 20px;
-        min-width: 180px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+        transition: 0.2s;
     }
 
-    .nav-card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        width: 100%;
-        max-width: 1100px;
-    }
-
-    .nav-card {
-        background-color: #ffffff;
-        border: 1px solid #dee2e6;
-        border-radius: 12px;
-        padding: 20px;
-        text-decoration: none !important;
-        color: #333 !important;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-align: center;
-    }
-
-        /* Using your lib-green variable on hover */
-        .nav-card:hover {
+        .notif-pill:hover {
             border-color: #198754;
-            color: #198754 !important;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.1);
+            background: #f9fffb;
         }
+
+    .btn-link-custom {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-decoration: none;
+        color: #198754;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Badge Color Mapping from Controller StatusClasses */
+    .badge.bg-status-pending {
+        background-color: #fffbeb !important;
+        color: #d97706 !important;
+        border: 1px solid #feebc8;
+    }
+
+    .badge.bg-status-approved {
+        background-color: #f0fff4 !important;
+        color: #198754 !important;
+        border: 1px solid #c6f6d5;
+    }
+
+    .badge.bg-status-completed {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        border: 1px solid #bee3f8;
+    }
+
+    .badge.bg-status-rejected {
+        background-color: #fef2f2 !important;
+        color: #dc3545 !important;
+        border: 1px solid #fed7d7;
+    }
+
+    .badge.bg-status-cancelled {
+        background-color: #f3f4f6 !important;
+        color: #6b7280 !important;
+        border: 1px solid #e2e8f0;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.1em;
+    }
 </style>

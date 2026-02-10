@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
-
+@{
+    var role = Context.Session.GetString("UserRole");
+}
 <h2>Circulation</h2>
 <div class="row g-4 mt-2">
     <div class="col-md-4">
@@ -23,64 +25,63 @@
 </div>
 <br />
 <div id="bm-page-container">
-    <div class="card p-3 shadow-sm border-0">
-        <div class="card-header">
-            <h3 class="card-title">Borrower Requests</h3>
+    @if (ViewBag.IsStudentAssistant == false)
+                                    {
+        <div class="card p-3 shadow-sm border-0">
+            <div class="card-header">
+                <h3 class="card-title">Borrower Requests</h3>
 
-        </div>
-
-        <div class="table-responsive">
-            <table class="table align-middle text-center">
-                <thead>
-                    <tr>
-                        <th>Borrow ID</th>
-                        <th>Name</th>
-                        <th>Book Title</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        var reservedRequests = Model?.Where(bb => bb.Status == "Reserved").ToList()
-                        ?? new List<CLIR_InfoSystem.Models.BookBorrowing>();
-                    }
-
-                    
-                        @foreach (var bb in reservedRequests)
-                        {   
-                            <tr>
-                                <td>@bb.BorrowId</td>
-                                <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
-                                <td>@(bb.Book?.Title ?? "No Title")</td>
-                                <td>@bb.BorrowDate.ToString("yyyy-MM-dd")</td>
-                                @if (ViewBag.IsStudentAssistant == false)
-                                {
-                                    <td>
-                                        <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
-                                        <button class="denybuttons" onclick="denyRequest('@bb.BorrowId')">Deny</button>
-                                    </td>
-                                }
-                                else
-                                {
-                                    <td>
-                                        <a class="disabled-link">Confirm</a> | <a class="disabled-link">Deny</a>
-                                    </td>
-                                }
-                            </tr>
+            </div>
+        
+            <div class="table-responsive">
+                <table class="table align-middle text-center">
+                    <thead>
+                        <tr>
+                            <th>Borrow ID</th>
+                            <th>Name</th>
+                            <th>Book Title</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var reservedRequests = Model?.Where(bb => bb.Status == "Reserved").ToList()
+                            ?? new List<CLIR_InfoSystem.Models.BookBorrowing>();
                         }
-                    
-                    
-                    
-                </tbody>
-            </table>
-        </div>
 
-        <div class="card-footer">
-            <!--
-                <button class="see-all">See All</button>        #Dont Need Yet
-                -->
+                    
+                            @foreach (var bb in reservedRequests)
+                            {   
+                                <tr>
+                                    <td>@bb.BorrowId</td>
+                                    <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
+                                    <td>@(bb.Book?.Title ?? "No Title")</td>
+                                    <td>@bb.BorrowDate.ToString("yyyy-MM-dd")</td>
+                                    @if (ViewBag.IsStudentAssistant == false)
+                                    {
+                                        <td>
+                                            <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
+                                            <button class="denybuttons" onclick="denyRequest('@bb.BorrowId')">Deny</button>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                        <button class="acceptbuttons" disabled>Confirm</button> | <button class="denybuttons" disabled>Deny</button>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                    
+                    
+                    
+                    </tbody>
+                </table>
+            </div>
+
+        
         </div>
-    </div>
+    }
 </div>
 
 <br />

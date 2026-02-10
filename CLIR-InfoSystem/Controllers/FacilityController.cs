@@ -230,6 +230,19 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("ManageBookaLibrarian");
         }
 
+        public IActionResult LibrarianComplete(int sessionId)
+        {
+            var booking = _context.BookALibrarians.Find(sessionId);
+            if (booking != null)
+            {
+                booking.Status = "Completed";
+                LogAction($"Completed Librarian Consultation #{sessionId}", "book_a_librarian");
+                _context.SaveChanges();
+                TempData["Success"] = "Patron checked in successfully.";
+            }
+            return RedirectToAction("ManageBookaLibrarian");
+        }
+
         [HttpPost]
         public IActionResult CancelLibrarianBooking(int sessionId)
         {
