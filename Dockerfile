@@ -1,21 +1,18 @@
-﻿# Stage 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy project file and restore dependencies
-COPY *.csproj ./
+# Copy the project file from the subfolder
+COPY CLIR-InfoSystem/*.csproj ./ 
 RUN dotnet restore
 
-# Copy everything else and publish
-COPY . ./
+# Copy the rest of the source code
+COPY CLIR-InfoSystem/. ./CLIR-InfoSystem/
+WORKDIR /app/CLIR-InfoSystem
 RUN dotnet publish -c Release -o out
 
-# Stage 2: Runtime
+# Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+COPY --from=build /app/CLIR-InfoSystem/out .
 
-# Copy built files from previous stage
-COPY --from=build /app/out .
-
-# Run the app
 ENTRYPOINT ["dotnet", "CLIR_InfoSystem.dll"]
