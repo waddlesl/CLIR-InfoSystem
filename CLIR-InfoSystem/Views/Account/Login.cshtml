@@ -10,18 +10,43 @@
     <style>
         html, body {
             margin: 0;
+            padding: 0;
             height: 100%;
+            background-color: white; /* Updated to your Navy #1e2953 */
+            font-family: 'Segoe UI', sans-serif;
         }
 
-            body::before {
-                content: "";
-                position: fixed;
-                inset: 0;
-                z-index: -1;
-                margin: 0;
-                transform: scale(1.1);
-                background-image: linear-gradient(red,blue,white);
-                filter: blur(0px);
+        /* Top Navy Header */
+        .top-header {
+            background-color: #1a2035;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        .header-text {
+            line-height: 1.2;
+        }
+
+            .header-text .main-title {
+                font-weight: bold;
+                font-size: 14px;
+                display: block;
+            }
+
+            .header-text .sub-title {
+                font-size: 11px;
+                opacity: 0.8;
             }
 
         .container {
@@ -31,86 +56,110 @@
             height: 100vh;
         }
 
-        .label1 {
-            text-align: center;
+        .login-box {
+            border-radius: 12px;
+            width: 450px;
+            background-color: white;
+            padding: 40px;
+            color: #1e2953;
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.4);
+            margin-top: 60px; /* Space for the header */
         }
 
         .logomain {
             display: flex;
             justify-content: center;
-            align-content: center;
             margin-bottom: 20px;
         }
 
+        .logo {
+            width: 90px;
+            height: auto;
+        }
+
+        .label1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
         h2 {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e2953;
         }
 
         p {
-            font-size: 15px;
-        }
-
-        body {
-            background: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .login-box {
-            border-radius: 10px;
-            width: 60vh;
-            background-color: white; /* Changed to solid white for iPad visibility */
-            padding: 40px;
-            font-family: 'Segoe UI', sans-serif;
-            color: #1a2035; /* Changed text color to dark for white background */
-            box-shadow: 7px 5px 30px rgba(0,0,0,0.3);
+            font-size: 14px;
+            color: #555;
         }
 
         .form-control {
             border-radius: 6px;
-            height: 45px; /* Slightly taller for touch */
-            margin-bottom: 15px;
+            height: 48px;
             border: 1px solid #ced4da;
-            box-shadow: 7px 2px 30px rgba(0, 0, 0, 0.1);
         }
+
+            .form-control:focus {
+                border-color: #ed1e28;
+                box-shadow: 0 0 0 0.2rem rgba(237, 30, 40, 0.1);
+            }
 
         .btn-red {
             width: 100%;
             border: none;
-            padding: 10px;
+            padding: 12px;
             font-weight: bold;
-            border-radius: 10px;
-            background-color: #EE1D24;
+            border-radius: 8px;
+            background-color: #ed1e28;
             color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
 
-        .logo {
-            width: 100px;
-            height: auto;
-            margin-bottom: 10px
-        }
+            .btn-red:hover {
+                background-color: #c4161d;
+                transform: translateY(-1px);
+            }
 
         .error-text {
-            color: #EE1D24;
+            color: #ed1e28;
             text-align: center;
-            font-size: 14px;
-            margin-bottom: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            background: #ffe6e6;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .login-footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 0.75rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="login-box shadow-lg">
+    <header class="top-header">
+        <img src="~/images/clirlogo.png" class="header-logo" alt="Logo" />
+        <div class="header-text">
+            <span class="main-title">CENTER FOR LEARNING AND INFORMATION RESOURCES</span>
+            <span class="sub-title">MAPÚA MALAYAN COLLEGES LAGUNA</span>
+        </div>
+    </header>
 
+    <div class="container">
+        <div class="login-box">
             <div class="logomain">
-                <img src="~/images/clirlogo.png" class="logo" />
+                <img src="~/images/clirlogo.png" class="logo" alt="CLIR Logo" />
             </div>
 
             <div class="label1">
                 <h2>CLIR Library Information Management</h2>
-                <p>Please Log In To Continue</p>
+                <p>Please log in to your account</p>
             </div>
 
             @if (ViewBag.Error != null)
@@ -119,11 +168,15 @@
             }
 
             <form asp-action="Login" method="post">
-                <input type="text" name="username" class="form-control" placeholder="Username" required />
-                <input type="password" name="password" class="form-control" placeholder="Password" required />
-                <button type="submit" class="btn-red mt-3">LOGIN</button>
+                <input type="text" name="username" class="form-control mb-3" placeholder="Username" required />
+                <input type="password" name="password" class="form-control mb-4" placeholder="Password" required />
+                <button type="submit" class="btn-red">Sign In</button>
             </form>
         </div>
     </div>
+
+    <footer class="login-footer">
+        &copy; 2026 Center for Learning and Information Resource. All Rights Reserved.
+    </footer>
 </body>
 </html>

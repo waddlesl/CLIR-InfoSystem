@@ -1,64 +1,138 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
 
-<div class="container mt-5">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">Book Borrowing</h2>
-        <p class="text-muted small">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</p>
+<div class="container mt-3">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">Book Borrowing</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="catalogSearch"
+                   class="form-control border-start-0"
+                   placeholder="Search (Acc No. or Title)">
+        </div>
     </div>
 
-    <div class="card shadow-sm border-0 p-4">
-        <div class="d-flex justify-content-end mb-3">
-            <div class="input-group" style="max-width: 300px;">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="bi bi-search text-muted"></i>
-                </span>
-                <input type="text" id="catalogSearch" class="form-control border-start-0" placeholder="Search (Acc No. or Title)">
+    <!-- CARD -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <!-- TABLE -->
+            <div class="table-responsive">
+                <table class="table align-middle mb-0" id="bookTable">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th>Acc No.</th>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Collection</th>
+                            <th>Location</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookTableBody">
+                        @foreach (var book in Model)
+                        {
+                            <tr>
+                                <td class="small">@book.AccessionId</td>
+                                <td class="fw-semibold">@book.Title</td>
+                                <td>@book.Author</td>
+                                <td>@book.Collection</td>
+                                <td>@book.LibraryLocation</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-success px-3"
+                                            onclick="confirmBorrow('@book.AccessionId', '@book.Title')">
+                                        Borrow
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- FOOTER AREA -->
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <!-- PAGE INFO LEFT -->
+                <div id="pageInfo" class="small text-muted"></div>
+
+                <!-- PAGINATION RIGHT -->
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                </nav>
+
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead class="small text-muted">
-                    <tr>
-                        <th>Acc No.</th>
-                        <th>Book Title</th>
-                        <th>Author</th>
-                        <th>Collection</th>
-                        <th>Location</th>
-                        <th class="text-end">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="bookTableBody">
-                    @foreach (var book in Model) {
-                        <tr>
-                            <td class="small">@book.AccessionId</td>
-                            <td class="fw-semibold">@book.Title</td>
-                            <td>@book.Author</td>
-                            <td>@book.Collection</td>
-                            <td>@book.LibraryLocation</td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-success px-3" 
-                                        onclick="confirmBorrow('@book.AccessionId', '@book.Title')">
-                                    Borrow
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        function updateTable() {
+            let rows = $("#bookTableBody tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            $("#bookTableBody tr").hide();
+            
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+
+            rows.slice(start, end).show();
+
+            // Page Info
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            // Generate Pagination
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                </li>`;
+            }
+            $("#pagination").html(paginationHtml);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
+        }
+
         // Real-time Search
         $("#catalogSearch").on("keyup", function() {
             var value = $(this).val().toLowerCase();
-            $("#bookTableBody tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            $("#bookTableBody tr").each(function() {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggleClass("filtered", !isMatch);
             });
+            currentPage = 1;
+            updateTable();
+        });
+
+        // Initialize
+        $(document).ready(function() {
+            updateTable();
         });
 
         function confirmBorrow(accId, title) {
@@ -69,7 +143,7 @@
                 input: 'text',
                 inputPlaceholder: 'Enter your Patron ID',
                 showCancelButton: true,
-                confirmButtonColor: '#198754', // Reverted to Green
+                confirmButtonColor: '#198754',
                 confirmButtonText: 'Confirm'
             }).then((result) => {
                 if (result.isConfirmed && result.value) {
@@ -87,4 +161,8 @@
             });
         }
     </script>
+    <style>
+        .page-link { color: #198754; }
+        .page-item.active .page-link { background-color: #198754; border-color: #198754; color: white; }
+    </style>
 }
