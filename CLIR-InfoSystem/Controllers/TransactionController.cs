@@ -24,7 +24,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(b => b.BorrowDate)
                 .ToList();
 
-            return View(myLoans);
+            return View("~/Views/Patron/PatronMyBorrowings.cshtml",myLoans);
         }
 
         [HttpPost]

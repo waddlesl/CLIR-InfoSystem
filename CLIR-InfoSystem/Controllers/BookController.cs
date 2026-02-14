@@ -175,7 +175,7 @@ namespace CLIR_InfoSystem.Controllers
             var availableBooks = _context.Books
                 .Where(b => b.AvailabilityStatus == "Available")
                 .ToList();
-            return View(availableBooks);
+            return View("~/Views/Patron/PatronBorrowBooks.cshtml",availableBooks);
         }
 
         [HttpPost]

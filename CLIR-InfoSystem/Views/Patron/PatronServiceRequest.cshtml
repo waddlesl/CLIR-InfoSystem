@@ -1,12 +1,10 @@
 ﻿@model CLIR_InfoSystem.Models.ServiceRequest
 
 @{
-    string serviceName = Model?.ServiceType ?? "Service";
     bool alreadyRequested = ViewBag.AlreadyRequested ?? false;
 }
 
 <style>
-    /* Card Container */
     .request-card {
         max-width: 600px;
         margin: 50px auto;
@@ -26,7 +24,6 @@
         padding: 30px 40px 40px;
     }
 
-    /* Form Styling */
     .form-group label {
         font-size: 0.75rem;
         font-weight: 700;
@@ -47,7 +44,6 @@
         font-weight: 500;
     }
 
-    /* Submit Button */
     .btn-submit {
         background-color: #198754;
         color: white;
@@ -56,7 +52,7 @@
         border-radius: 8px;
         font-weight: bold;
         transition: all 0.2s;
-        width: 100%; /* Full width button to match card style */
+        width: 100%;
     }
 
         .btn-submit:hover {
@@ -64,7 +60,6 @@
             box-shadow: 0 4px 12px rgba(25, 135, 84, 0.2);
         }
 
-    /* Custom Alert Styling */
     .alert-success-custom {
         background-color: #d1e7dd;
         border: none;
@@ -77,46 +72,78 @@
 <div class="container">
     <div class="request-card">
         <div class="card-header-custom">
-            <h2 class="fw-bold mb-0">Request @serviceName Access</h2>
-            
+            <h2 class="fw-bold mb-0">Request Service Access</h2>
         </div>
 
         <div class="card-body-custom">
-            @* 1. Success Message Case *@
+
+            <!-- SUCCESS MESSAGE -->
             <div id="successMessage" class="alert-success-custom text-center"
                  style="@(alreadyRequested ? "display:block;" : "display:none;")">
                 <i class="bi bi-check-circle-fill d-block mb-2" style="font-size: 2rem;"></i>
                 <h5 class="fw-bold">Request Submitted!</h5>
-                <p class="small mb-0">Your request for <strong>@serviceName</strong> is being processed. Please check your email (@Context.Session.GetString("UserEmail")) for the invitation link shortly.</p>
+                <p class="small mb-0">
+                    Your request for <strong id="selectedServiceName"></strong> is being processed.
+                    Please check your email (@Context.Session.GetString("UserEmail")) for the invitation link shortly.
+                </p>
                 <hr>
-                <a href="/Patron/Index" class="btn btn-sm btn-outline-success border-0 fw-bold">Return to Dashboard</a>
+                <a href="/Patron/Index" class="btn btn-sm btn-outline-success border-0 fw-bold">
+                    Return to Dashboard
+                </a>
             </div>
 
-            @* 2. Form Case *@
+            <!-- FORM -->
             @if (!alreadyRequested)
             {
                 <form id="serviceForm">
-                    <input type="hidden" name="ServiceType" value="@serviceName" />
-                    <input type="hidden" name="PatronId" value="@Context.Session.GetString("UserId")" />
 
+                    <input type="hidden" name="PatronId"
+                           value="@Context.Session.GetString("UserId")" />
+
+                    <!-- SERVICE DROPDOWN -->
+                    <div class="form-group">
+                        <label>Select Service Type</label>
+                        <select name="ServiceType" class="form-control" required>
+                            <option value="">-- Select Service --</option>
+                            <option value="Grammarly">Grammarly</option>
+                            <option value="Turnitin">Turnitin</option>
+                        </select>
+                    </div>
+
+                    <!-- USER INFO -->
                     <div class="form-group">
                         <label>Patron Identification</label>
-                        <div class="display-field">@Context.Session.GetString("UserId")</div>
+                        <div class="display-field">
+                            @Context.Session.GetString("UserId")
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Confirmation Email</label>
-                        <div class="display-field">@Context.Session.GetString("UserEmail")</div>
+                        <div class="display-field">
+                            @Context.Session.GetString("UserEmail")
+                        </div>
                     </div>
 
+                    <!-- TERMS CHECKBOX -->
                     <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="academicCheck" required>
-                        <label class="form-check-label small text-muted" for="academicCheck">
-                            I understand that this access is granted for <strong>academic and research use only</strong>.
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="academicCheck"
+                               required>
+                        <label class="form-check-label small text-muted"
+                               for="academicCheck">
+                            I understand that this access is granted for
+                            <strong>academic and research use only</strong>.
                         </label>
                     </div>
 
-                    <button type="button" onclick="submitService()" class="btn btn-submit">SUBMIT REQUEST</button>
+                    <button type="button"
+                            onclick="submitService()"
+                            class="btn btn-submit">
+                        SUBMIT REQUEST
+                    </button>
+
                 </form>
             }
         </div>
@@ -124,12 +151,28 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function submitService() {
+
         const checkbox = document.getElementById('academicCheck');
         const form = document.getElementById('serviceForm');
         const successBox = document.getElementById('successMessage');
+        const serviceSelect = form.querySelector("select[name='ServiceType']");
+        const selectedService = serviceSelect.value;
 
+        // Validate Service Selection
+        if (!selectedService) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Service Required',
+                text: 'Please select a service type.',
+                confirmButtonColor: '#198754'
+            });
+            return;
+        }
+
+        // Validate Checkbox
         if (!checkbox.checked) {
             Swal.fire({
                 icon: 'warning',
@@ -142,21 +185,26 @@
 
         const formData = new FormData(form);
 
-            fetch('/Request/SubmitServiceRequest', {
-        method: 'POST',
-        body: formData
-    })
+        fetch('/Request/SubmitServiceRequest', {
+            method: 'POST',
+            body: formData
+        })
         .then(response => {
             if (response.ok) {
+
                 form.style.display = 'none';
                 successBox.style.display = 'block';
-                // Trigger a nice success toast
+
+                document.getElementById("selectedServiceName")
+                        .innerText = selectedService;
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Submitted!',
                     showConfirmButton: false,
                     timer: 1500
                 });
+
             } else {
                 Swal.fire({
                     icon: 'error',

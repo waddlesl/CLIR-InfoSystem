@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CLIR_InfoSystem.Views.Account
+namespace CLIR_InfoSystem.Views.Patron
 {
-    public class ManageStaffModel : PageModel
+    public class BookaSeatModel : PageModel
     {
         public void OnGet()
         {

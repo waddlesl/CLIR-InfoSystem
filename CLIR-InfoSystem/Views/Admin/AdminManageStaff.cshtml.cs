@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CLIR_InfoSystem.Views.Account
+namespace CLIR_InfoSystem.Views.Admin
 {
-    public class AuditLogsModel : PageModel
+    public class ManageStaffModel : PageModel
     {
         public void OnGet()
         {

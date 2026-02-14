@@ -12,7 +12,7 @@ namespace CLIR_InfoSystem.Controllers
     {
         public PatronController(LibraryDbContext context) : base(context) { }
 
-        public IActionResult Index()
+        public IActionResult PatronActivity()
         {
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
@@ -68,7 +68,7 @@ namespace CLIR_InfoSystem.Controllers
                                          (p.LastName != null && p.LastName.Contains(searchTerm)) ||
                                          p.PatronId == searchTerm);
             }
-            return View(query.ToList());
+            return View("~/Views/Staff/StaffManagePatrons.cshtml",query.ToList());
         }
 
         [HttpPost]

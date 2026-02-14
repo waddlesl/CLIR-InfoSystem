@@ -82,7 +82,7 @@ namespace CLIR_InfoSystem.Controllers
 
         #endregion
 
-        #region Staff Management
+        #region Staff Management 
 
         public IActionResult ManageStaff(string searchTerm)
         {
@@ -100,7 +100,7 @@ namespace CLIR_InfoSystem.Controllers
                     s.LastName.Contains(searchTerm));
             }
 
-            return View(query.ToList());
+            return View("~/Views/Admin/AdminManageStaff.cshtml",query.ToList());
         }
 
         [HttpPost]
@@ -171,7 +171,7 @@ namespace CLIR_InfoSystem.Controllers
 
         #endregion
 
-        #region Admin Features
+        #region Audit Logs & System Reports
 
         public IActionResult AuditLogs()
         {
@@ -186,7 +186,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.StaffLogs = allLogs.Where(l => l.StaffId != null).ToList();
             ViewBag.PatronLogs = allLogs.Where(l => l.PatronId != null).ToList();
 
-            return View();
+            return View("~/Views/Admin/AdminAuditLogs.cshtml");
         }
 
         public IActionResult SystemReports()
@@ -205,7 +205,7 @@ namespace CLIR_InfoSystem.Controllers
                 .Select(g => new { Name = g.Key, Count = g.Count() })
                 .ToDictionary(k => k.Name, v => v.Count);
 
-            return View();
+            return View("~/Views/Admin/AdminSystemReports.cshtml");
         }
 
         #endregion

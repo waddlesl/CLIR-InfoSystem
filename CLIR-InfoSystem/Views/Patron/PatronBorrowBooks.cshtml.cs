@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CLIR_InfoSystem.Views.Facility
+namespace CLIR_InfoSystem.Views.Patron
 {
-    public class BookaSeatModel : PageModel
+    public class BorrowingModel : PageModel
     {
         public void OnGet()
         {

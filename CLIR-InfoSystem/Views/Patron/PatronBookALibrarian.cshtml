@@ -92,7 +92,7 @@
                 $.post(form.attr('action'), form.serialize(), function (res) {
                     if (res.success) {
                         Swal.fire({ title: "Request Sent!", text: res.message, icon: "success" })
-                            .then(() => { window.location.href = '/Patron/Index'; });
+                            .then(() => { window.location.href = '/Dashboard/PatronDashboard'; });
                     } else {
                         Swal.fire({ title: "Booking Failed", text: res.message, icon: "error" });
                     }

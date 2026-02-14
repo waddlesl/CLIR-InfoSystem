@@ -1,0 +1,110 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
+
+<div class="container mt-3">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">My Current Borrowings</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="borrowSearch"
+                   class="form-control border-start-0"
+                   placeholder="Search Book Title...">
+        </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <!-- TABLE -->
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th class="text-end">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowTableBody">
+                        @foreach (var loan in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@loan.Book?.Title</td>
+                                <td>@loan.BorrowDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @(loan.Status == "Reserved"
+                                                                    ? "---"
+                                                                    : loan.DueDate?.ToString("MMM dd, yyyy"))
+                                </td>
+                                <td class="text-end">
+                                    @if (loan.Status == "Reserved")
+                                    {
+                                        <span class="badge bg-info text-dark px-3">Reserved</span>
+                                    }
+                                    else if (loan.Status == "Overdue")
+                                    {
+                                        <span class="badge bg-danger px-3">@loan.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark px-3">@loan.Status</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- FOOTER AREA (for consistency even without pagination) -->
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="small text-muted">
+                    Total Records: @Model.Count()
+                </div>
+                <div></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Real-time Search Logic (unchanged)
+        $("#borrowSearch").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#borrowTableBody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    </script>
+
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
+}

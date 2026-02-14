@@ -14,29 +14,26 @@ namespace CLIR_InfoSystem.Controllers
 
         #region Grammarly & Turnitin Services
 
-        public IActionResult RequestTurnitin() => CheckExistingRequest("Turnitin");
-        public IActionResult RequestGrammarly() => CheckExistingRequest("Grammarly");
-
-        private IActionResult CheckExistingRequest(string type)
+        public IActionResult ServiceRequest(string? type)
         {
             string? patronId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
 
-            var existing = _context.Services.FirstOrDefault(s =>
-                s.PatronId == patronId &&
-                s.ServiceType == type &&
-                (s.RequestStatus == "Pending" || s.RequestStatus == "Approved"));
+            var model = new ServiceRequest { PatronId = patronId };
 
-            ViewBag.AlreadyRequested = (existing != null);
+            if (!string.IsNullOrEmpty(type))
+                model.ServiceType = type;
 
-            var model = new ServiceRequest
-            {
-                ServiceType = type,
-                PatronId = patronId
-            };
+            // Check if there is already a pending/approved request for the type
+            ViewBag.AlreadyRequested = !string.IsNullOrEmpty(type) &&
+                _context.Services.Any(s =>
+                    s.PatronId == patronId &&
+                    s.ServiceType == type &&
+                    (s.RequestStatus == "Pending" || s.RequestStatus == "Approved"));
 
-            return View("ServiceForm", model);
+            return View("~/Views/Patron/PatronServiceRequest.cshtml", model);
         }
+
 
         [HttpPost]
         public IActionResult SubmitServiceRequest(ServiceRequest model)
@@ -49,9 +46,21 @@ namespace CLIR_InfoSystem.Controllers
             model.RequestStatus = "Pending";
             model.StaffId = null;
 
+            // Remove irrelevant ModelState keys
             ModelState.Remove("Patron");
             ModelState.Remove("Staff");
             ModelState.Remove("RequestStatus");
+
+            // **SERVER-SIDE DUPLICATE CHECK**
+            bool alreadyRequested = _context.Services.Any(s =>
+                s.PatronId == patronId &&
+                s.ServiceType == model.ServiceType &&
+                (s.RequestStatus == "Pending" || s.RequestStatus == "Approved"));
+
+            if (alreadyRequested)
+            {
+                return BadRequest("You already have a pending or approved request for this service.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -67,6 +76,7 @@ namespace CLIR_InfoSystem.Controllers
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
             return BadRequest(string.Join(", ", errors));
         }
+
 
         #endregion
 
@@ -87,7 +97,7 @@ namespace CLIR_InfoSystem.Controllers
             PopulateBooksDropdown();
 
             var model = new OddsRequest { PatronId = userId };
-            return View(model);
+            return View("~/Views/Patron/PatronOdds.cshtml",model);
         }
 
         [HttpPost]

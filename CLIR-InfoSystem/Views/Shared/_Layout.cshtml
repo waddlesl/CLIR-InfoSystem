@@ -196,11 +196,10 @@
                 <div class="nav-item"><a asp-controller="Book" asp-action="PatronBorrow">📚 Borrow Books</a></div>
                 <div class="nav-item"><a asp-controller="Transaction" asp-action="Index">📖 My Borrowings</a></div>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="BookASeat">🪑 Book a Seat</a></div>
-                <div class="nav-item"><a asp-controller="Request" asp-action="RequestTurnitin">🛡️ Request Turnitin</a></div>
-                <div class="nav-item"><a asp-controller="Request" asp-action="RequestGrammarly">✍️ Request Grammarly</a></div>
+                <div class="nav-item"><a asp-controller="Request" asp-action="ServiceRequest">🛠️ Service Request</a></div>
                 <div class="nav-item"><a asp-controller="Request" asp-action="Odds">📄 Request Document</a></div>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="BookALibrarian">👨‍🏫 Book a Librarian</a></div>
-                <div class="nav-item"><a asp-controller="Patron" asp-action="Index">📜 My Activity</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="PatronActivity">📜 My Activity</a></div>
             }
 
             <div class="sidebar-footer">
@@ -222,7 +221,35 @@
         // Auto-collapse on small screens (like iPad in portrait)
         if (window.innerWidth < 992) {
             document.getElementById('sidebar').classList.add('collapsed');
+
         }
+
+
+        var userRole = "@role";  // retrieved from session
+
+        // Set timeout based on role
+        var sessionTimeout = (userRole === "Patron") ? 10 * 60 : 15 * 60; // 10mins for Patrons, 15mins for others
+        var idleTime = 0;
+
+        function resetIdle() {
+            idleTime = 0;
+        }
+
+        // Listen for any user activity
+        document.onmousemove = resetIdle;
+        document.onkeypress = resetIdle;
+        document.ontouchstart = resetIdle;
+        document.onclick = resetIdle;
+        document.onscroll = resetIdle;
+
+        // Check idle every second
+        setInterval(() => {
+            idleTime++;
+            if (idleTime >= sessionTimeout) {
+                alert("Your session has expired due to inactivity.");
+                window.location.href = '/Account/Logout';
+            }
+        }, 1000);
     </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

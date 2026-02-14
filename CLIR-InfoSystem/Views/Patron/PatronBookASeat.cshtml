@@ -1,0 +1,182 @@
+﻿@model CLIR_InfoSystem.Models.SeatBooking
+
+@{
+    bool alreadyBooked = ViewBag.AlreadyBooked ?? false;
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container mt-3">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">Book a Library Seat</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- CARD -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            @if (alreadyBooked)
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-calendar-check text-warning" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold mt-3">Reservation Active</h5>
+                    <p class="text-muted mb-3">
+                        You already have a seat reserved. Please complete your current visit or cancel it before booking a new one.
+                    </p>
+                    <div class="d-grid">
+                        <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold">Return to Dashboard</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <form id="bookingForm">
+
+                    <!-- DATE -->
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">Booking Date</label>
+                        <input type="date"
+                               id="BookingDate"
+                               asp-for="BookingDate"
+                               class="form-control"
+                               required
+                               min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <!-- BUILDING + SLOT -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="small fw-bold text-muted">Building</label>
+                            <select id="Building" class="form-select" required disabled>
+                                <option value="">-- Select --</option>
+                                <option value="Rizal Building">Rizal Building</option>
+                                <option value="Einstein Building">Einstein Building</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="small fw-bold text-muted">Time Slot</label>
+                            <select id="SlotId" asp-for="SlotId" class="form-select" required disabled>
+                                <option value="">-- Select Date --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SEATS -->
+                    <div class="mb-4">
+                        <label class="small fw-bold text-muted">Available Seats</label>
+                        <select id="SeatId" asp-for="SeatId" class="form-select" required disabled>
+                            <option value="">-- Complete above fields --</option>
+                        </select>
+                    </div>
+
+                    <!-- SUBMIT -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success fw-bold py-2">Confirm Reservation</button>
+                    </div>
+
+                </form>
+            }
+        </div>
+
+        <!-- FOOTER -->
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="small text-muted">
+                Library Seat Reservation System
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // AJAX Booking Submission
+            $('#bookingForm').submit(function (e) {
+                e.preventDefault();
+
+                $.post('/Facility/ConfirmBooking', $(this).serialize(), function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Reserved!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonColor: '#198754'
+                        }).then(() => {
+                            window.location.href = '/Dashboard/PatronDashboard';
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Unavailable',
+                            text: response.message,
+                            icon: 'error',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                }).fail(function() {
+                    Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
+                });
+            });
+
+            // Cascading dropdowns
+            $('#BookingDate').change(function () {
+                var selectedDate = $(this).val();
+                if(selectedDate) {
+                    $('#Building').prop('disabled', false);
+                    $.getJSON('/Facility/GetAvailableSlots', { selectedDate: selectedDate }, function(data) {
+                        var items = '<option value="">-- Select Slot --</option>';
+                        $.each(data, function(i, slot) {
+                            items += "<option value='" + slot.slotId + "'>" + slot.displayText + "</option>";
+                        });
+                        $('#SlotId').html(items).prop('disabled', false);
+                    });
+                }
+            });
+
+            $('#Building').change(function() {
+                if($(this).val()) {
+                    $('#SeatId').val('').prop('disabled', true);
+                }
+            });
+
+            $('#BookingDate, #Building, #SlotId').change(function () {
+                var date = $('#BookingDate').val();
+                var bld = $('#Building').val();
+                var slot = $('#SlotId').val();
+
+                if (date && bld && slot) {
+                    $('#SeatId').prop('disabled', false);
+                    $.getJSON('/Facility/GetAvailableSeats', { building: bld, slotId: slot, date: date }, function(data) {
+                        var items = '<option value="">-- Select a Seat --</option>';
+                        $.each(data, function(i, seat) {
+                            items += "<option value='" + seat.id + "'>" + seat.name + "</option>";
+                        });
+                        $('#SeatId').html(items);
+                    });
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
+}

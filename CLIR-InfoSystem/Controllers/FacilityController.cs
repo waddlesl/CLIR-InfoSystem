@@ -23,7 +23,7 @@ namespace CLIR_InfoSystem.Controllers
 
             var currentTime = DateTime.Now.TimeOfDay;
             ViewBag.TimeSlots = _context.TimeSlots.Where(s => s.StartTime >= currentTime).ToList();
-            return View();
+            return View("~/Views/Patron/PatronBookASeat.cshtml");
         }
 
         [HttpPost]
@@ -75,7 +75,7 @@ namespace CLIR_InfoSystem.Controllers
                 (b.Status == "Pending" || b.Status == "Approved"));
 
             ViewBag.Librarians = _context.Staff.ToList();
-            return View();
+            return View("~/Views/Patron/PatronBookALibrarian.cshtml");
         }
 
         public IActionResult ManageBookings()
