@@ -12,6 +12,45 @@ namespace CLIR_InfoSystem.Controllers
     {
         public AccountController(LibraryDbContext context) : base(context) { }
 
+       
+
+        // Temporary route: /Account/SeedData
+        [HttpGet]
+        public IActionResult SeedData()
+        {
+            // 1. Check if the admin already exists to prevent duplicates/crashes
+            if (_context.Staff.Any(u => u.Username == "admin"))
+            {
+                return Content("Database already seeded. Please log in.");
+            }
+
+            // 2. Initialize Staff
+            var staffList = new List<Staff>
+    {
+        new Staff {
+            FirstName = "Melard", LastName = "Salapare", Username = "admin",
+            Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"),
+            TypeOfUser = "Admin", Status = "Active"
+        },
+        new Staff {
+            FirstName = "Maria", LastName = "Clara", Username = "mclara",
+            Password = BCrypt.Net.BCrypt.HashPassword("staff456"),
+            TypeOfUser = "Librarian", Status = "Active"
+        },
+        new Staff {
+            FirstName = "Jose", LastName = "Rizal", Username = "jrizal",
+            Password = BCrypt.Net.BCrypt.HashPassword("student789"),
+            TypeOfUser = "Student Assistant", Status = "Active"
+        }
+    };
+
+
+            _context.Staff.AddRange(staffList);
+            _context.SaveChanges();
+
+            return Content("Database Seeded Successfully! Log in with 'admin' / '1234Admin'.");
+        }
+
         #region Authentication
 
         [HttpGet]
@@ -31,12 +70,10 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult Login(string username, string password)
         {
             // 1. Staff Login
-            var staff = _context.Staff.FirstOrDefault(u =>
-                u.Username == username &&
-                u.Password == password &&
-                u.Status == "Active");
+            var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Status == "Active");
 
-            if (staff != null)
+            // Use BCrypt.Verify to check the plain-text password against the hashed database entry
+            if (staff != null && BCrypt.Net.BCrypt.Verify(password, staff.Password))
             {
                 HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
                 HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
@@ -107,12 +144,11 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult AddStaff([FromBody] Staff newStaff)
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
-            if (newStaff == null) return Json(new { success = false });
 
-            if (string.IsNullOrEmpty(newStaff.Status)) newStaff.Status = "Active";
+            // Hash the password before saving
+            newStaff.Password = BCrypt.Net.BCrypt.HashPassword(newStaff.Password);
 
             _context.Staff.Add(newStaff);
-            LogAction($"Added new staff: {newStaff.Username}", "staff");
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -129,7 +165,11 @@ namespace CLIR_InfoSystem.Controllers
             staff.LastName = updatedStaff.LastName;
             staff.Username = updatedStaff.Username;
             staff.TypeOfUser = updatedStaff.TypeOfUser;
-            if (!string.IsNullOrEmpty(updatedStaff.Password)) staff.Password = updatedStaff.Password;
+            if (!string.IsNullOrEmpty(updatedStaff.Password))
+            {
+                // Only re-hash if the admin actually typed a new password
+                staff.Password = BCrypt.Net.BCrypt.HashPassword(updatedStaff.Password);
+            }
 
             LogAction($"Updated staff profile: {staff.Username}", "staff");
             _context.SaveChanges();
