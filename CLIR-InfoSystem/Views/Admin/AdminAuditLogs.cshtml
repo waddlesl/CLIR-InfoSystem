@@ -44,14 +44,7 @@
                                 <td class="ps-4 small">@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
                                 <td class="fw-semibold">@log.Staff?.FirstName @log.Staff?.LastName</td>
                                 <td>@log.ActionPerformed</td>
-                                <td>
-                                    @{
-                                        var module = log.TableAffected?.ToLower() ?? "";
-                                        var badgeClass = module.Contains("staff") ? "badge-staff" :
-                                        module.Contains("book") ? "badge-book" : "badge-default";
-                                    }
-                                    <span class="badge @badgeClass">@log.TableAffected</span>
-                                </td>
+                                <td><span class="badge badge-default">@log.TableAffected</span></td>
                             </tr>
                         }
                     </tbody>
@@ -91,13 +84,7 @@
                                 <td class="ps-4 small">@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
                                 <td><span class="fw-semibold">@log.Patron?.FirstName @log.Patron?.LastName</span></td>
                                 <td>@log.ActionPerformed</td>
-                                <td>
-                                    @{
-                                        var pModule = log.TableAffected?.ToLower() ?? "";
-                                        var pBadge = pModule.Contains("borrow") ? "badge-book" : "badge-default";
-                                    }
-                                    <span class="badge @pBadge">@log.TableAffected</span>
-                                </td>
+                                <td><span class="badge badge-default">@log.TableAffected</span></td>
                             </tr>
                         }
                     </tbody>
@@ -155,7 +142,6 @@
             else { patronCurrentPage = newPage; paginateTable('patronLogBody', 'patronPagination', 'patronPageInfo', patronCurrentPage); }
         };
 
-        // Jump to Page Listener
         $("#staffJump, #patronJump").on("keyup", function(e) {
             if (e.key === "Enter") {
                 let val = parseInt($(this).val());
@@ -193,11 +179,28 @@
     </script>
 
     <style>
-    
+        .badge-default {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            font-weight: 500;
+        }
+
+        .form-control-sm {
+            height: 31px;
+            font-size: 0.8rem;
+        }
+
+        .page-link {
+            color: #1a2035;
+            font-weight: bold;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
 
         .page-item.active .page-link {
-            background-color: #1e2953;
-            border-color: #1e2953;
+            background-color: #1a2035;
+            border-color: #1a2035;
             color: white;
         }
     </style>
