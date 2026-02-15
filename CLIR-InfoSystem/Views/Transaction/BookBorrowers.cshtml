@@ -1,216 +1,125 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
+<div class="container mt-3">
 <div class="row g-4 mt-2">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="card p-3 shadow-sm border-0">
             <h6 class="text-muted">Borrowed Books</h6>
             <h3>@ViewBag.BorrowedBookCount</h3>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="card p-3 shadow-sm border-0">
             <h6 class="text-muted">Overdue Books</h6>
             <h3>@ViewBag.OverdueBookCount</h3>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Borrow History</h6>
-            <a asp-controller="Transaction" asp-action="BorrowersHistory" class="">Button</a>
-        </div>
-    </div>
 </div>
 <br />
-<div id="bm-page-container">
-    <div class="card p-3 shadow-sm border-0">
-        <div class="card-header">
-            <h3 class="card-title">Borrower Requests</h3>
-
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">Current Borrowers</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
         </div>
 
-        <div class="table-responsive">
-            <table class="table align-middle text-center">
-                <thead>
-                    <tr>
-                        <th>Borrow ID</th>
-                        <th>Name</th>
-                        <th>Book Title</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        //to get only reserved requests
-                        var reservedRequests = Model.Where(bb => bb.Status == "Reserved");
-                    }
-
-                    @if (!reservedRequests.Any())
-                    {
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="borrowSearch"
+                   class="form-control border-start-0"
+                   placeholder="Search Borrow Requests">
+        </div>
+    </div>
+  
+        <div class="card p-3 shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table align-middle text-center">
+                    <thead>
                         <tr>
-                            <td>
-                                <em>No borrower requests found.</em>
-                            </td>
+                            <th>Borrow ID</th>
+                            <th>Name</th>
+                            <th>Book Title</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Fee</th>
+                            <th>Action</th>
                         </tr>
-                    }
-                    else{
-                        foreach (var bb in reservedRequests)
+                    </thead>
+                <tbody id="currentBorrowerTable">
+                        @{
+                            var allRequests = Model.Where(bb => bb.Status == "Borrowed" || bb.Status == "Overdue");
+                        }
+
+                        @if (!allRequests.Any())
                         {
                             <tr>
-                                <td>@bb.BorrowId</td>
-                                <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
-                                <td>@(bb.Book?.Title ?? "No Title")</td>
-                                @if (ViewBag.IsStudentAssistant == false)
-                                {
-                                    <td>
-                                        <div class="d-flex gap-2 justify-content-center align-items-center">
-                                            <form asp-action="ApproveRequest" method="post">
-                                                <input type="hidden" name="id" value="@bb.BorrowId" />
-                                                <button type="submit" class="btn btn-sm btn-success">Fulfilled</button>
-                                            </form>
-
-                                            <form asp-action="DenyRequest" method="post">
-                                                <input type="hidden" name="id" value="@bb.BorrowId" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                    
-                                }
-                                else
-                                {
-                                    <td>
-                                        <div class="d-flex gap-2 justify-content-center align-items-center">
-                                            <form asp-action="ApproveRequest" method="post">
-                                                <input type="hidden" name="id" value="@bb.BorrowId" />
-                                                <button type="submit" class="btn btn-sm btn-secondary" disabled>Fulfilled</button>
-                                            </form>
-
-                                            <form asp-action="DenyRequest" method="post">
-                                                <input type="hidden" name="id" value="@bb.BorrowId" />
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary" disabled>Cancel</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                }
+                                <td colspan="7" style="text-align: center;">
+                                    <em>No borrowers found.</em>
+                                </td>
                             </tr>
                         }
-                    
-                    }
-                    
-                </tbody>
-            </table>
-        </div>
+                        else
+                        {
+                            foreach (var bb in allRequests)
+                            {
+                                <tr>
+                                    <td>@bb.BorrowId</td>
+                                    <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
+                                    <td>@(bb.Book?.Title ?? "No Title")</td>
+                                    <td>@bb.DueDate?.ToString("yyyy-MM-dd")</td>
+                                    <td>@bb.Status</td>
+                                    <td>
+                                        @if (bb.Status == "Overdue")
+                                        {
+                                            <span class="text-danger">P@(bb.Book?.Subtotal + 50 ?? 0)</span>
+                                        }
+                                        else
+                                        {
+                                            <span>P@(bb.Book?.Subtotal ?? 0)</span>
+                                        }
 
-        <div class="card-footer">
-            <!--
-                <button class="see-all">See All</button>        #Dont Need Yet
-                -->
+
+                                    </td>
+                                    @if (ViewBag.IsStudentAssistant == false)
+                                    {
+                                        <td>
+                                            <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')">Extend</button>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')" disabled>Extend</button>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+
+            <!-- PAGE INFO LEFT -->
+            <div id="pageInfo" class="small text-muted"></div>
+
+            <!-- PAGINATION RIGHT -->
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+            </nav>
+
         </div>
     </div>
 </div>
+
+
 
 <br />
-
-<div id="bm-page-container">
-    <div class="card p-3 shadow-sm border-0">
-        <div class="card-header">
-            <h3 class="card-title">Current Borrower</h3>
-            
-                @if (ViewBag.IsStudentAssistant == false)
-            {
-                //<a asp-controller="Book" asp-action="AddBorrower" class="btn-primary">Add Borrower</a>            #dont need yet
-            }
-           
-            <br />
-            <!--Search-->
-            <div class="d-flex align-items-center">
-                <form method="get" asp-action="BookBorrowers" class="d-flex me-2">
-                    <input type="text" name="searchTerm" placeholder="Search by ID or Borrower Name..." class="form-control" style="width: 250px;" />
-                    <button type="submit" class="btn btn-secondary ms-1">Search</button>
-                </form>
-                
-            </div>
-
-
-            
-           
-            
-        </div>
-
-        <div class="table-responsive">
-            <table class="table align-middle text-center">
-                <thead>
-                    <tr>
-                        <th>Borrow ID</th>
-                        <th>Name</th>
-                        <th>Book Title</th>
-                        <th>Due Date</th>
-                        <th>Status</th>
-                        <th>Fee</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        var allRequests = Model.Where(bb => bb.Status == "Borrowed" || bb.Status == "Overdue");
-                    }
-
-                    @if (!allRequests.Any())
-                    {
-                        <tr>
-                            <td>
-                                <em>No book borrowers found.</em>
-                            </td>
-                        </tr>
-                    }
-                    else{
-                    foreach (var bb in allRequests)
-                    {
-                        <tr>
-                            <td>@bb.BorrowId</td>
-                            <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
-                            <td>@(bb.Book?.Title ?? "No Title")</td>
-                            <td>@bb.DueDate?.ToString("yyyy-MM-dd")</td>
-                            <td>@bb.Status</td>
-                            <td>
-                                @if(bb.Status == "Overdue")
-                                {
-                                    <span class="text-danger">P@(bb.Book?.Subtotal+50 ?? 0)</span>
-                                }
-                                else
-                                {
-                                    <span>P@(bb.Book?.Subtotal ?? 0)</span>
-                                }
-
-
-                            </td>
-                            @if (ViewBag.IsStudentAssistant == false)
-                            {
-                                <td>
-                                        <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')">Extend</button>
-                                </td>
-                            }
-                            else
-                            {
-                                <td>
-                                        <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="openExtendModal('@bb.BorrowId', '@bb.DueDate')" disabled>Extend</button>
-                                </td>
-                            }
-                        </tr>
-                    }
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card-footer">
-            <!--
-                <button class="see-all">See All</button> #Dont Need Yet
-                -->
-        </div>
-    </div>
-</div>
 
 
 <!--popup for extending-->
@@ -231,34 +140,79 @@
     </div>
 </div>
 
+
+
+
 @section Scripts {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-        function confirmRequest(id) {
-           
-            processRequest('/Book/ConfirmRequest', id);
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        function updateTable() {
+            let rows = $("#currentBorrowerTable tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            $("#currentBorrowerTable tr").hide();
+
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+
+            rows.slice(start, end).show();
+
+            // Page Info
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            // Generate Pagination
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                                </li>`;
+            }
+            $("#pagination").html(paginationHtml);
         }
 
-        function denyRequest(id) {
-            processRequest('/Book/DenyRequest', id);
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
         }
 
+        // Real-time Search
+        $("#borrowSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#currentBorrowerTable tr").each(function() {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggleClass("filtered", !isMatch);
+            });
+            currentPage = 1;
+            updateTable();
+        });
+
+        // Initialize
+        $(document).ready(function() {
+            updateTable();
+        });
+
+
+       
         function processRequest(url, id) {
             fetch(`${url}?id=${id}`, { method: 'POST' })
-            .then(response => {
-                if (response.ok) {
-                    
-                    location.reload();
-                } else {
-                    alert("Update failed. Please check the console.");
-                }
-            })
-            .catch(err => console.error(err));
+                .then(response => {
+                    if (response.ok) {
+
+                        location.reload();
+                    } else {
+                        alert("Update failed. Please check the console.");
+                    }
+                })
+                .catch(err => console.error(err));
         }
 
 
 
-                function returnBook(id) {
+        function returnBook(id) {
             Swal.fire({
                 title: "Confirm Return?",
                 text: "This will mark the book as Available again.",
@@ -274,8 +228,8 @@
 
         function openExtendModal(id, currentDueDate) {
             document.getElementById('extendBorrowId').value = id;
-       
-            if(currentDueDate) {
+
+            if (currentDueDate) {
                 document.getElementById('newDueDate').value = currentDueDate.split(' ')[0];
             }
             new bootstrap.Modal(document.getElementById('extendModal')).show();
@@ -291,13 +245,25 @@
             }
 
             fetch(`/Book/ExtendDueDate?id=${id}&newDate=${newDate}`, { method: 'POST' })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    Swal.fire("Error", "Could not extend date", "error");
-                }
-            });
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        Swal.fire("Error", "Could not extend date", "error");
+                    }
+                });
         }
     </script>
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
+
 }

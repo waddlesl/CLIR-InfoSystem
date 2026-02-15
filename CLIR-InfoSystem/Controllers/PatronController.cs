@@ -56,6 +56,8 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManagePatrons(string searchTerm)
         {
+            var role = HttpContext.Session.GetString("UserRole");
+            ViewBag.IsStudentAssistant = role == "Student Assistant";
             var query = _context.Patrons
                 .Include(p => p.Department)
                 .Include(p => p.Program)

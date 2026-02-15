@@ -108,6 +108,51 @@ namespace CLIR_InfoSystem.Controllers
             var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
 
             return View(results);
+
+
+
+        }
+
+        public IActionResult BookBorrowersRequest(string searchTerm)
+        {
+
+            var today = DateTime.Now;
+            var overdueBooks = _context.BookBorrowings
+                .Where(b => b.Status == "Borrowed" && b.DueDate < today)
+                .ToList();
+
+            if (overdueBooks.Any())
+            {
+                foreach (var loan in overdueBooks)
+                {
+                    loan.Status = "Overdue";
+                }
+                _context.SaveChanges();
+            }
+
+            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
+            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
+
+            var role = HttpContext.Session.GetString("UserRole");
+            ViewBag.IsStudentAssistant = role == "Student Assistant";
+
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(p => p.Patron.FirstName.Contains(searchTerm) ||
+                                         p.Patron.LastName.Contains(searchTerm) ||
+                                         p.BorrowId.ToString().Contains(searchTerm) ||
+                                         (p.Book != null && p.Book.Title.Contains(searchTerm)));
+            }
+
+            var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
+
+            return View(results);
+
         }
 
         [HttpPost]
@@ -117,6 +162,7 @@ namespace CLIR_InfoSystem.Controllers
             if (request != null && request.Book != null)
             {
                 request.Status = "Borrowed";
+                request.Book.AvailabilityStatus = "Borrowed";
                 request.BorrowDate = DateTime.Now;
                 request.DueDate = DateTime.Now.AddDays(7);
                 request.Book.AvailabilityStatus = "Borrowed";
@@ -136,6 +182,7 @@ namespace CLIR_InfoSystem.Controllers
             if (request != null && request.Book != null)
             {
                 request.Status = "Returned";
+                request.Book.AvailabilityStatus = "Available";
                 request.ReturnDate = DateTime.Now;
                 request.Book.AvailabilityStatus = "Available";
 

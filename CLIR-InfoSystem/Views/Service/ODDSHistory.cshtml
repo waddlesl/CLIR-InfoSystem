@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.OddsRequest>
 <div class="container mt-3">
     <div class="report-tabs">
-        <a asp-controller="Service" asp-action="ManageServices" class="tab active">Requests</a>
-        <a asp-controller="Service" asp-action="ODDSHistory" class="tab">History</a>
+        <a asp-controller="Service" asp-action="ManageODDS" class="tab">Requests</a>
+        <a asp-controller="Service" asp-action="ODDSHistory" class="tab active">History</a>
     </div>
     <div id="bm-page-container">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h4 class="fw-bold mb-0">Document Delivery Request</h4>
+                <h4 class="fw-bold mb-0">Document Delivery History</h4>
                 <small class="text-muted">
                     @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
                 </small>
@@ -18,13 +18,13 @@
                     <i class="bi bi-search text-muted"></i>
                 </span>
                 <input type="text"
-                       id="roddsSearch"
+                       id="hoddsSearch"
                        class="form-control border-start-0"
-                       placeholder="Search ODDS Requests">
+                       placeholder="Search ODDS History">
             </div>
         </div>
         <div class="card p-3 shadow-sm border-0">
-        <div class="table-responsive">
+            <div class="table-responsive">
             <table class="table align-middle text-center">
             <thead>
                 <tr>
@@ -35,14 +35,14 @@
                     <th>Type Of Material</th>
                     <th>Service Type</th>
                     <th>Request Date</th>
+                    <th>Date Access Provided</th>
                     <th>Status</th>
-                    <th>Action</th>
 
                 </tr>
             </thead>
-            <tbody id="oddsRequestTable">
-                @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus == "Pending"))
-                {
+            <tbody id="oddsHistoryTable">
+                    @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus != "Pending"))
+                    {
                     <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
                         <td>@ServiceRequest.PatronId</td>
                         <td>@(ServiceRequest.Patron.FirstName + " " + ServiceRequest.Patron.LastName)</td>
@@ -51,28 +51,15 @@
                         <td>@ServiceRequest.MaterialType</td>
                         <td>@ServiceRequest.ServiceType</td>
                         <td>@ServiceRequest.RequestDate.ToString("yyyy-MM-dd")</td>
+                        <td>@(ServiceRequest.DateOfAccessProvided?.ToString("yyyy-MM-dd") ?? "N/A")</td>
                         <td>
                             <span class="badge @(ServiceRequest.RequestStatus == "Fulfilled" ? "bg-success" : "bg-secondary")">
                                 @ServiceRequest.RequestStatus
                             </span>
                         </td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center align-items-center">
-                                <form asp-action="UpdateOddsStatus" method="post">
-                                    <input type="hidden" name="requestId" value="@ServiceRequest.RequestId" />
-                                    <input type="hidden" name="status" value="Fulfilled" />
-                                    <button type="submit" class="btn btn-sm btn-success">Fulfilled</button>
-                                </form>
 
-                                <form asp-action="UpdateOddsStatus" method="post">
-                                    <input type="hidden" name="requestId" value="@ServiceRequest.RequestId" />
-                                    <input type="hidden" name="status" value="Cancelled" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                                </form>
-                            </div>
-                        </td>
                     </tr>
-                }
+                    }
             </tbody>
         </table>
     </div>
@@ -90,7 +77,6 @@
 </div>
 </div>
 </div>
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -98,11 +84,11 @@
         let currentPage = 1;
 
         function updateTable() {
-            let rows = $("#oddsRequestTable tr:not(.filtered)");
+            let rows = $("#oddsHistoryTable tr:not(.filtered)");
             let totalRows = rows.length;
             let totalPages = Math.ceil(totalRows / rowsPerPage);
 
-            $("#oddsRequestTable tr").hide();
+            $("#oddsHistoryTable tr").hide();
 
             let start = (currentPage - 1) * rowsPerPage;
             let end = start + rowsPerPage;
@@ -128,9 +114,9 @@
         }
 
         // Real-time Search
-        $("#roddsSearch").on("keyup", function() {
+        $("#hoddsSearch").on("keyup", function() {
             var value = $(this).val().toLowerCase();
-            $("#oddsRequestTable tr").each(function() {
+            $("#oddsHistoryTable tr").each(function() {
                 let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
                 $(this).toggleClass("filtered", !isMatch);
             });
@@ -156,4 +142,3 @@
         }
     </style>
 }
-

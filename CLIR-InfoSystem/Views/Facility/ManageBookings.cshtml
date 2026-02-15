@@ -1,8 +1,5 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.SeatBooking>
-
-<h2>Manage Seat Bookings</h2>
-
-<div id="bm-page-container">
+    <!--
     <div class="card p-3 shadow-sm border-0">
         <div class="card-header">
             <h3 class="card-title">Booking Requests</h3>
@@ -68,12 +65,40 @@
         </div>
     </div>
     <br />
-    <div class="card p-3 shadow-sm border-0">
-        <div class="card-header">
-            <h3 class="card-title">Bookings</h3>
-
+    -->
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">Book a Seat History</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
         </div>
 
+        <div class="input-group" style="max-width: 500px;">
+            <form method="get" asp-action="ManageBookings" class="filter-controls p-2 bg-white rounded-3 shadow-sm border d-flex gap-2 align-items-end">
+                <div class="flex-grow-1">
+                    <label class="small fw-bold text-muted ms-1">Select Date</label>
+                    <input type="date" name="selectedDate" class="form-control" value="@ViewBag.SelectedDate" />
+                </div>
+                <div class="flex-grow-1">
+                    <label class="small fw-bold text-muted ms-1">Building</label>
+                    <select name="building" class="form-select">
+                        <option value="">All Buildings</option>
+                        <option value="Rizal">Rizal Campus</option>
+                        <option value="Einstein">Einstein Building</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-1">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-filter"></i> Filter
+                    </button>
+                    <a asp-action="ManageBookings" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card p-3 shadow-sm border-0">
         <div class="table-responsive">
             <table class="table align-middle text-center">
                 <thead>
@@ -85,7 +110,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="seatsTable">
                     @foreach (var item in Model.Where(sb => sb.Status != "Reserved"))
                     {
                         <tr>
@@ -131,5 +156,70 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-flex justify-content-between align-items-center">
+
+            <!-- PAGE INFO LEFT -->
+            <div id="pageInfo" class="small text-muted"></div>
+
+            <!-- PAGINATION RIGHT -->
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+            </nav>
+
+        </div>
     </div>
 </div>
+
+                            @section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        function updateTable() {
+            let rows = $("#seatsTable tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            $("#seatsTable tr").hide();
+
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+
+            rows.slice(start, end).show();
+
+            // Page Info
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            // Generate Pagination
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                                </li>`;
+            }
+            $("#pagination").html(paginationHtml);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
+        }
+         // Initialize
+        $(document).ready(function() {
+            updateTable();
+        });
+
+</script>
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
+}

@@ -19,8 +19,9 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.IsStudentAssistant = role == "Student Assistant";
 
             ViewBag.BookCount = _context.Books.Count();
-            ViewBag.BorrowedBookCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
-            ViewBag.OverdueBookCount = _context.BookBorrowings.Count(b => b.Status == "Overdue");
+            ViewBag.AvailableBookCount = _context.Books.Count(b => b.AvailabilityStatus == "Available");
+            ViewBag.BorrowedBookCount = _context.Books.Count(b => b.AvailabilityStatus == "Borrowed");
+            ViewBag.ArchivedBookCount = _context.Books.Count(b => b.AvailabilityStatus == "Archived");
 
             var query = _context.Books.AsQueryable();
 
@@ -207,6 +208,42 @@ namespace CLIR_InfoSystem.Controllers
             _context.SaveChanges();
 
             return Json(new { success = true, message = "Request submitted! Please proceed to the counter." });
+        }
+        public IActionResult confirmRequest(int id)
+        {
+            var request = _context.BookBorrowings.Find(id);
+            if (request != null)
+            {
+                request.Status = "Borrowed";
+                request.BorrowDate = DateTime.Now;
+                request.DueDate = DateTime.Now.AddDays(7);
+                _context.SaveChanges();
+            }
+
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            return Ok(query);
+        }
+
+        //accept deny
+        public IActionResult denyRequest(int id)
+        {
+            var request = _context.BookBorrowings.Find(id);
+            if (request != null)
+            {
+                request.Status = "Denied";
+                _context.SaveChanges();
+            }
+
+            var query = _context.BookBorrowings
+                .Include(bb => bb.Book)
+                .Include(bb => bb.Patron)
+                .AsQueryable();
+
+            return Ok(query);
         }
     }
 }

@@ -22,6 +22,126 @@
             overflow-x: hidden;
         }
 
+        /*For reports hehehe*/
+        :root {
+            --primary-red: #CC0000;
+            --dark-bg: #1a202c;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-controls {
+            display: flex; /* Puts dropdowns in a row */
+            align-items: center; /* Centers them vertically */
+            min-width: 500px; /* This is what makes it "Longer" */
+            transition: all 0.3s; /* Makes it feel smooth */
+        }
+
+        #reports-page-container {
+            padding: 2rem;
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Tab Navigation - Modern Pill Style */
+        .report-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0.5rem;
+            background: #e2e8f0;
+            border-radius: 12px;
+            width: fit-content;
+            overflow-x: auto;
+        }
+
+            .report-tabs .tab {
+                padding: 0.6rem 1.2rem;
+                text-decoration: none;
+                color: #4a5568;
+                font-weight: 600;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+            }
+
+                .report-tabs .tab.active {
+                    background-color: white;
+                    color: var(--primary-red);
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                }
+
+        /* Layout Grids */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-secondary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card Styling */
+        .report-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: transform 0.2s ease;
+        }
+
+            .report-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .dark-card {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #2d3748 100%);
+            color: white;
+            border: none;
+        }
+
+        .card-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .dark-card .card-label {
+            color: #a0aec0;
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            color: #1a202c;
+        }
+
+        .dark-card .card-value {
+            color: white;
+        }
+
+        .card-subtext {
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            color: #718096;
+        }
+
+        /* Chart Container */
+        .graph-box {
+            min-height: 250px;
+        }
+
         /* Shorter Top Banner */
         .top-banner {
             background-color: #1a2035;
@@ -88,6 +208,14 @@
                 margin-left: -260px;
             }
 
+        .submenu {
+            
+            padding-left: 20px;
+            
+        }
+
+        
+
         .nav-item {
             padding: 12px 20px;
             border-left: 4px solid transparent;
@@ -95,19 +223,43 @@
             transition: 0.2s;
         }
 
+        .nav-itemfordisabled {
+            padding: 12px 20px;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+       /*For Book borrower*/
+        .nav-itemfordisabled a{
+                cursor: default;
+            color: inherit;
+            text-decoration: none;
+            list-style: none;
+            display: block;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
             .nav-item a {
                 color: inherit;
                 text-decoration: none;
+                list-style: none;
                 display: block;
                 width: 100%;
                 font-size: 0.9rem;
             }
+            .submenu li {
+                list-style: none;
+            }
+
 
             .nav-item:hover, .nav-active {
                 background: #2b3553;
                 color: white !important;
                 border-left: 4px solid #d92d20;
             }
+
+       
 
         .main-content {
             flex: 1;
@@ -172,7 +324,18 @@
                 <div class="nav-group-label">Library Management</div>
                 <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons">👤 Patron Management</a></div>
                 <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement">📚 Book Catalog</a></div>
-                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers">🤝 Manage Borrowers</a></div>
+                <div class="nav-itemfordisabled"><a disabled>🤝 Book Borrowers</a></div>
+                <ul class="submenu">
+                    <li class ="nav-item">
+                        <a asp-controller="Transaction" asp-action="BookBorrowersRequest">📝Borrower Requests</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Transaction" asp-action="BookBorrowers">🫴🏻Current Borrowers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Transaction" asp-action="BorrowersHistory">📜Borrower History</a>
+                    </li>
+                </ul>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings">🪑 Seat Reservations</a></div>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian">👨‍🏫 Book A Librarian</a></div>
                 <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS">📩 Digital Requests</a></div>

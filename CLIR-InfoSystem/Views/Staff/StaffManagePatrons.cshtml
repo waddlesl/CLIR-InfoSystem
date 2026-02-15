@@ -1,19 +1,36 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.Patron>
 
-<div class="container">
+<div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Patron Management</h2>
-        <div class="d-flex align-items-center">
-            <form method="get" asp-action="ManagePatrons" class="d-flex me-2">
-                <input type="text" name="searchTerm" placeholder="Search Patron ID or Name..." class="form-control" style="width: 250px;" />
-                <button type="submit" class="btn btn-secondary ms-1">Search</button>
-            </form>
-            <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddModal()">
-                <b class="me-1" style="font-size: 1.2rem;">+</b> Add Patron
-            </button>
+        <div>
+            <h4 class="fw-bold mb-0">Patron List</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
+        </div>
+
+        <div class="input-group" style="max-width: 500px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="patronSearch"
+                   class="form-control border-start-0"
+                   placeholder="Search Book">
+            @if (ViewBag.IsStudentAssistant == false)
+            {
+                <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddModal()">
+                    <b class="me-1" style="font-size: 1.2rem;">+</b> Add Book
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary d-flex align-items-center" onclick="openAddModal()" disabled>
+                    <b class="me-1" style="font-size: 1.2rem;">+</b> Add Book
+                </button>
+            }
         </div>
     </div>
-
     <table class="table align-middle">
         <thead>
             <tr>
@@ -25,7 +42,7 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="patronTable">
             @foreach (var p in Model)
             {
                 <tr>
@@ -40,8 +57,21 @@
                 </tr>
             }
         </tbody>
+
     </table>
+    <div class="d-flex justify-content-between align-items-center">
+
+        <!-- PAGE INFO LEFT -->
+        <div id="pageInfo" class="small text-muted"></div>
+
+        <!-- PAGINATION RIGHT -->
+        <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+        </nav>
+
+    </div>
 </div>
+
 
 <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -127,9 +157,59 @@
     </div>
 </div>
 
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        function updateTable() {
+                let rows = $("#patronTable tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+                $("#patronTable tr").hide();
+
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+
+            rows.slice(start, end).show();
+
+            // Page Info
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            // Generate Pagination
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                        </li>`;
+            }
+            $("#pagination").html(paginationHtml);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
+        }
+
+        // Real-time Search
+        $("#patronSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+                $("#patronTable tr").each(function() {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggleClass("filtered", !isMatch);
+            });
+            currentPage = 1;
+            updateTable();
+        });
+
+        // Initialize
+        $(document).ready(function() {
+            updateTable();
+        });
+
         function toggleStudentFields(typeSelector, deptSelector, progSelector) {
             const isStudent = $(typeSelector).val() === "Student";
             if (isStudent) {
@@ -308,4 +388,15 @@
             });
         }
     </script>
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
 }

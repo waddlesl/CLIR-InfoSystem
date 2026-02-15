@@ -166,9 +166,11 @@ namespace CLIR_InfoSystem.Controllers
                 .Include(b => b.Patron)
                 .ThenInclude(p => p.Program)
                 .Include(b => b.Book)
-                .Where(s => s.ReturnDate >= dateRange.Start && s.ReturnDate <= dateRange.End);
+                .Where(s => s.ReturnDate >= dateRange.Start && s.ReturnDate <= dateRange.End || s.ReturnDate == null && s.Status == "Overdue" || s.ReturnDate == null && s.Status == "Reserved");
 
             ViewBag.BookBorrowCount = borrowings.Count();
+            ViewBag.CurrentBorrowers = borrowings.Count(bb => bb.Status == "Borrowed");
+            ViewBag.OverdueCount = borrowings.Count(bb => bb.Status == "Overdue");
             ViewBag.BookBorrowCountForCollege = borrowings.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
             ViewBag.BookBorrowCountForSHS = borrowings.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
 
@@ -205,7 +207,7 @@ namespace CLIR_InfoSystem.Controllers
                 .GroupBy(bb => bb.Patron.Department.DeptCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
-                .FirstOrDefault();
+                .FirstOrDefault() ?? "N/A";
 
             var currentYear = DateTime.Now.Year;
             ViewBag.LBookingTopProgram = bookings
@@ -258,7 +260,7 @@ namespace CLIR_InfoSystem.Controllers
                 .GroupBy(bb => bb.Patron.Department.DeptCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
-                .FirstOrDefault();
+                .FirstOrDefault() ?? "N/A";
             return View();
         }
 
@@ -302,16 +304,29 @@ namespace CLIR_InfoSystem.Controllers
 
         private async Task<byte[]> ExportPdfAsync(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
         {
+            // 1. Tell Playwright where to store/find the browser in Azure
+            var homePath = Environment.GetEnvironmentVariable("HOME") ?? ".";
+            var browserPath = Path.Combine(homePath, "playwright");
+            Environment.SetEnvironmentVariable("PLAYWRIGHT_BROWSERS_PATH", browserPath);
+
+            // 2. Install Chromium (This will only download if missing)
+            // Note: In Azure, this might take a while the first time.
             Microsoft.Playwright.Program.Main(new[] { "install", "chromium" });
 
             using var playwright = await Playwright.CreateAsync();
+
+            // 3. Launch with specific Azure-friendly arguments
             await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
-                Headless = true
+                Headless = true,
+                Args = new[] {
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage"
+        }
             });
 
             var page = await browser.NewPageAsync();
-
             string html = GetHtmlContent(startDate, endDate, yearReport, termReport);
 
             await page.SetContentAsync(html);
@@ -320,7 +335,13 @@ namespace CLIR_InfoSystem.Controllers
             {
                 Format = "A4",
                 PrintBackground = true,
-                Margin = new Margin { Top = "20px", Bottom = "20px", Left = "20px", Right = "20px" }
+                Margin = new Microsoft.Playwright.Margin
+                {
+                    Top = "20px",
+                    Bottom = "20px",
+                    Left = "20px",
+                    Right = "20px"
+                }
             });
 
             await browser.CloseAsync();

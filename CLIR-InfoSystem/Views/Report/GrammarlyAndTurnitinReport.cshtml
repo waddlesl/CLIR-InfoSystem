@@ -1,5 +1,16 @@
 ﻿<div id="reports-page-container">
-    <h2 style="margin-bottom:20px">Reports & Analytics</h2>
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
+        <div class="col-md-4">
+            <h2 class="fw-bold mb-1">Reports & Analytics</h2>
+            
+        </div>
+        <div class="col-md-6 d-flex justify-content-end">
+            <div class="col-md-12">
+                <partial name="_ReportFilter" />
+            </div>
+        </div>
+    </div>
+
     <div class="report-tabs">
         <a asp-controller="Report" asp-action="ReportDashboard" class="tab">Book A Seat (Rizal)</a>
         <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
@@ -10,27 +21,37 @@
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
     </div>
 
-    <h2 class="section-subtitle">@ViewBag.CurrentService</h2>
-    <partial name="_ReportFilter" />
-
-    <div class="stats-row-top">
-        <div class="report-card dark-card">
-            <p class="card-label">Total Reservations</p>
-            <h1 class="card-value">@ViewBag.GATCount</h1>
+    <div class="dashboard-grid">
+        <div class="report-card dark-card d-flex flex-column justify-content-center py-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="card-label opacity-75">Total Requests</span>
+                    <h1 class="card-value">@ViewBag.GATCount</h1>
+                </div>
+                <i class="fas @(ViewBag.CurrentService == "Grammarly" ? "fa-pen-nib" : "fa-file-signature") fa-3x opacity-25"></i>
+            </div>
+            <p class="card-subtext">Total processing requests for @ViewBag.CurrentService.</p>
         </div>
-        <div class="report-card mini-card">
-            <p class="card-label">Most Dept. Utilized</p>
-            <h2 class="card-value">@ViewBag.GATMostDept</h2>
+
+        <div class="report-card d-flex flex-column border-top border-secondary border-4 justify-content-center">
+            <span class="card-label">Most Utilized Department</span>
+            <h2 class="card-value mt-2">@ViewBag.GATMostDept</h2>
         </div>
     </div>
 
-    <div class="stats-row-bottom">
-        <div class="report-card mini-card">
-            <p class="card-label">College</p>
+    <div class="stats-secondary-grid mt-4">
+
+        <div class="report-card border-top border-secondary border-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-label">College Level</span>
+            </div>
             <h2 class="card-value">@ViewBag.GATCountForCollege</h2>
         </div>
-        <div class="report-card mini-card">
-            <p class="card-label">SHS</p>
+
+        <div class="report-card border-top border-secondary border-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-label">SHS Level</span>
+            </div>
             <h2 class="card-value">@ViewBag.GATCountForSHS</h2>
         </div>
     </div>

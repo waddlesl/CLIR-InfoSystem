@@ -31,5 +31,82 @@ body {
 }
 
 
+/*For Reports*/
+
+.report-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.dark-card {
+    background: linear-gradient(135deg, #CC0000 0%, #880000 100%);
+    color: white;
+}
+
+.mini-card {
+    background: white;
+    padding: 20px;
+    transition: transform 0.2s;
+}
+
+    .mini-card:hover {
+        transform: translateY(-5px);
+    }
+
+.card-label {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.report-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+}
+
+    .report-tabs::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+
+    /* Individual Tab Link */
+    .report-tabs .tab {
+        padding: 12px 20px;
+        text-decoration: none;
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-radius: 10px 10px 0 0;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+    }
+
+        /* Hover State */
+        .report-tabs .tab:hover {
+            color: #CC0000;
+            background-color: rgba(204, 0, 0, 0.05);
+        }
+
+        /* Active State */
+        .report-tabs .tab.active {
+            color: #CC0000;
+            border-bottom: 3px solid #CC0000;
+            background-color: rgba(204, 0, 0, 0.02);
+        }
+
+/* Badge in Navigation (Optional) */
+.tab-count {
+    font-size: 0.7rem;
+    vertical-align: top;
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+
 
 

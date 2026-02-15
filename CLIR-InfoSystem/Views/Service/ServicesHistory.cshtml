@@ -1,13 +1,13 @@
-﻿@model IEnumerable<CLIR_InfoSystem.Models.OddsRequest>
+﻿@model IEnumerable<CLIR_InfoSystem.Models.ServiceRequest>
 <div class="container mt-3">
     <div class="report-tabs">
-        <a asp-controller="Service" asp-action="ManageServices" class="tab active">Requests</a>
-        <a asp-controller="Service" asp-action="ODDSHistory" class="tab">History</a>
+        <a asp-controller="Service" asp-action="ManageServices" class="tab">Requests</a>
+        <a asp-controller="Service" asp-action="ServicesHistory" class="tab active">History</a>
     </div>
     <div id="bm-page-container">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h4 class="fw-bold mb-0">Document Delivery Request</h4>
+                <h4 class="fw-bold mb-0">Service History</h4>
                 <small class="text-muted">
                     @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
                 </small>
@@ -18,75 +18,59 @@
                     <i class="bi bi-search text-muted"></i>
                 </span>
                 <input type="text"
-                       id="roddsSearch"
+                       id="hServiceSearch"
                        class="form-control border-start-0"
-                       placeholder="Search ODDS Requests">
+                       placeholder="Search Service History">
             </div>
         </div>
         <div class="card p-3 shadow-sm border-0">
-        <div class="table-responsive">
-            <table class="table align-middle text-center">
+            <div class="table-responsive">
+       
+        <table class="table align-middle">
             <thead>
                 <tr>
                     <th>Patron ID</th>
                     <th>Name</th>
                     <th>Department</th>
                     <th>Email</th>
-                    <th>Type Of Material</th>
                     <th>Service Type</th>
                     <th>Request Date</th>
                     <th>Status</th>
-                    <th>Action</th>
 
                 </tr>
             </thead>
-            <tbody id="oddsRequestTable">
-                @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus == "Pending"))
+            <tbody id="serviceTable">
+                @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus != "Pending"))
                 {
                     <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
                         <td>@ServiceRequest.PatronId</td>
                         <td>@(ServiceRequest.Patron.FirstName + " " + ServiceRequest.Patron.LastName)</td>
                         <td>@ServiceRequest.Patron.Department.DeptCode</td>
                         <td>@ServiceRequest.Patron.Email</td>
-                        <td>@ServiceRequest.MaterialType</td>
                         <td>@ServiceRequest.ServiceType</td>
                         <td>@ServiceRequest.RequestDate.ToString("yyyy-MM-dd")</td>
                         <td>
-                            <span class="badge @(ServiceRequest.RequestStatus == "Fulfilled" ? "bg-success" : "bg-secondary")">
+                            <span class="badge @(ServiceRequest.RequestStatus == "Approved" ? "bg-success" : "bg-secondary")">
                                 @ServiceRequest.RequestStatus
                             </span>
                         </td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center align-items-center">
-                                <form asp-action="UpdateOddsStatus" method="post">
-                                    <input type="hidden" name="requestId" value="@ServiceRequest.RequestId" />
-                                    <input type="hidden" name="status" value="Fulfilled" />
-                                    <button type="submit" class="btn btn-sm btn-success">Fulfilled</button>
-                                </form>
 
-                                <form asp-action="UpdateOddsStatus" method="post">
-                                    <input type="hidden" name="requestId" value="@ServiceRequest.RequestId" />
-                                    <input type="hidden" name="status" value="Cancelled" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                                </form>
-                            </div>
-                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center">
 
-            <!-- PAGE INFO LEFT -->
-            <div id="pageInfo" class="small text-muted"></div>
+                <!-- PAGE INFO LEFT -->
+                <div id="pageInfo" class="small text-muted"></div>
 
-            <!-- PAGINATION RIGHT -->
-            <nav>
-                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
-            </nav>
+                <!-- PAGINATION RIGHT -->
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                </nav>
 
-        </div>
+            </div>
 </div>
 </div>
 </div>
@@ -98,11 +82,11 @@
         let currentPage = 1;
 
         function updateTable() {
-            let rows = $("#oddsRequestTable tr:not(.filtered)");
+            let rows = $("#serviceTable tr:not(.filtered)");
             let totalRows = rows.length;
             let totalPages = Math.ceil(totalRows / rowsPerPage);
 
-            $("#oddsRequestTable tr").hide();
+            $("#serviceTable tr").hide();
 
             let start = (currentPage - 1) * rowsPerPage;
             let end = start + rowsPerPage;
@@ -128,9 +112,9 @@
         }
 
         // Real-time Search
-        $("#roddsSearch").on("keyup", function() {
+        $("#hServiceSearch").on("keyup", function() {
             var value = $(this).val().toLowerCase();
-            $("#oddsRequestTable tr").each(function() {
+            $("#serviceTable tr").each(function() {
                 let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
                 $(this).toggleClass("filtered", !isMatch);
             });
@@ -156,4 +140,3 @@
         }
     </style>
 }
-

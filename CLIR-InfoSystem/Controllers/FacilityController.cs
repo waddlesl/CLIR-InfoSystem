@@ -78,15 +78,64 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Patron/PatronBookALibrarian.cshtml");
         }
 
-        public IActionResult ManageBookings()
+        public IActionResult ManageBookings(DateTime? selectedDate, string? building)
         {
-            var activeBookings = _context.SeatBookings
+            var query = _context.SeatBookings
                 .Include(b => b.TimeSlot)
-                .ToList();
+                .AsQueryable();
+            if (selectedDate.HasValue)
+            {
+                query = query.Where(b => b.BookingDate.Date == selectedDate.Value.Date);
+            }
+            if (!string.IsNullOrEmpty(building))
+            {
+                if (building == "Einstein") {
+                    query = query.Where(b => b.SeatId > 14);
+                }
+                else
+                {
+                    query = query.Where(b => b.SeatId < 15);
+                }
 
+            }
+
+            // Pass filters back to the view to keep the dropdowns synced
+            ViewBag.SelectedDate = selectedDate?.ToString("yyyy-MM-dd");
+            ViewBag.SelectedBuilding = building;
+
+            var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
             return View(activeBookings);
         }
 
+
+        
+        public IActionResult HistoryBookaLibrarian()
+        {
+            var today = DateTime.Now;
+            var completedRequest = _context.BookALibrarians
+                .Where(b => b.Status == "Approved" && today > b.BookingDate)
+                .ToList();
+
+            if (completedRequest.Any())
+            {
+                foreach (var service in completedRequest)
+                {
+                    service.Status = "Completed";
+                }
+                _context.SaveChanges();
+            }
+
+            string userId = HttpContext.Session.GetString("UserId");
+            var librarian = _context.BookALibrarians
+                .Include(s => s.Patron)
+                    .ThenInclude(p => p.Department)
+                .Include(s => s.Staff)
+                .Where(s => s.Staff.StaffId == Convert.ToInt32(userId))
+                .OrderByDescending(o => o.BookingDate)
+                .ToList();
+
+            return View(librarian);
+        }
         public IActionResult ManageBookaLibrarian()
         {
             var today = DateTime.Now;

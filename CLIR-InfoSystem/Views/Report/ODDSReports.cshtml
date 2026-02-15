@@ -1,5 +1,16 @@
 ﻿<div id="reports-page-container">
-    <h2 style="margin-bottom:20px">Reports & Analytics</h2>
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
+        <div class="col-md-4">
+            <h2 class="fw-bold mb-1">Reports & Analytics</h2>
+            
+        </div>
+        <div class="col-md-6 d-flex justify-content-end">
+            <div class="col-md-12">
+                <partial name="_ReportFilter" />
+            </div>
+        </div>
+    </div>
+
     <div class="report-tabs">
         <a asp-controller="Report" asp-action="ReportDashboard" class="tab">Book A Seat (Rizal)</a>
         <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
@@ -10,54 +21,66 @@
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
     </div>
 
-    <h2 class="section-subtitle">Online Document Delivery Service</h2>
-    <partial name="_ReportFilter" />
-
-
-    <div class="stats-row-top">
-        <div class="report-card dark-card">
-            <p class="card-label">Total Reservations</p>
+    <div class="dashboard-grid">
+        <div class="report-card dark-card d-flex flex-column justify-content-center py-4">
+            <span class="card-label opacity-75">Total ODDS Requests</span>
             <h1 class="card-value">@ViewBag.ODDSCount</h1>
+            <p class="card-subtext">Cumulative document deliveries processed.</p>
         </div>
-    </div>
 
-    <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="report-card mini-card">
-                <p class="card-label">College</p>
-                <h2 class="card-value">@ViewBag.ODDSCountForCollege</h2>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="report-card mini-card">
-                <p class="card-label">SHS</p>
-                <h2 class="card-value">@ViewBag.ODDSCountForSHS</h2>
-            </div>
-        </div>
-    </div>
-        
-    <div class="row g-4 mt-2">
-    <div class="report-card mini-card">
-        <p class="card-label">Top 5 Programs</p>
-
-        @if (ViewBag.ODDSProgram == null || !Enumerable.Any(ViewBag.ODDSProgram))
-        {
-            <h2 class="card-value">N/A</h2>
-        }
-        else
-        {
-            <ul style="list-style: none; padding: 0;">
-                @foreach (var book in ViewBag.ODDSProgram)
-                {
-                    <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                        <strong>@book.Program</strong>
-                        <strong>@book.Count</strong>
-                    </li>
+        <div class="report-card">
+            <span class="card-label">User Level Breakdown</span>
+            <div class="mt-4">
+                @{
+                    double total = (double)(ViewBag.ODDSCount ?? 1);
+                    double collPercent = ((double)(ViewBag.ODDSCountForCollege ?? 0) / total) * 100;
+                    double shsPercent = ((double)(ViewBag.ODDSCountForSHS ?? 0) / total) * 100;
                 }
-            </ul>
-        }
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                        <span>College Level</span>
+                        <span>@ViewBag.ODDSCountForCollege</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                        <span>SHS Level</span>
+                        <span>@ViewBag.ODDSCountForSHS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="report-card border-top border-secondary border-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="card-label m-0">Top Programs</span>
+                    <i class="fas fa-file-export text-muted"></i>
+                </div>
+
+                @if (ViewBag.ODDSProgram == null || !Enumerable.Any(ViewBag.ODDSProgram))
+                {
+                    <div class="text-center py-4">
+                        <h4 class="text-muted">No Program Data Available</h4>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var book in ViewBag.ODDSProgram)
+                        {
+                            <div class="list-group-item px-0 border-0 mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold">@book.Program</span>
+                                    <span class="badge bg-light text-dark border">@book.Count</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
-
-

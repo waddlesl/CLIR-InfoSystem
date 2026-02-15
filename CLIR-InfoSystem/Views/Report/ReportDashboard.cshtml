@@ -1,5 +1,14 @@
 ﻿<div id="reports-page-container">
-    <h2 style="margin-bottom:20px">Reports & Analytics</h2>
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
+        <div class="col-md-4">
+            <h2 class="fw-bold mb-1">Reports & Analytics</h2>
+        </div>
+        <div class="col-md-6 d-flex justify-content-end">
+            <div class="col-md-12">
+                <partial name="_ReportFilter" />
+            </div>
+        </div>
+    </div>
 
     <div class="report-tabs">
         <a asp-controller="Report" asp-action="ReportDashboard" class="tab active">Book A Seat (Rizal)</a>
@@ -11,117 +20,76 @@
         <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
     </div>
 
-    <h2 class="section-subtitle">Book A Seat (Rizal)</h2>
-    <partial name="_ReportFilter" />
-
-
-    <!--
-        <form method="get">
-        <select id="yearDropdown" name="selectedYear" class="form-control mb-2">
-        </select>
-
-        <select id="termDropdown" name="selectedTerm" class="form-control mb-2">
-            <option value="">Select Term</option>
-            <option value="1" selected="@(Context.Request.Query["selectedTerm"] == "1")">1st Term</option>
-            <option value="2" selected="@(Context.Request.Query["selectedTerm"] == "2")">2nd Term</option>
-            <option value="3" selected="@(Context.Request.Query["selectedTerm"] == "3")">3rd Term</option>
-        </select>
-        <button type="submit" asp-controller="Report" asp-action="ReportDashboard" class="btn-red mt-3">Filter</button>
-        <button id="downloadBtn" type="submit" asp-controller="Report" asp-action="DownloadReport" class="btn-red mt-3">Download PDF</button>
-    </form>
-
-
-    -->
-    
-
-    <div class="stats-row-top">
-        <div class="report-card dark-card">
-            <p class="card-label">Total Reservations</p>
+    <div class="dashboard-grid">
+        <div class="report-card dark-card d-flex flex-column justify-content-center py-4">
+            <span class="card-label opacity-75">Total Seat Reservations</span>
             <h1 class="card-value">@ViewBag.RBookingCount</h1>
+            <p class="card-subtext">Total Book a Seat for Rizal Campus.</p>
         </div>
 
-        <div class="report-card" style="flex: 2;">
-            <p class="card-label">Average Volume (Mon-Sat)</p>
-            <div class="graph-box" style="height: 200px; position: relative;">
+        <div class="report-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="card-label">Average Visitors (Mon-Sat)</span>
+                <i class="fas fa-chart-line text-danger"></i>
+            </div>
+            <div class="graph-box">
                 <canvas id="visitorChart"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="report-card mini-card">
-                <p class="card-label">College</p>
-                <h2 class="card-value">@ViewBag.RBookingCountForCollege</h2>
-            </div>
+    <div class="stats-secondary-grid mt-4">
+        <div class="report-card border-top border-secondary border-4">
+            <span class="card-label">College Level</span>
+            <h2 class="card-value">@ViewBag.RBookingCountForCollege</h2>
         </div>
-        <div class="col-md-6">
-            <div class="report-card mini-card">
-                <p class="card-label">SHS</p>
-                <h2 class="card-value">@ViewBag.RBookingCountForSHS</h2>
-            </div>
-        </div>
-    </div>
-    <div class="row g-4 mt-2">
-        <div class="col-md-12">
-            <div class="report-card mini-card">
-                <p class="card-label">Most Dept. Utilized</p>
-                <h2 class="card-value">@ViewBag.RBookingTopDepartment</h2>
-            </div>
-        </div>
-        <!--<div class="col-md-6">
-            <div class="report-card mini-card">
-                <p class="card-label">Most Utilized Seat</p>
-                <h2 class="card-value">@ViewBag.RBookingPreferedSeat</h2>
-            </div>
-        </div>--> 
-    </div>
 
+        <div class="report-card border-top border-secondary border-4">
+            <span class="card-label">SHS Level</span>
+            <h2 class="card-value">@ViewBag.RBookingCountForSHS</h2>
+        </div>
+
+        <div class="report-card border-top border-secondary border-4 text-center">
+            <span class="card-label">Top Department</span>
+            <h2 class="card-value" style="font-size: 1.4rem;">@ViewBag.RBookingTopDepartment</h2>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-
     document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById('visitorChart').getContext('2d');
 
-        const labels = @Html.Raw(ViewBag.VisitorLabels);
-        const dataValues = @Html.Raw(ViewBag.VisitorData);
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, '#CC0000');
+        gradient.addColorStop(1, 'rgba(204, 0, 0, 0.4)');
 
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: @Html.Raw(ViewBag.VisitorLabels ?? "[]"),
                 datasets: [{
-                    label: 'Avg Visitors(Per Day)',
-                    data: dataValues,
-                    backgroundColor: '#CC0000',
-                    borderRadius: 5,
-                    borderWidth: 0
+                    label: 'Avg Visitors',
+                    data: @Html.Raw(ViewBag.VisitorData ?? "[]"),
+                    backgroundColor: gradient,
+                    borderRadius: 8,
+                    barThickness: 30
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { display: false },
-                    ticks: {
-                        font: { size: 10 },
-                        //to show whole numbers para mas maganda tignan
-                        stepSize: 1,
-                        callback: function(value) {
-                            if (value % 1 === 0) { return value; }
-                            }
-                        }
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f0f0f0', drawBorder: false },
+                        ticks: { stepSize: 1, color: '#999' }
                     },
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 10 } }
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#666', font: { weight: '600' } }
                     }
                 }
             }
