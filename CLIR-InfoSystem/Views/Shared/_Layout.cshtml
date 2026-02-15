@@ -6,6 +6,7 @@
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
 }
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +21,14 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
+        }
+        /*para sa ipad sana*/
+        @@media (max-width: 1024px) {
+            
+            .report-tabs {
+                overflow-x: auto;
+                display: flex;
+            }
         }
 
         /*For reports hehehe*/
@@ -48,6 +57,7 @@
         .report-tabs {
             display: flex;
             gap: 0.5rem;
+            overflow-x: auto;
             margin-bottom: 2rem;
             padding: 0.5rem;
             background: #e2e8f0;
