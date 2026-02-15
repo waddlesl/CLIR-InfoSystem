@@ -106,13 +106,27 @@ namespace CLIR_InfoSystem.Controllers
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId)) return BadRequest("Session expired");
 
-            var countToday = _context.Odds.Count(o =>
-                o.PatronId == userId &&
-                o.RequestDate >= DateTime.Today);
-
+            // 1. Quota Check
+            var countToday = _context.Odds.Count(o => o.PatronId == userId && o.RequestDate >= DateTime.Today);
             if (countToday >= 5)
                 return BadRequest("Daily limit reached. You can only request 5 items per day.");
 
+            // 2. URL VALIDATION
+            if (!string.IsNullOrEmpty(model.ResourceLink))
+            {
+                bool isValidUrl = Uri.TryCreate(model.ResourceLink, UriKind.Absolute, out Uri? uriResult)
+                                  && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+                if (!isValidUrl) return BadRequest("Please provide a valid URL link.");
+            }
+
+            // 3. DATE NEEDED VALIDATION 
+            if (model.DateNeeded.HasValue && model.DateNeeded.Value.Date < DateTime.Today)
+            {
+                return BadRequest("The 'Date Needed' cannot be in the past.");
+            }
+
+            // 4. Duplicate Check
             if (!string.IsNullOrEmpty(model.AccessionId))
             {
                 bool isDuplicate = _context.Odds.Any(o =>
@@ -120,13 +134,15 @@ namespace CLIR_InfoSystem.Controllers
                     o.AccessionId == model.AccessionId &&
                     o.RequestStatus == "Pending");
 
-                if (isDuplicate) return BadRequest("You already have a pending request for this specific item.");
+                if (isDuplicate) return BadRequest("You already have a pending request for this item.");
             }
 
+            // Set System Fields
             model.PatronId = userId;
             model.RequestDate = DateTime.Now;
             model.RequestStatus = "Pending";
 
+            // Clean up navigation properties for validation
             ModelState.Remove("Patron");
             ModelState.Remove("Book");
             ModelState.Remove("Staff");
@@ -134,12 +150,9 @@ namespace CLIR_InfoSystem.Controllers
             if (ModelState.IsValid)
             {
                 _context.Odds.Add(model);
-
-                // AUDIT LOG
-                LogAction($"Submitted ODDS request for Accession: {model.AccessionId}", "ODDS");
-
+                LogAction($"Submitted ODDS request for {model.MaterialType}. Needed by: {model.DateNeeded?.ToShortDateString()}", "ODDS");
                 _context.SaveChanges();
-                return Ok(new { remaining = 4 - countToday });
+                return Ok(new { message = "Success" });
             }
 
             return BadRequest("Invalid form data.");

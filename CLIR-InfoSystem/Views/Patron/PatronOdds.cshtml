@@ -149,9 +149,21 @@
                     <input type="url"
                            class="form-control"
                            asp-for="ResourceLink"
-                           placeholder="https://example.com/article-link" />
+                           placeholder="https://example.com/article-link"
+                           pattern="https?://.*"
+                           title="Include http:// or https://" />
+                    <small class="text-muted">Include http:// or https://</small>
+                </div>
+
+                <div class="form-group mb-5">
+                    <label>Date Needed</label>
+                    <input type="date"
+                           class="form-control"
+                           asp-for="DateNeeded"
+                           min="@DateTime.Now.ToString("yyyy-MM-dd")"
+                           required />
                     <small class="text-muted">
-                        Provide a link if the material is from an external database.
+                        Let us know your deadline for this material.
                     </small>
                 </div>
 
