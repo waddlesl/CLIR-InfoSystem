@@ -24,65 +24,56 @@
     </div>
 </div>
 <br />
-<div id="bm-page-container">
-    @if (ViewBag.IsStudentAssistant == false)
-                                    {
-        <div class="card p-3 shadow-sm border-0">
-            <div class="card-header">
-                <h3 class="card-title">Borrower Requests</h3>
+ @if (ViewBag.IsStudentAssistant == false)
+    {
+<div class="card shadow-sm border-0">
 
-            </div>
-        
-            <div class="table-responsive">
-                <table class="table align-middle text-center">
-                    <thead>
+    <div class="card-body p-4">
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="small text-muted">
+                    <tr>
+                        <th>Borrow ID</th>
+                        <th>Name</th>
+                        <th>Book Title</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var reservedRequests = Model?.Where(bb => bb.Status == "Reserved").ToList()
+                        ?? new List<CLIR_InfoSystem.Models.BookBorrowing>();
+                    }
+                    @foreach (var bb in reservedRequests)
+                    {
                         <tr>
-                            <th>Borrow ID</th>
-                            <th>Name</th>
-                            <th>Book Title</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            var reservedRequests = Model?.Where(bb => bb.Status == "Reserved").ToList()
-                            ?? new List<CLIR_InfoSystem.Models.BookBorrowing>();
-                        }
-
-                    
-                            @foreach (var bb in reservedRequests)
-                            {   
-                                <tr>
-                                    <td>@bb.BorrowId</td>
-                                    <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
-                                    <td>@(bb.Book?.Title ?? "No Title")</td>
-                                    <td>@bb.BorrowDate.ToString("yyyy-MM-dd")</td>
-                                    @if (ViewBag.IsStudentAssistant == false)
-                                    {
-                                        <td>
-                                            <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
-                                            <button class="denybuttons" onclick="denyRequest('@bb.BorrowId')">Deny</button>
-                                        </td>
-                                    }
-                                    else
-                                    {
-                                        <td>
-                                        <button class="acceptbuttons" disabled>Confirm</button> | <button class="denybuttons" disabled>Deny</button>
-                                        </td>
-                                    }
-                                </tr>
+                            <td>@bb.BorrowId</td>
+                            <td>@(bb.Patron?.FirstName + " " + bb.Patron?.LastName)</td>
+                            <td>@(bb.Book?.Title ?? "No Title")</td>
+                            <td>@bb.BorrowDate.ToString("yyyy-MM-dd")</td>
+                            @if (ViewBag.IsStudentAssistant == false)
+                            {
+                                <td>
+                                    <button class="acceptbuttons" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
+                                    <button class="denybuttons" onclick="denyRequest('@bb.BorrowId')">Deny</button>
+                                </td>
                             }
-                    
-                    
-                    
-                    </tbody>
-                </table>
-            </div>
-
-        
+                            else
+                            {
+                                <td>
+                                    <button class="acceptbuttons" disabled>Confirm</button> | <button class="denybuttons" disabled>Deny</button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-    }
+    </div>
 </div>
+    }
+
 
 <br />
 

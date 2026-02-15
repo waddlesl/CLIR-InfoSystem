@@ -1,36 +1,54 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
-<h2>Book Management</h2>
-
-<div class="row g-4 mt-2">
-    <div class="col-md-4">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Available Books</h6>
+<div class="container mt-3">
+    <div class="col-md-12 d-flex justify-content-around ">
+        <div class="col-sm-2 card p-3 shadow-sm border-1">
+            <h6 class="text-muted">Book Count</h6>
             <h3>@ViewBag.BookCount</h3>
         </div>
+        <div class="col-sm-2 card p-3 shadow-sm border-1">
+            <h6 class="text-muted">Borrowed Books</h6>
+            <h3>@ViewBag.BorrowedBookCount</h3>
+        </div>
+        <div class="col-sm-2 card p-3 shadow-sm border-1">
+            <h6 class="text-muted">Available Books</h6>
+            <h3>@ViewBag.AvailableBookCount</h3>
+        </div>
+        <div class="col-sm-2 card p-3 shadow-sm border-1">
+            <h6 class="text-muted">Archived Books</h6>
+            <h3>@ViewBag.ArchivedBookCount</h3>
+        </div>
     </div>
-</div>
-<div class="row g-4 mt-2">
-    <div class="col-md-12">
 
-        <div class="card p-3 shadow-sm border-0">
-            <div class="card-header">
-                <h3 class="card-title">Books List</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">Book List</h4>
+            <small class="text-muted">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
+        </div>
 
-                <!--Search-->
-                <div class="d-flex align-items-center">
-                    <form method="get" asp-action="BookManagement" class="d-flex me-2">
-                        <input type="text" name="searchTerm" placeholder="Search by ID or Book Name..." class="form-control" style="width: 250px;" />
-                        <button type="submit" class="btn btn-secondary ms-1">Search</button>
-                    </form>
-                    @if (ViewBag.IsStudentAssistant == false)
-                    {
-                        <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddBookModal()">
-                            <b class="me-1" style="font-size: 1.2rem;">+</b> Add Book
-                        </button>
-                    }
-                </div>
-
-            </div>
+        <div class="input-group" style="max-width: 500px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="bookSearch"
+                   class="form-control border-start-0"
+                   placeholder="Search Book">
+            @if (ViewBag.IsStudentAssistant == false)
+            {
+                <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddBookModal()">
+                    <b class="me-1" style="font-size: 1.2rem;">+</b> Add Book
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary d-flex align-items-center" onclick="openAddBookModal()" disabled>
+                    <b class="me-1" style="font-size: 1.2rem;">+</b> Add Book
+                </button>
+            }
+        </div>
+    </div>
 
             <div class="table-responsive">
                 <table class="table align-middle">
@@ -43,7 +61,7 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="booksTable">
                         @if (ViewBag.IsStudentAssistant == false)
                         {
                             @foreach (var book in Model)
@@ -74,7 +92,7 @@
                                             }
                                             else
                                             {
-                                                <em class="small text-muted">No status actions</em>
+                                                <em class="small text-muted">Can not Archive</em>
                                             }
                                         }
                                         else
@@ -132,19 +150,21 @@
                         
                     </tbody>
                 </table>
-            </div>
-
-            <div class="card-footer">
-                <!-- 
-                <button class="see-all">See All</button>        #Dont Need Yet
-                -->
-            </div>
         </div>
+        <div class="d-flex justify-content-between align-items-center">
 
+            <!-- PAGE INFO LEFT -->
+            <div id="pageInfo" class="small text-muted"></div>
+
+            <!-- PAGINATION RIGHT -->
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+            </nav>
+
+        </div>
     </div>
-    
 
-</div>
+
 
 
 
@@ -263,6 +283,57 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        function updateTable() {
+                let rows = $("#booksTable tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+                $("#booksTable tr").hide();
+
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+
+            rows.slice(start, end).show();
+
+            // Page Info
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            // Generate Pagination
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                        </li>`;
+            }
+            $("#pagination").html(paginationHtml);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
+        }
+
+        // Real-time Search
+        $("#bookSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+                $("#booksTable tr").each(function() {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggleClass("filtered", !isMatch);
+            });
+            currentPage = 1;
+            updateTable();
+        });
+
+        // Initialize
+        $(document).ready(function() {
+            updateTable();
+        });
+
+   
+
         
         function openAddBookModal() {
             
@@ -395,4 +466,15 @@
             });
         }
     </script>
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
 }
