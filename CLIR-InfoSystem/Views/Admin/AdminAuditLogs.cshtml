@@ -1,61 +1,207 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.AuditLog>
 
-<div class="container mt-4">
-    <h2 class="text-center fw-bold mb-4">System Audit Logs</h2>
+<div class="container-fluid px-4 mt-3">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h5 class="fw-bold mb-0" style="color: #1a2035; font-size: 1.1rem;">System Audit Logs</h5>
+            <small class="text-muted">Generated: @DateTime.Now.ToString("MMM dd, yyyy | hh:mm tt")</small>
+        </div>
 
-    <div class="card shadow-sm mx-auto mb-5" style="max-width: 95%; border-radius: 15px;">
-        <div class="card-body">
-            <h4 class="fw-bold text-primary"><i class="bi bi-person-badge"></i> Staff Activity</h4>
-            <hr />
-            <table class="table table-hover mt-3">
-                <thead class="table-light">
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Staff Member</th>
-                        <th>Action Performed</th>
-                        <th>Module</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var log in (List<CLIR_InfoSystem.Models.AuditLog>)ViewBag.StaffLogs)
-                    {
-                        <tr>
-                            <td>@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
-                            <td><strong>@log.Staff?.FirstName @log.Staff?.LastName</strong></td>
-                            <td>@log.ActionPerformed</td>
-                            <td><span class="badge bg-info text-dark">@log.TableAffected</span></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="input-group input-group-sm" style="width: 380px;">
+                <span class="input-group-text bg-white text-muted small">Date Range</span>
+                <input type="date" id="startDate" class="form-control">
+                <input type="date" id="endDate" class="form-control">
+                <button class="btn btn-outline-secondary" type="button" id="btnClearFilters"><i class="bi bi-arrow-counterclockwise"></i></button>
+            </div>
+            <div class="input-group input-group-sm" style="width: 280px;">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="logSearch" class="form-control border-start-0" placeholder="Search name, action, or module...">
+            </div>
+            <select id="viewToggle" class="form-select form-select-sm" style="width: 130px;">
+                <option value="staff">Staff Logs</option>
+                <option value="patron">Patron Logs</option>
+            </select>
         </div>
     </div>
 
-    <div class="card shadow-sm mx-auto" style="max-width: 95%; border-radius: 15px;">
-        <div class="card-body">
-            <h4 class="fw-bold text-success"><i class="bi bi-people"></i> Patron Activity</h4>
-            <hr />
-            <table class="table table-hover mt-3">
-                <thead class="table-light">
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Patron Name</th>
-                        <th>Action Performed</th>
-                        <th>Module</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var log in (List<CLIR_InfoSystem.Models.AuditLog>)ViewBag.PatronLogs)
-                    {
+    <div id="staffSection" class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="small text-muted">
                         <tr>
-                            <td>@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
-                            <td><strong>@log.Patron?.FirstName @log.Patron?.LastName</strong> <small class="text-muted">(@log.PatronId)</small></td>
-                            <td>@log.ActionPerformed</td>
-                            <td><span class="badge bg-secondary">@log.TableAffected</span></td>
+                            <th class="ps-4">Date & Time</th>
+                            <th>Staff Member</th>
+                            <th>Action Performed</th>
+                            <th>Module</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="staffLogBody">
+                        @foreach (var log in (List<CLIR_InfoSystem.Models.AuditLog>)ViewBag.StaffLogs)
+                        {
+                            <tr data-date="@log.LogDate.ToString("yyyy-MM-dd")">
+                                <td class="ps-4 small">@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                <td class="fw-semibold">@log.Staff?.FirstName @log.Staff?.LastName</td>
+                                <td>@log.ActionPerformed</td>
+                                <td><span class="badge badge-default">@log.TableAffected</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="staffPageInfo" class="small text-muted"></div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="input-group input-group-sm" style="width: 120px;">
+                        <span class="input-group-text bg-transparent border-0 text-muted">Go to</span>
+                        <input type="number" id="staffJump" class="form-control form-control-sm" min="1" placeholder="Pg #">
+                    </div>
+                    <nav><ul class="pagination pagination-sm mb-0" id="staffPagination"></ul></nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="patronSection" class="card shadow-sm border-0" style="display: none;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th class="ps-4">Date & Time</th>
+                            <th>Patron Name</th>
+                            <th>Action Performed</th>
+                            <th>Module</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patronLogBody">
+                        @foreach (var log in (List<CLIR_InfoSystem.Models.AuditLog>)ViewBag.PatronLogs)
+                        {
+                            <tr data-date="@log.LogDate.ToString("yyyy-MM-dd")">
+                                <td class="ps-4 small">@log.LogDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                <td><span class="fw-semibold">@log.Patron?.FirstName @log.Patron?.LastName</span></td>
+                                <td>@log.ActionPerformed</td>
+                                <td><span class="badge badge-default">@log.TableAffected</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="patronPageInfo" class="small text-muted"></div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="input-group input-group-sm" style="width: 120px;">
+                        <span class="input-group-text bg-transparent border-0 text-muted">Go to</span>
+                        <input type="number" id="patronJump" class="form-control form-control-sm" min="1" placeholder="Pg #">
+                    </div>
+                    <nav><ul class="pagination pagination-sm mb-0" id="patronPagination"></ul></nav>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        let rowsPerPage = 10;
+        let staffCurrentPage = 1;
+        let patronCurrentPage = 1;
+
+        function paginateTable(tableBodyId, paginationId, infoId, currentPage) {
+            const items = $(`#${tableBodyId} tr:not(.d-none)`);
+            const numItems = items.length;
+            const numPages = Math.ceil(numItems / rowsPerPage);
+            if (currentPage > numPages) currentPage = numPages || 1;
+
+            const $pagination = $(`#${paginationId}`);
+            $pagination.empty();
+
+            if (numItems > 0) {
+                $pagination.append(`
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0)" onclick="changePage('${tableBodyId}', ${currentPage - 1})">&laquo;</a>
+                    </li>
+                    <li class="page-item active"><span class="page-link">${currentPage} / ${numPages}</span></li>
+                    <li class="page-item ${currentPage === numPages ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0)" onclick="changePage('${tableBodyId}', ${currentPage + 1})">&raquo;</a>
+                    </li>
+                `);
+            }
+
+            items.hide().slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).show();
+            $(`#${infoId}`).text(`Showing ${(currentPage-1)*rowsPerPage + 1}-${Math.min(currentPage*rowsPerPage, numItems)} of ${numItems}`);
+        }
+
+        window.changePage = function(tableId, newPage) {
+            if (tableId === 'staffLogBody') { staffCurrentPage = newPage; paginateTable('staffLogBody', 'staffPagination', 'staffPageInfo', staffCurrentPage); }
+            else { patronCurrentPage = newPage; paginateTable('patronLogBody', 'patronPagination', 'patronPageInfo', patronCurrentPage); }
+        };
+
+        $("#staffJump, #patronJump").on("keyup", function(e) {
+            if (e.key === "Enter") {
+                let val = parseInt($(this).val());
+                let tableId = this.id === "staffJump" ? 'staffLogBody' : 'patronLogBody';
+                if (val > 0) changePage(tableId, val);
+            }
+        });
+
+        function filterAll() {
+            const search = $("#logSearch").val().toLowerCase();
+            const start = $("#startDate").val();
+            const end = $("#endDate").val();
+
+            $("tbody tr").each(function() {
+                const text = $(this).text().toLowerCase();
+                const rowDate = $(this).data('date');
+                const matchesSearch = text.indexOf(search) > -1;
+                const matchesDate = (!start || rowDate >= start) && (!end || rowDate <= end);
+                $(this).toggleClass('d-none', !(matchesSearch && matchesDate));
+            });
+            paginateTable('staffLogBody', 'staffPagination', 'staffPageInfo', staffCurrentPage);
+            paginateTable('patronLogBody', 'patronPagination', 'patronPageInfo', patronCurrentPage);
+        }
+
+        $("#viewToggle").on("change", function() {
+            const isStaff = $(this).val() === "staff";
+            $("#staffSection").toggle(isStaff); $("#patronSection").toggle(!isStaff);
+            filterAll();
+        });
+
+        $("#logSearch, #startDate, #endDate").on("input change", filterAll);
+        $("#btnClearFilters").on("click", () => { $("#logSearch, #startDate, #endDate").val(""); filterAll(); });
+
+        $(document).ready(() => filterAll());
+    </script>
+
+    <style>
+        .badge-default {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            font-weight: 500;
+        }
+
+        .form-control-sm {
+            height: 31px;
+            font-size: 0.8rem;
+        }
+
+        .page-link {
+            color: #1a2035;
+            font-weight: bold;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
+}

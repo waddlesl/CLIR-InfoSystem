@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -12,118 +13,31 @@ namespace CLIR_InfoSystem.Controllers
     {
         public AccountController(LibraryDbContext context) : base(context) { }
 
-       
-
         // Temporary route: /Account/SeedData
         [HttpGet]
         public IActionResult SeedData()
         {
-            // 1. Check if the admin already exists to prevent duplicates/crashes
             if (_context.Staff.Any(u => u.Username == "admin"))
             {
                 return Content("Database already seeded. Please log in.");
             }
 
-            // 2. Initialize Staff
             var staffList = new List<Staff>
-    {
-        new Staff {
-            FirstName = "Melard", LastName = "Salapare", Username = "admin",
-            Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"),
-            TypeOfUser = "Admin", Status = "Active"
-        },
-        new Staff {
-            FirstName = "Maria", LastName = "Clara", Username = "mclara",
-            Password = BCrypt.Net.BCrypt.HashPassword("staff456"),
-            TypeOfUser = "Librarian", Status = "Active"
-        },
-        new Staff {
-            FirstName = "Jose", LastName = "Rizal", Username = "jrizal",
-            Password = BCrypt.Net.BCrypt.HashPassword("student789"),
-            TypeOfUser = "Student Assistant", Status = "Active"
-        }
-    };
-
+            {
+                new Staff { FirstName = "Melard", LastName = "Salapare", Username = "admin", Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"), TypeOfUser = "Admin", Status = "Active" },
+                new Staff { FirstName = "Maria", LastName = "Clara", Username = "mclara", Password = BCrypt.Net.BCrypt.HashPassword("staff456"), TypeOfUser = "Librarian", Status = "Active" },
+                new Staff { FirstName = "Jose", LastName = "Rizal", Username = "jrizal", Password = BCrypt.Net.BCrypt.HashPassword("student789"), TypeOfUser = "Student Assistant", Status = "Active" }
+            };
 
             _context.Staff.AddRange(staffList);
             _context.SaveChanges();
-
             return Content("Database Seeded Successfully! Log in with 'admin' / '1234Admin'.");
         }
 
-        #region Authentication
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            // If already logged in, skip the login page
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
-            {
-                var role = HttpContext.Session.GetString("UserRole");
-                if (role == "Patron") return RedirectToAction("PatronDashboard", "Dashboard");
-                return RedirectToAction(role.Replace(" ", "") + "Dashboard", "Dashboard");
-            }
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(string username, string password)
-        {
-            // 1. Staff Login
-            var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Status == "Active");
-
-            // Use BCrypt.Verify to check the plain-text password against the hashed database entry
-            if (staff != null && BCrypt.Net.BCrypt.Verify(password, staff.Password))
-            {
-                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
-                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
-                HttpContext.Session.SetInt32("StaffId", staff.StaffId);
-                HttpContext.Session.SetString("UserName", staff.FirstName);
-
-                LogAction("Logged into the system", "staff");
-                _context.SaveChanges();
-
-                string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
-                return RedirectToAction(dashboardAction, "Dashboard");
-            }
-
-            // 2. Patron Login (ID + Last Name)
-            var patron = _context.Patrons
-                .Include(p => p.Department)
-                .Include(p => p.Program)
-                .FirstOrDefault(p => p.PatronId == username);
-
-            if (patron != null && patron.LastName.ToLower() == password.ToLower())
-            {
-                HttpContext.Session.SetString("UserRole", "Patron");
-                HttpContext.Session.SetString("UserName", patron.FirstName);
-                HttpContext.Session.SetString("UserId", patron.PatronId);
-
-                LogAction("Logged into Kiosk", "patron");
-                _context.SaveChanges();
-
-                return RedirectToAction("PatronDashboard", "Dashboard");
-            }
-
-            ViewBag.Error = "Invalid ID or Surname. Please try again.";
-            return View();
-        }
-
-        public IActionResult Logout()
-        {
-            LogAction("Logged out", "session");
-            _context.SaveChanges();
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
-        }
-
-        #endregion
-
-        #region Staff Management 
+        #region Staff Management
 
         public IActionResult ManageStaff(string searchTerm)
         {
-            // Use the BaseController helper to restrict access
             if (!IsAuthorized("Admin")) return Unauthorized();
 
             var query = _context.Staff
@@ -137,7 +51,7 @@ namespace CLIR_InfoSystem.Controllers
                     s.LastName.Contains(searchTerm));
             }
 
-            return View("~/Views/Admin/AdminManageStaff.cshtml",query.ToList());
+            return View("~/Views/Admin/AdminManageStaff.cshtml", query.ToList());
         }
 
         [HttpPost]
@@ -145,9 +59,22 @@ namespace CLIR_InfoSystem.Controllers
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
 
-            // Hash the password before saving
-            newStaff.Password = BCrypt.Net.BCrypt.HashPassword(newStaff.Password);
+            // VALIDATION: No Empty Fields
+            if (string.IsNullOrWhiteSpace(newStaff.FirstName) ||
+                string.IsNullOrWhiteSpace(newStaff.LastName) ||
+                string.IsNullOrWhiteSpace(newStaff.Username) ||
+                string.IsNullOrWhiteSpace(newStaff.Password))
+            {
+                return Json(new { success = false, message = "All fields are required." });
+            }
 
+            if (_context.Staff.Any(s => s.Username == newStaff.Username))
+            {
+                return Json(new { success = false, message = "Username is already taken." });
+            }
+
+            newStaff.Password = BCrypt.Net.BCrypt.HashPassword(newStaff.Password);
+            newStaff.Status = "Active";
             _context.Staff.Add(newStaff);
             _context.SaveChanges();
             return Json(new { success = true });
@@ -159,26 +86,45 @@ namespace CLIR_InfoSystem.Controllers
             if (!IsAuthorized("Admin")) return Unauthorized();
 
             var staff = _context.Staff.Find(updatedStaff.StaffId);
-            if (staff == null) return Json(new { success = false, message = "Not found" });
+            if (staff == null) return Json(new { success = false, message = "Staff member not found." });
+
+            // VALIDATION: No Empty Fields (Password is optional on update)
+            if (string.IsNullOrWhiteSpace(updatedStaff.FirstName) ||
+                string.IsNullOrWhiteSpace(updatedStaff.LastName) ||
+                string.IsNullOrWhiteSpace(updatedStaff.Username))
+            {
+                return Json(new { success = false, message = "Name and Username cannot be empty." });
+            }
+
+            if (_context.Staff.Any(s => s.Username == updatedStaff.Username && s.StaffId != updatedStaff.StaffId))
+            {
+                return Json(new { success = false, message = "Username is already taken by another user." });
+            }
 
             staff.FirstName = updatedStaff.FirstName;
             staff.LastName = updatedStaff.LastName;
             staff.Username = updatedStaff.Username;
             staff.TypeOfUser = updatedStaff.TypeOfUser;
+
             if (!string.IsNullOrEmpty(updatedStaff.Password))
             {
-                // Only re-hash if the admin actually typed a new password
                 staff.Password = BCrypt.Net.BCrypt.HashPassword(updatedStaff.Password);
             }
 
-            LogAction($"Updated staff profile: {staff.Username}", "staff");
             _context.SaveChanges();
             return Json(new { success = true });
         }
-
         public IActionResult ToggleStatus(int id)
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
+
+            // Prevent Admin from deactivating their own account
+            var currentUserId = HttpContext.Session.GetInt32("StaffId");
+            if (id == currentUserId)
+            {
+                TempData["AlertMessage"] = "You cannot deactivate your own account.";
+                return RedirectToAction("ManageStaff");
+            }
 
             var staff = _context.Staff.Find(id);
             if (staff != null)
@@ -211,7 +157,67 @@ namespace CLIR_InfoSystem.Controllers
 
         #endregion
 
-        #region Audit Logs & System Reports
+        #region Authentication
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                var role = HttpContext.Session.GetString("UserRole");
+                if (role == "Patron") return RedirectToAction("PatronDashboard", "Dashboard");
+                return RedirectToAction(role.Replace(" ", "") + "Dashboard", "Dashboard");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(string username, string password)
+        {
+            var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Status == "Active");
+
+            if (staff != null && BCrypt.Net.BCrypt.Verify(password, staff.Password))
+            {
+                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
+                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+                HttpContext.Session.SetInt32("StaffId", staff.StaffId);
+                HttpContext.Session.SetString("UserName", staff.FirstName);
+
+                LogAction("Logged into the system", "staff");
+                _context.SaveChanges();
+
+                return RedirectToAction(staff.TypeOfUser.Replace(" ", "") + "Dashboard", "Dashboard");
+            }
+
+            var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == username);
+            if (patron != null && patron.LastName.ToLower() == password.ToLower())
+            {
+                HttpContext.Session.SetString("UserRole", "Patron");
+                HttpContext.Session.SetString("UserName", patron.FirstName);
+                HttpContext.Session.SetString("UserId", patron.PatronId);
+                HttpContext.Session.SetString("UserEmail", patron.Email ?? "");
+
+                LogAction("Logged into Kiosk", "patron");
+                _context.SaveChanges();
+
+                return RedirectToAction("PatronDashboard", "Dashboard");
+            }
+
+            ViewBag.Error = "Invalid ID or Surname.";
+            return View();
+        }
+
+        public IActionResult Logout()
+        {
+            LogAction("Logged out", "session");
+            _context.SaveChanges();
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+        #endregion
+
+        #region Audit Logs & Reports
 
         public IActionResult AuditLogs()
         {
@@ -233,17 +239,30 @@ namespace CLIR_InfoSystem.Controllers
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
 
-            ViewBag.TotalBooks = _context.Books.Count();
+            // Date Logic
+            var now = DateTime.Now;
+            var firstDayThisMonth = new DateTime(now.Year, now.Month, 1);
+            var firstDayLastMonth = firstDayThisMonth.AddMonths(-1);
+
+            // Current Stats
+            ViewBag.InventoryValue = _context.Books.Sum(b => (double?)((b.Price ?? 0) - (b.Discount ?? 0))) ?? 0;
             ViewBag.ActivePatrons = _context.Patrons.Count();
             ViewBag.TotalOdds = _context.Odds.Count();
-            ViewBag.InventoryValue = _context.Books.Sum(b => (b.Price ?? 0) - (b.Discount ?? 0));
+            ViewBag.PendingServices = _context.Services.Count(s => s.RequestStatus == "Pending");
 
-            ViewBag.StaffPerformance = _context.Odds
-                .Include(o => o.Staff)
-                .Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null)
-                .GroupBy(o => o.Staff.FirstName)
-                .Select(g => new { Name = g.Key, Count = g.Count() })
-                .ToDictionary(k => k.Name, v => v.Count);
+            // Comparison Logic: ODDS Fulfillment
+            int thisMonthCount = _context.Odds.Count(o => o.RequestDate >= firstDayThisMonth);
+            int lastMonthCount = _context.Odds.Count(o => o.RequestDate >= firstDayLastMonth && o.RequestDate < firstDayThisMonth);
+
+            // Calculate Growth/Decline Percentage
+            double diff = thisMonthCount - lastMonthCount;
+            ViewBag.OddsGrowth = lastMonthCount == 0 ? 0 : Math.Round((diff / lastMonthCount) * 100, 1);
+            ViewBag.IsPositive = diff >= 0;
+
+            // ... Keep your Dictionaries here ...
+            ViewBag.StaffPerformance = _context.Odds.Include(o => o.Staff).Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null)
+                .GroupBy(o => o.Staff.FirstName).ToDictionary(k => k.Key, v => v.Count());
+            ViewBag.MaterialDemand = _context.Odds.GroupBy(o => o.MaterialType).ToDictionary(k => k.Key ?? "Unknown", v => v.Count());
 
             return View("~/Views/Admin/AdminSystemReports.cshtml");
         }

@@ -1,68 +1,125 @@
 ﻿@model CLIR_InfoSystem.Models.BookALibrarian
 
-<div class="container mt-5">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">Book-A-Librarian</h2>
-        <p class="text-muted small">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</p>
-    </div>
+<div class="container py-3 d-flex justify-content-center">
 
-    <div style="max-width: 600px; margin: 0 auto;">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                @if (ViewBag.HasActiveRequest == true)
-                {
-                    <div class="text-center py-4">
-                        <div class="mb-3">
-                            <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
-                        </div>
-                        <h4 class="fw-bold">Request Already Active</h4>
-                        <p class="text-muted">You cannot book a new session while you have a <b>Pending</b> or <b>Approved</b> request.</p>
-                        <hr />
-                        <a href="/Patron/Index" class="btn btn-outline-secondary btn-sm">View My Activity</a>
-                    </div>
-                }
-                else
-                {
-                    <form id="librarianBookingForm" asp-action="SubmitBooking" method="post">
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted">CONSULTATION TOPIC</label>
-                            <input type="text" class="form-control" asp-for="Topic" placeholder="e.g., Thesis Research" required />
-                        </div>
+    <div class="card shadow-sm border-0"
+         style="max-width: 600px; width: 100%; border-radius: 18px;">
 
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted">DESCRIPTION</label>
-                            <textarea class="form-control" asp-for="Description" rows="3" placeholder="Details..." required></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted">PREFERRED LIBRARIAN (OPTIONAL)</label>
-                            <select class="form-select" asp-for="StaffId">
-                                <option value="">-- Any Available Librarian --</option>
-                                @if (ViewBag.Librarians != null)
-                                {
-                                    foreach (var staff in ViewBag.Librarians)
-                                    {
-                                        <option value="@staff.StaffId">@staff.FirstName @staff.LastName</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="small fw-bold text-muted">PREFERRED DATE & TIME (8:00 AM - 5:00 PM)</label>
-                            <input type="datetime-local" id="bookingDateInput" class="form-control" asp-for="BookingDate" required
-                                   min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                            <small id="timeError" class="text-danger" style="display:none;">Please select a weekday (Mon-Fri) between 8 AM and 5 PM.</small>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" id="submitBtn" class="btn btn-success fw-bold py-2">BOOK SESSION</button>
-                        </div>
-                    </form>
-                }
-            </div>
+        <!-- HEADER -->
+        <div class="card-body text-center pt-4 pb-2">
+            <h4 class="fw-bold mb-1">Book-A-Librarian</h4>
+            <small class="text-muted d-block">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
         </div>
+
+        <div class="card-body p-4">
+
+            @if (ViewBag.HasActiveRequest == true)
+            {
+                <div class="text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-exclamation-circle text-warning"
+                           style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Request Already Active</h5>
+                    <p class="text-muted">
+                        You cannot book a new session while you have a
+                        <b>Pending</b> or <b>Approved</b> request.
+                    </p>
+                    <hr />
+                    <a href="/Patron/PatronActivity"
+                       class="btn btn-outline-secondary btn-sm">
+                        View My Activity
+                    </a>
+                </div>
+            }
+            else
+            {
+                <form id="librarianBookingForm"
+                      asp-action="SubmitBooking"
+                      method="post">
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">
+                            CONSULTATION TOPIC
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               asp-for="Topic"
+                               placeholder="e.g., Thesis Research"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">
+                            DESCRIPTION
+                        </label>
+                        <textarea class="form-control"
+                                  asp-for="Description"
+                                  rows="3"
+                                  placeholder="Details..."
+                                  required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">
+                            PREFERRED LIBRARIAN (OPTIONAL)
+                        </label>
+                        <select class="form-select" asp-for="StaffId">
+                            <option value="">
+                                -- Any Available Librarian --
+                            </option>
+                            @if (ViewBag.Librarians != null)
+                            {
+                                foreach (var staff in ViewBag.Librarians)
+                                {
+                                    <option value="@staff.StaffId">
+                                        @staff.FirstName @staff.LastName
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="small fw-bold text-muted">
+                            PREFERRED DATE & TIME (8:00 AM - 5:00 PM)
+                        </label>
+                        <input type="datetime-local"
+                               id="bookingDateInput"
+                               class="form-control"
+                               asp-for="BookingDate"
+                               required
+                               min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+
+                        <small id="timeError"
+                               class="text-danger"
+                               style="display:none;">
+                            Please select a weekday (Mon-Fri) between 8 AM and 5 PM.
+                        </small>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit"
+                                id="submitBtn"
+                                class="btn btn-success fw-bold py-2">
+                            BOOK SESSION
+                        </button>
+                    </div>
+
+                </form>
+            }
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="card-footer bg-white border-0 text-center py-3 small text-muted">
+            Book-A-Librarian Service
+        </div>
+
     </div>
+
 </div>
 
 @section Scripts {

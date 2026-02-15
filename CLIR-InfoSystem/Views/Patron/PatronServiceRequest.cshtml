@@ -8,16 +8,13 @@
     .request-card {
         max-width: 600px;
         margin: 50px auto;
-        background: #fff;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-radius: 18px;
         border: none;
-        overflow: hidden;
     }
 
     .card-header-custom {
-        padding: 30px 20px 10px;
         text-align: center;
+        padding: 30px 20px 10px;
     }
 
     .card-body-custom {
@@ -69,10 +66,15 @@
     }
 </style>
 
-<div class="container">
-    <div class="request-card">
+<div class="container d-flex justify-content-center">
+    <div class="card shadow-sm request-card">
+
+        <!-- HEADER -->
         <div class="card-header-custom">
-            <h2 class="fw-bold mb-0">Request Service Access</h2>
+            <h4 class="fw-bold mb-1">Request Service Access</h4>
+            <small class="text-muted d-block">
+                @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
+            </small>
         </div>
 
         <div class="card-body-custom">
@@ -87,7 +89,7 @@
                     Please check your email (@Context.Session.GetString("UserEmail")) for the invitation link shortly.
                 </p>
                 <hr>
-                <a href="/Patron/Index" class="btn btn-sm btn-outline-success border-0 fw-bold">
+                <a href="/Dashboard/PatronDashboard" class="btn btn-sm btn-outline-success border-0 fw-bold">
                     Return to Dashboard
                 </a>
             </div>
@@ -101,7 +103,7 @@
                            value="@Context.Session.GetString("UserId")" />
 
                     <!-- SERVICE DROPDOWN -->
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label>Select Service Type</label>
                         <select name="ServiceType" class="form-control" required>
                             <option value="">-- Select Service --</option>
@@ -147,6 +149,12 @@
                 </form>
             }
         </div>
+
+        <!-- FOOTER -->
+        <div class="card-footer bg-white border-0 text-center py-3 small text-muted">
+            Library Service Access System
+        </div>
+
     </div>
 </div>
 

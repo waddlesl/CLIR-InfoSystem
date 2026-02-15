@@ -1,23 +1,28 @@
 ﻿@{
     ViewData["Title"] = "Patron Dashboard";
+
+    var userName = Context.Session.GetString("UserName") ?? "Patron";
 }
 
+
 <div class="container py-5">
-    @* Centered Title *@
+
+    <!-- Welcome Header -->
     <div class="text-center mb-5">
+        <h3 class="fw-bold text-clir">Welcome, @userName!</h3>
         <h2 class="fw-bold text-clir">Library Service Hub</h2>
         <p class="text-muted">A quick glance at your latest library updates</p>
-        <hr class="mx-auto" style="width: 50px; height: 4px; background: #198754; opacity: 1; border-radius: 2px;">
+        <hr class="mx-auto" style="width: 60px; height: 4px; background: #198754; opacity: 1; border-radius: 2px;">
     </div>
 
-    @* Separated Capsules with Equal Height *@
+    <!-- Dashboard Capsules -->
     <div class="row g-4 justify-content-center d-flex align-items-stretch" style="max-width: 1000px; margin: 0 auto;">
 
-        @* Left Capsule: Comprehensive Stats *@
+        <!-- Left Capsule: Account Stats -->
         <div class="col-md-4">
             <div class="capsule-card bg-clir text-white h-100 p-4 shadow-sm">
                 <div class="text-center mb-4">
-                    <h6 class="text-uppercase tracking-wider small opacity-75">Account Standing</h6>
+                    <h6 class="text-uppercase tracking-wider small opacity-75">Account Summary</h6>
                 </div>
 
                 <div class="d-flex flex-column gap-3">
@@ -29,7 +34,6 @@
                         <span class="small opacity-75">Seat Bookings</span>
                         <span class="fw-bold fs-5">@(ViewBag.ActiveSeats ?? 0)</span>
                     </div>
-                    @* This now correctly counts Pending ODDS, Services, Consultations, and Reserved Books *@
                     <div class="stat-pill border border-warning border-opacity-25">
                         <span class="small text-warning fw-bold">Total Pending</span>
                         <span class="fw-bold fs-5 text-warning">@(ViewBag.MyPendingRequests ?? 0)</span>
@@ -38,12 +42,12 @@
             </div>
         </div>
 
-        @* Right Capsule: Integrated Notification Feed *@
+        <!-- Right Capsule: Recent Activities -->
         <div class="col-md-7">
             <div class="capsule-card bg-white h-100 p-4 shadow-sm border">
                 <div class="d-flex justify-content-between align-items-center mb-4 px-2">
                     <h6 class="fw-bold text-clir mb-0 small text-uppercase tracking-wider">Recent Activity</h6>
-                    <a href="@Url.Action("Index", "Patron")" class="btn-link-custom">
+                    <a href="~/Patron/PatronActivity" class="btn-link-custom">
                         View History <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
@@ -51,7 +55,7 @@
                 <div class="d-flex flex-column gap-2">
                     @if (ViewBag.AllActivities == null || ViewBag.AllActivities.Count == 0)
                     {
-                        <div class="text-center py-5 text-muted small italic">
+                        <div class="text-center py-5 text-muted small fst-italic">
                             <i class="bi bi-inbox d-block fs-2 mb-2 opacity-50"></i>
                             No recent updates found.
                         </div>
@@ -75,6 +79,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -93,15 +98,12 @@
 
     .capsule-card {
         border-radius: 25px;
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-        .capsule-card:hover {
-            transform: translateY(-3px);
-        }
 
     .stat-pill {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255,255,255,0.1);
         padding: 12px 20px;
         border-radius: 18px;
         display: flex;
@@ -117,13 +119,9 @@
         transition: 0.2s;
     }
 
-        .notif-pill:hover {
-            border-color: #198754;
-            background: #f9fffb;
-        }
 
     .btn-link-custom {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 700;
         text-decoration: none;
         color: #198754;
@@ -131,7 +129,12 @@
         letter-spacing: 0.5px;
     }
 
-    /* Badge Color Mapping from Controller StatusClasses */
+    .btn-link-custom:hover {
+    color: #145c38; /* slightly darker green */
+    text-decoration: underline; /* optional underline on hover */
+}
+
+    /* Badge Colors */
     .badge.bg-status-pending {
         background-color: #fffbeb !important;
         color: #d97706 !important;
