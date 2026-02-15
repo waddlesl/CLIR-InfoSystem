@@ -1,58 +1,79 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.Staff>
 
-<div class="container">
+<div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-        <h2>Staff Management</h2>
+        <h2 class="fw-bold" style="color: #1a2035;">Staff Management</h2>
 
-        <div class="d-flex align-items-center">
-            <form method="get" asp-action="ManageStaff" class="d-flex me-2">
-                <input type="text" name="searchTerm" placeholder="Search by ID or Username..." class="form-control" style="width: 250px;" />
-                <button type="submit" class="btn btn-secondary ms-1">Search</button>
+        <div class="d-flex gap-2">
+            <form autocomplete="off">
+                <div class="input-group" style="width: 350px;">
+                    <input type="text" id="staffSearch" placeholder="Search by ID or Username..." class="form-control" autocomplete="off" />
+                    <button type="button" class="btn btn-secondary px-3">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
             </form>
 
-            <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddModal()">
-                <b class="me-1" style="font-size: 1.2rem;">+</b> Add Staff
+            <button type="button" class="btn btn-success px-3" onclick="openAddModal()">
+                <b>+</b> Add Staff
             </button>
         </div>
     </div>
 
-    <table class="table align-middle">
-        <thead>
-            <tr>
-                <th>Staff ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Role</th>
-                <th>Username</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var staff in Model)
-            {
-                <tr style="@(staff.Status == "Inactive" ? "opacity: 0.6;" : "")">
-                    <td>@staff.StaffId</td>
-                    <td>@staff.FirstName</td>
-                    <td>@staff.LastName</td>
-                    <td>@staff.TypeOfUser</td>
-                    <td>@staff.Username</td>
-                    <td>
-                        <span class="badge @(staff.Status == "Active" ? "bg-success" : "bg-secondary")">
-                            @staff.Status
-                        </span>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-link p-0" onclick="openEditModal(@staff.StaffId)">Edit</button> |
-                        <button type="button" class="btn btn-sm btn-link p-0 @(staff.Status == "Active" ? "text-danger" : "text-success")"
-                                onclick="confirmToggle(@staff.StaffId, '@(staff.Status == "Active" ? "Archive" : "Activate")')">
-                            @(staff.Status == "Active" ? "Archive" : "Activate")
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0" id="staffTable">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th>Staff ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Role</th>
+                            <th>Username</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTableBody">
+                        @foreach (var staff in Model)
+                        {
+                            <tr style="@(staff.Status == "Inactive" ? "opacity: 0.6;" : "")">
+                                <td class="small">@staff.StaffId</td>
+                                <td class="fw-semibold">@staff.FirstName</td>
+                                <td>@staff.LastName</td>
+                                <td>@staff.TypeOfUser</td>
+                                <td>@staff.Username</td>
+                                <td>
+                                    <span class="badge @(staff.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                        @staff.Status
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-primary px-3" onclick="openEditModal(@staff.StaffId)">
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-sm @(staff.Status == "Active" ? "btn-danger" : "btn-success") px-3"
+                                            onclick="confirmToggle(@staff.StaffId, '@(staff.Status == "Active" ? "Archive" : "Activate")')">
+                                        @(staff.Status == "Active" ? "Archive" : "Activate")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="pageInfo" class="small text-muted"></div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
@@ -91,13 +112,14 @@
                 <input type="text" id="editFirst" class="form-control mb-2" placeholder="First Name" />
                 <input type="text" id="editLast" class="form-control mb-2" placeholder="Last Name" />
                 <input type="text" id="editUser" class="form-control mb-2" placeholder="Username" />
+                <input type="password" id="editPass" class="form-control mb-2" placeholder="New Password (optional)" />
                 <select id="editRole" class="form-select">
                     <option value="Librarian">Librarian</option>
                     <option value="Student Assistant">Student Assistant</option>
                 </select>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="saveStaff()">Save</button>
+                <button type="button" class="btn btn-primary" onclick="updateStaff()">Save Changes</button>
             </div>
         </div>
     </div>
@@ -106,19 +128,81 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        const SwalStatic = Swal.mixin({
-            showClass: { popup: '', backdrop: '', icon: '' },
-            hideClass: { popup: '', backdrop: '', icon: '' }
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        $(document).ready(function() {
+            updateTable();
+
+            // Catch TempData Alerts (like the Self-Lockout warning)
+            var alertMsg = '@TempData["AlertMessage"]';
+            if (alertMsg) {
+                Swal.fire({
+                    icon: alertMsg.includes('cannot') || alertMsg.includes('denied') ? 'warning' : 'success',
+                    title: 'System Notification',
+                    text: alertMsg,
+                    confirmButtonColor: '#1a2035'
+                });
+            }
         });
 
-        // Add Modal Functions
+        function updateTable() {
+            let rows = $("#staffTableBody tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            $("#staffTableBody tr").hide();
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+
+            rows.slice(start, end).show();
+
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                </li>`;
+            }
+            $("#pagination").html(paginationHtml);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
+        }
+
+        $("#staffSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#staffTableBody tr").each(function() {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggleClass("filtered", !isMatch);
+            });
+            currentPage = 1;
+            updateTable();
+        });
+
         function openAddModal() {
             $('#addFirst, #addLast, #addUser, #addPass').val('');
             new bootstrap.Modal(document.getElementById('addModal')).show();
         }
 
+        function openEditModal(id) {
+            $.get('/Account/GetStaffDetails/' + id, function(data) {
+                $('#editId').val(data.staffId);
+                $('#editFirst').val(data.firstName);
+                $('#editLast').val(data.lastName);
+                $('#editUser').val(data.username);
+                $('#editRole').val(data.typeOfUser);
+                $('#editPass').val(''); // Clear password field
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            });
+        }
+
+        // Action Handlers
         function createStaff() {
-            var staff = {
+            const data = {
                 FirstName: $('#addFirst').val(),
                 LastName: $('#addLast').val(),
                 Username: $('#addUser').val(),
@@ -126,55 +210,79 @@
                 TypeOfUser: $('#addRole').val(),
                 Status: 'Active'
             };
-            $.ajax({
-                url: '/Account/AddStaff',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(staff),
-                success: function(res) { if(res.success) location.reload(); }
-            });
+            submitStaffData('/Account/AddStaff', data);
         }
 
-        // Edit Modal Functions
-                function openEditModal(id) {
-            $.get('/Account/GetStaffDetails/' + id, function(data) {
-                // Try camelCase if PascalCase fails (staffId vs StaffId)
-                $('#editId').val(data.staffId || data.StaffId);
-                $('#editFirst').val(data.firstName || data.FirstName);
-                $('#editLast').val(data.lastName || data.LastName);
-                $('#editUser').val(data.username || data.Username);
-                $('#editRole').val(data.typeOfUser || data.TypeOfUser);
-
-                new bootstrap.Modal(document.getElementById('editModal')).show();
-            });
-        }
-
-        function saveStaff() {
-            var staff = {
+        function updateStaff() {
+            const data = {
                 StaffId: parseInt($('#editId').val()),
                 FirstName: $('#editFirst').val(),
                 LastName: $('#editLast').val(),
                 Username: $('#editUser').val(),
+                Password: $('#editPass').val(),
                 TypeOfUser: $('#editRole').val()
             };
+            submitStaffData('/Account/UpdateStaff', data);
+        }
+
+        // Generic AJAX function to handle success/error messages
+        function submitStaffData(url, data) {
             $.ajax({
-                url: '/Account/UpdateStaff',
+                url: url,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(staff),
-                success: function(res) { if(res.success) location.reload(); }
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Staff record updated successfully.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        // Triggers the "Username is already taken" alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            text: res.message,
+                            confirmButtonColor: '#1e2953'
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Server connection failed.', 'error');
+                }
             });
         }
 
         function confirmToggle(id, action) {
-            SwalStatic.fire({
-                title: 'Confirm',
-                text: `Sure you want to ${action}?`,
-                icon: 'question',
-                showCancelButton: true
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to ${action} this staff member?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#1a2035',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `Yes, ${action}!`
             }).then((result) => {
-                if (result.isConfirmed) window.location.href = '/Account/ToggleStatus/' + id;
+                if (result.isConfirmed) {
+                    window.location.href = '/Account/ToggleStatus/' + id;
+                }
             });
         }
     </script>
+
+    <style>
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035 !important;
+            border-color: #1a2035 !important;
+            color: white !important;
+        }
+    </style>
 }
