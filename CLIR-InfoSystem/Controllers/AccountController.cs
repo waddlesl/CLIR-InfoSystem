@@ -239,17 +239,30 @@ namespace CLIR_InfoSystem.Controllers
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
 
-            ViewBag.TotalBooks = _context.Books.Count();
+            // Date Logic
+            var now = DateTime.Now;
+            var firstDayThisMonth = new DateTime(now.Year, now.Month, 1);
+            var firstDayLastMonth = firstDayThisMonth.AddMonths(-1);
+
+            // Current Stats
+            ViewBag.InventoryValue = _context.Books.Sum(b => (double?)((b.Price ?? 0) - (b.Discount ?? 0))) ?? 0;
             ViewBag.ActivePatrons = _context.Patrons.Count();
             ViewBag.TotalOdds = _context.Odds.Count();
-            ViewBag.InventoryValue = _context.Books.Sum(b => (b.Price ?? 0) - (b.Discount ?? 0));
+            ViewBag.PendingServices = _context.Services.Count(s => s.RequestStatus == "Pending");
 
-            ViewBag.StaffPerformance = _context.Odds
-                .Include(o => o.Staff)
-                .Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null)
-                .GroupBy(o => o.Staff.FirstName)
-                .Select(g => new { Name = g.Key, Count = g.Count() })
-                .ToDictionary(k => k.Name, v => v.Count);
+            // Comparison Logic: ODDS Fulfillment
+            int thisMonthCount = _context.Odds.Count(o => o.RequestDate >= firstDayThisMonth);
+            int lastMonthCount = _context.Odds.Count(o => o.RequestDate >= firstDayLastMonth && o.RequestDate < firstDayThisMonth);
+
+            // Calculate Growth/Decline Percentage
+            double diff = thisMonthCount - lastMonthCount;
+            ViewBag.OddsGrowth = lastMonthCount == 0 ? 0 : Math.Round((diff / lastMonthCount) * 100, 1);
+            ViewBag.IsPositive = diff >= 0;
+
+            // ... Keep your Dictionaries here ...
+            ViewBag.StaffPerformance = _context.Odds.Include(o => o.Staff).Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null)
+                .GroupBy(o => o.Staff.FirstName).ToDictionary(k => k.Key, v => v.Count());
+            ViewBag.MaterialDemand = _context.Odds.GroupBy(o => o.MaterialType).ToDictionary(k => k.Key ?? "Unknown", v => v.Count());
 
             return View("~/Views/Admin/AdminSystemReports.cshtml");
         }

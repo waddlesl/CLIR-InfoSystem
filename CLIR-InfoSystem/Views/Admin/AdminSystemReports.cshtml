@@ -1,58 +1,112 @@
 ﻿<div class="container mt-4">
-    <h2 class="text-center fw-bold mb-4">System Analytics & Reports</h2>
+    <div class="mb-4 border-bottom pb-3">
+        <h4 class="fw-bold mb-0" style="color: #1e2953;">System Analytics & Reports</h4>
+        <p class="text-muted mb-0 small"><i class="bi bi-calendar3 me-1"></i> @DateTime.Now.ToString("MMMM dd, yyyy | hh:mm tt")</p>
+    </div>
 
     <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm text-center p-3" style="border-radius: 15px; border-top: 5px solid #0d6efd;">
-                <h6 class="text-muted text-uppercase">Total Inventory Value</h6>
-                <h3 class="fw-bold text-primary">₱ @String.Format("{0:N2}", ViewBag.InventoryValue)</h3>
-                <small class="text-muted">Current Book Assets</small>
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 h-100" style="border-radius: 15px; border-top: 5px solid #1e2953;">
+                <h6 class="text-muted text-uppercase x-small fw-bold">Inventory Value</h6>
+                <h4 class="fw-bold mb-1" style="color: #1e2953;">₱@String.Format("{0:N2}", ViewBag.InventoryValue)</h4>
+                <div class="d-flex align-items-center">
+                    <span class="text-muted small">Total Book Assets</span>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm text-center p-3" style="border-radius: 15px; border-top: 5px solid #198754;">
-                <h6 class="text-muted text-uppercase">System Reach</h6>
-                <h3 class="fw-bold text-success">@ViewBag.ActivePatrons</h3>
-                <small class="text-muted">Registered Patrons</small>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 h-100" style="border-radius: 15px; border-top: 5px solid #ed1e28;">
+                <h6 class="text-muted text-uppercase x-small fw-bold">Active Patrons</h6>
+                <h4 class="fw-bold mb-1" style="color: #ed1e28;">@ViewBag.ActivePatrons</h4>
+                <div class="d-flex align-items-center">
+                    <span class="text-muted small">Registered Users</span>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm text-center p-3" style="border-radius: 15px; border-top: 5px solid #ffc107;">
-                <h6 class="text-muted text-uppercase">ODDS Utilization</h6>
-                <h3 class="fw-bold text-warning">@ViewBag.TotalOdds</h3>
-                <small class="text-muted">Total Requests Processed</small>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 h-100" style="border-radius: 15px; border-top: 5px solid #198754;">
+                <h6 class="text-muted text-uppercase x-small fw-bold">ODDS Requests</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h4 class="fw-bold text-success mb-1">@ViewBag.TotalOdds</h4>
+                    @if (ViewBag.OddsGrowth != null)
+                    {
+                        <span class="badge @(ViewBag.IsPositive ? "bg-success" : "bg-danger") rounded-pill p-1 small">
+                            <i class="bi @(ViewBag.IsPositive ? "bi-arrow-up" : "bi-arrow-down")"></i> @ViewBag.OddsGrowth%
+                        </span>
+                    }
+                </div>
+                <small class="text-muted x-small">vs last month</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 h-100" style="border-radius: 15px; border-top: 5px solid #ffc107;">
+                <h6 class="text-muted text-uppercase x-small fw-bold">Pending Services</h6>
+                <h4 class="fw-bold text-warning mb-1">@ViewBag.PendingServices</h4>
+                <small class="text-muted x-small">Awaiting Action</small>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm mx-auto" style="max-width: 95%; border-radius: 15px;">
-        <div class="card-body">
-            <h4 class="fw-bold mb-3"><i class="bi bi-graph-up"></i> Librarian Performance (Fulfilled ODDS)</h4>
-            <hr />
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Librarian Name</th>
-                        <th class="text-center">Fulfilled Requests</th>
-                        <th>Productivity Bar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var staff in (Dictionary<string, int>)ViewBag.StaffPerformance)
-                    {
-                        <tr>
-                            <td class="fw-bold">@staff.Key</td>
-                            <td class="text-center">@staff.Value</td>
-                            <td style="width: 40%;">
-                                <div class="progress" style="height: 10px;">
-                                    <div class="progress-bar bg-info" role="progressbar"
-                                         style="width: @(staff.Value * 5)%"></div>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 15px;">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #1e2953;"><i class="bi bi-person-badge me-2"></i>Librarian Performance</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="small text-muted text-uppercase">
+                                <tr>
+                                    <th>Staff Name</th>
+                                    <th class="text-center">Fulfilled</th>
+                                    <th>Efficiency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var staff in (Dictionary<string, int>)ViewBag.StaffPerformance)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@staff.Key</td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-pill" style="background-color: #1e2953;">@staff.Value</span>
+                                        </td>
+                                        <td style="width: 45%;">
+                                            <div class="progress" style="height: 6px; background-color: #e9ecef;">
+                                                <div class="progress-bar" style="width: @(Math.Min(staff.Value * 10, 100))%; background-color: #ed1e28;"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 15px;">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #1e2953;"><i class="bi bi-pie-chart me-2"></i>Resource Demand</h5>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in (Dictionary<string, int>)ViewBag.MaterialDemand)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                <span class="text-muted small">@item.Key</span>
+                                <span class="fw-bold">@item.Value</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .x-small {
+        font-size: 0.75rem;
+    }
+</style>
