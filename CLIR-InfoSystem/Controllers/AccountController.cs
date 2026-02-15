@@ -195,6 +195,7 @@ namespace CLIR_InfoSystem.Controllers
                 HttpContext.Session.SetString("UserRole", "Patron");
                 HttpContext.Session.SetString("UserName", patron.FirstName);
                 HttpContext.Session.SetString("UserId", patron.PatronId);
+                HttpContext.Session.SetString("UserEmail", patron.Email ?? "");
 
                 LogAction("Logged into Kiosk", "patron");
                 _context.SaveChanges();
