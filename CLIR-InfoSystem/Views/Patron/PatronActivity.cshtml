@@ -1,203 +1,227 @@
-﻿<style>
-    /* 1. Card Layout for the History Section */
-    .history-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: none;
-        overflow: hidden;
-    }
+﻿<div class="container mt-3">
 
-    /* 2. Custom Tab Container */
-    .gray-tab-container {
-        display: flex;
-        background: #f1f3f5;
-        padding: 5px;
-        gap: 5px;
-    }
-
-    /* 3. Custom Tab Button */
-    .gray-tab-btn {
-        flex: 1;
-        padding: 12px;
-        cursor: pointer;
-        background: transparent;
-        color: #6c757d;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        outline: none !important;
-    }
-
-        .gray-tab-btn:hover {
-            background: rgba(108, 117, 125, 0.1);
-            color: #333;
-        }
-
-        .gray-tab-btn.active-gray {
-            background: white !important;
-            color: #333 !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-    /* 4. Status Capsules */
-    .capsule {
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        display: inline-block;
-    }
-
-    .capsule-success {
-        background: #d1e7dd;
-        color: #0f5132;
-    }
-
-    .capsule-primary {
-        background: #cfe2ff;
-        color: #084298;
-    }
-
-    .capsule-info {
-        background: #cff4fc;
-        color: #055160;
-    }
-
-    .capsule-secondary {
-        background: #e2e3e5;
-        color: #41464b;
-    }
-
-    /* 5. Table Polish */
-    .table thead th {
-        background-color: #f8f9fa;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #dee2e6;
-        color: #6c757d;
-    }
-
-    .custom-tab-content {
-        padding: 20px;
-    }
-</style>
-
-<div class="container mt-5" style="max-width: 900px;">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">📜 Activity History</h2>
-        <p class="text-muted small">Keep track of your previous and upcoming requests.</p>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">📜 Activity History</h4>
+            <small class="text-muted">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</small>
+        </div>
     </div>
 
-    <div class="history-card">
-        <div class="gray-tab-container" id="activityTab">
-            <button class="gray-tab-btn active-gray" onclick="showTab(event, 'seats')">🪑 Seats</button>
-            <button class="gray-tab-btn" onclick="showTab(event, 'odds')">📄 ODDS</button>
-            <button class="gray-tab-btn" onclick="showTab(event, 'consult')">👨‍🏫 Consultations</button>
+    <!-- CARD -->
+    <div class="card shadow-sm border-0">
+
+        <!-- TAB BUTTONS -->
+        <div class="d-flex bg-light p-2 gap-2 justify-content-center rounded">
+            <button class="gray-tab-btn rounded-pill active-gray" onclick="showTab(event,'seats')">🪑 Seats</button>
+            <button class="gray-tab-btn rounded-pill" onclick="showTab(event,'odds')">📄 ODDS</button>
+            <button class="gray-tab-btn rounded-pill" onclick="showTab(event,'consult')">👨‍🏫 Consultations</button>
         </div>
 
-        <div class="custom-tab-content">
+        <div class="card-body p-4">
+
+            <!-- SEATS TAB -->
             <div id="seats" class="tab-pane-custom">
-                @if (ViewBag.SeatHistory != null && ((IEnumerable<dynamic>)ViewBag.SeatHistory).Any())
-                {
-                    <table class="table align-middle">
-                        <thead><tr><th>Date</th><th>Slot</th><th class="text-center">Status</th></tr></thead>
-                        <tbody>
-                            @foreach (var item in ViewBag.SeatHistory)
-                            {
-                                <tr>
-                                    <td class="fw-bold text-dark">@item.BookingDate.ToShortDateString()</td>
-                                    <td>@item.TimeSlot?.DisplayText</td>
-                                    <td class="text-center">
-                                        <span class="capsule capsule-@(item.Status == "Completed" ? "success" : "primary")">
-                                            @item.Status
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-
-                    <p class="text-center py-4 text-muted small">No seat records found.</p>
-                }
-            </div>
-
-            <div id="odds" class="tab-pane-custom" style="display:none">
-                @if (ViewBag.OddsHistory != null && ((IEnumerable<dynamic>)ViewBag.OddsHistory).Any())
-                {
-                    <table class="table align-middle">
-                        <thead><tr><th>Material</th><th>Request Date</th><th class="text-center">Status</th></tr></thead>
-                        <tbody>
-                            @foreach (var item in ViewBag.OddsHistory)
-                            {
-                                <tr>
-                                    <td class="fw-bold">@item.MaterialType</td>
-                                    <td>@item.RequestDate.ToShortDateString()</td>
-                                    <td class="text-center"><span class="capsule capsule-info">@item.RequestStatus</span></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-
-                    <p class="text-center py-4 text-muted small">No document requests found.</p>
-                }
-            </div>
-
-            <div id="consult" class="tab-pane-custom" style="display:none">
-                @if (ViewBag.ConsultationHistory != null && ((IEnumerable<dynamic>)ViewBag.ConsultationHistory).Any())
-                {
-                    <table class="table align-middle">
-                        <thead>
-                            <tr><th>Topic</th><th>Date</th><th>Librarian</th><th class="text-center">Status</th></tr>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0" id="seatsTable">
+                        <thead class="small text-muted">
+                            <tr>
+                                <th>Date</th>
+                                <th>Slot</th>
+                                <th class="text-center">Status</th>
+                            </tr>
                         </thead>
-                        <tbody>
-                            @foreach (var item in ViewBag.ConsultationHistory)
+                        <tbody id="seatsBody">
+                            @if (ViewBag.SeatHistory != null)
                             {
-                                <tr>
-                                    <td class="fw-bold">@item.Topic</td>
-                                    <td>@item.BookingDate.ToString("MMM dd, yyyy")</td>
-                                    <td>@(item.Staff != null ? item.Staff.FirstName : "TBD")</td>
-                                    <td class="text-center">
-                                        <span class="capsule capsule-@(item.Status == "Approved" ? "success" : "info")">
-                                            @item.Status
-                                        </span>
-                                    </td>
-                                </tr>
+                                foreach (var item in ViewBag.SeatHistory)
+                                {
+                                    <tr>
+                                        <td>@item.BookingDate.ToShortDateString()</td>
+                                        <td>@item.TimeSlot?.DisplayText</td>
+                                        <td class="text-center">
+                                            <span class="capsule capsule-@(item.Status == "Completed" ? "success" : "primary")">@item.Status</span>
+                                        </td>
+                                    </tr>
+                                }
                             }
                         </tbody>
                     </table>
-                }
-                else
-                {
-
-                    <p class="text-center py-4 text-muted small">No librarian consultations found.</p>
-                }
+                </div>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div id="seatPageInfo" class="small text-muted"></div>
+                    <ul class="pagination pagination-sm mb-0" id="seatPagination"></ul>
+                </div>
             </div>
+
+            <!-- ODDS TAB -->
+            <div id="odds" class="tab-pane-custom" style="display:none">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0" id="oddsTable">
+                        <thead class="small text-muted">
+                            <tr>
+                                <th>Material</th>
+                                <th>Request Date</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="oddsBody">
+                            @if (ViewBag.OddsHistory != null)
+                            {
+                                foreach (var item in ViewBag.OddsHistory)
+                                {
+                                    <tr>
+                                        <td>@item.MaterialType</td>
+                                        <td>@item.RequestDate.ToShortDateString()</td>
+                                        <td class="text-center">
+                                            <span class="capsule capsule-info">@item.RequestStatus</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div id="oddsPageInfo" class="small text-muted"></div>
+                    <ul class="pagination pagination-sm mb-0" id="oddsPagination"></ul>
+                </div>
+            </div>
+
+            <!-- CONSULTATIONS TAB -->
+            <div id="consult" class="tab-pane-custom" style="display:none">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0" id="consultTable">
+                        <thead class="small text-muted">
+                            <tr>
+                                <th>Topic</th>
+                                <th>Date</th>
+                                <th>Librarian</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consultBody">
+                            @if (ViewBag.ConsultationHistory != null)
+                            {
+                                foreach (var item in ViewBag.ConsultationHistory)
+                                {
+                                    <tr>
+                                        <td>@item.Topic</td>
+                                        <td>@item.BookingDate.ToString("MMM dd, yyyy")</td>
+                                        <td>@(item.Staff?.FirstName ?? "TBD")</td>
+                                        <td class="text-center">
+                                            <span class="capsule capsule-@(item.Status == "Approved" ? "success" : "info")">@item.Status</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div id="consultPageInfo" class="small text-muted"></div>
+                    <ul class="pagination pagination-sm mb-0" id="consultPagination"></ul>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-<script>
-    function showTab(evt, tabName) {
-        var i, tabContent, tabBtns;
-        tabContent = document.getElementsByClassName("tab-pane-custom");
-        for (i = 0; i < tabContent.length; i++) {
-            tabContent[i].style.display = "none";
+@section Scripts {
+    <script>
+        // Tab switching
+        function showTab(evt, tabName) {
+            document.querySelectorAll(".tab-pane-custom").forEach(t => t.style.display = "none");
+            document.querySelectorAll(".gray-tab-btn").forEach(b => b.classList.remove("active-gray"));
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active-gray");
         }
-        tabBtns = document.getElementsByClassName("gray-tab-btn");
-        for (i = 0; i < tabBtns.length; i++) {
-            tabBtns[i].classList.remove("active-gray");
+
+        // Pagination function
+        function paginateTable(tableBodyId, paginationId, pageInfoId, rowsPerPage=5) {
+            let tbody = document.getElementById(tableBodyId);
+            if (!tbody) return;
+
+            let rows = Array.from(tbody.querySelectorAll("tr"));
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+            let pagination = document.getElementById(paginationId);
+            let pageInfo = document.getElementById(pageInfoId);
+
+            function showPage(page) {
+                rows.forEach((r,i) => r.style.display = (i >= (page-1)*rowsPerPage && i < page*rowsPerPage) ? "" : "none");
+                if (pageInfo) {
+                    let start = totalRows>0 ? (page-1)*rowsPerPage+1 : 0;
+                    let end = Math.min(page*rowsPerPage,totalRows);
+                    pageInfo.textContent = `Showing ${start} to ${end} of ${totalRows} entries`;
+                }
+            }
+
+            pagination.innerHTML = "";
+            for (let i=1;i<=totalPages;i++){
+                let li = document.createElement("li");
+                li.className = "page-item";
+                let btn = document.createElement("button");
+                btn.className = "page-link";
+                btn.innerText = i;
+                btn.addEventListener("click", ()=>{
+                    document.querySelectorAll("#"+paginationId+" .page-item").forEach(p=>p.classList.remove("active"));
+                    li.classList.add("active");
+                    showPage(i);
+                });
+                li.appendChild(btn);
+                pagination.appendChild(li);
+            }
+
+            if (totalPages>0){
+                pagination.querySelector("li").classList.add("active");
+                showPage(1);
+            }
         }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.classList.add("active-gray");
-    }
-</script>
+
+        document.addEventListener("DOMContentLoaded", function(){
+            paginateTable("seatsBody","seatPagination","seatPageInfo");
+            paginateTable("oddsBody","oddsPagination","oddsPageInfo");
+            paginateTable("consultBody","consultPagination","consultPageInfo");
+        });
+    </script>
+
+    <style>
+        .gray-tab-btn {
+            flex: 1;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            outline: none !important;
+        }
+
+            .gray-tab-btn:hover {
+                background: #e2e3e5;
+                color: #333;
+            }
+
+            .gray-tab-btn.active-gray {
+                background: #ffffff !important;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                color: #333;
+            }
+
+        .rounded-pill {
+            border-radius: 50px !important;
+        }
+
+        .page-link {
+            color: #1a2035;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+        }
+    </style>
+}

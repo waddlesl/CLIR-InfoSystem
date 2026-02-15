@@ -8,19 +8,19 @@
 
 <div class="container mt-3">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h4 class="fw-bold mb-0">Book a Library Seat</h4>
-            <small class="text-muted">
+   
+
+    <!-- CARD -->
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 600px; border-radius: 18px;">
+
+        <!-- HEADER -->
+        <div class="card-body text-center pt-4 pb-2">
+            <h4 class="fw-bold mb-1">Book a Library Seat</h4>
+            <small class="text-muted d-block">
                 @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
             </small>
         </div>
-        <div></div>
-    </div>
 
-    <!-- CARD -->
-    <div class="card shadow-sm border-0">
         <div class="card-body p-4">
 
             @if (alreadyBooked)
@@ -32,7 +32,9 @@
                         You already have a seat reserved. Please complete your current visit or cancel it before booking a new one.
                     </p>
                     <div class="d-grid">
-                        <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold">Return to Dashboard</a>
+                        <a href="/Dashboard/PatronDashboard" class="btn btn-warning fw-bold">
+                            Return to Dashboard
+                        </a>
                     </div>
                 </div>
             }
@@ -79,7 +81,9 @@
 
                     <!-- SUBMIT -->
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-success fw-bold py-2">Confirm Reservation</button>
+                        <button type="submit" class="btn btn-success fw-bold py-2">
+                            Confirm Reservation
+                        </button>
                     </div>
 
                 </form>
@@ -87,13 +91,13 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="card-footer bg-white border-0 py-3">
+        <div class="card-footer bg-white border-0 text-center py-3">
             <div class="small text-muted">
                 Library Seat Reservation System
             </div>
         </div>
+
     </div>
-</div>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
