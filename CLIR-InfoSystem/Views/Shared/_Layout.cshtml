@@ -6,7 +6,6 @@
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
 }
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +14,9 @@
     <title>CLIR Library Management System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="icon" type="image/x-icon" href="~/images/clirlogo.png" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
     <style>
         body {
             margin: 0;
@@ -22,141 +24,12 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
         }
-        /*para sa ipad sana*/
-        @@media (max-width: 1024px) {
-            
-            .report-tabs {
-                overflow-x: auto;
-                display: flex;
-            }
-        }
-
-        /*For reports hehehe*/
-        :root {
-            --primary-red: #CC0000;
-            --dark-bg: #1a202c;
-            --light-bg: #f8fafc;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .filter-controls {
-            display: flex; /* Puts dropdowns in a row */
-            align-items: center; /* Centers them vertically */
-            min-width: 500px; /* This is what makes it "Longer" */
-            transition: all 0.3s; /* Makes it feel smooth */
-        }
-
-        #reports-page-container {
-            padding: 2rem;
-            background-color: var(--light-bg);
-            min-height: 100vh;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-
-        /* Tab Navigation - Modern Pill Style */
-        .report-tabs {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            margin-bottom: 2rem;
-            padding: 0.5rem;
-            background: #e2e8f0;
-            border-radius: 12px;
-            width: fit-content;
-            overflow-x: auto;
-        }
-
-            .report-tabs .tab {
-                padding: 0.6rem 1.2rem;
-                text-decoration: none;
-                color: #4a5568;
-                font-weight: 600;
-                border-radius: 8px;
-                transition: all 0.2s ease;
-                white-space: nowrap;
-            }
-
-                .report-tabs .tab.active {
-                    background-color: white;
-                    color: var(--primary-red);
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                }
-
-        /* Layout Grids */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stats-secondary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        /* Card Styling */
-        .report-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: transform 0.2s ease;
-        }
-
-            .report-card:hover {
-                transform: translateY(-5px);
-            }
-
-        .dark-card {
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #2d3748 100%);
-            color: white;
-            border: none;
-        }
-
-        .card-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #718096;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .dark-card .card-label {
-            color: #a0aec0;
-        }
-
-        .card-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin: 0;
-            color: #1a202c;
-        }
-
-        .dark-card .card-value {
-            color: white;
-        }
-
-        .card-subtext {
-            font-size: 0.85rem;
-            margin-top: 1rem;
-            color: #718096;
-        }
-
-        /* Chart Container */
-        .graph-box {
-            min-height: 250px;
-        }
 
         /* Shorter Top Banner */
         .top-banner {
             background-color: #1a2035;
             color: white;
-            padding: 10px 20px; /* Shortened vertical padding */
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -171,7 +44,6 @@
             font-weight: bold;
         }
 
-        /* Restored Default Logout */
         .logout-link {
             color: white;
             text-decoration: none;
@@ -180,16 +52,15 @@
         }
 
             .logout-link:hover {
-                opacity: 0.7;
-                color: #ff4d4d;
+                color: #ed1e28;
+                opacity: 1;
             }
 
-        /* Hamburger Button */
         .hamburger {
             background: none;
             border: none;
             color: white;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             margin-right: 15px;
             display: flex;
@@ -213,63 +84,44 @@
             z-index: 1000;
         }
 
-            /* Toggle Class */
             .sidebar.collapsed {
                 margin-left: -260px;
             }
-
-        .submenu {
-            
-            padding-left: 20px;
-            
-        }
-
-        
 
         .nav-item {
             padding: 12px 20px;
             border-left: 4px solid transparent;
             cursor: pointer;
             transition: 0.2s;
-        }
-
-        .nav-itemfordisabled {
-            padding: 12px 20px;
-            border-left: 4px solid transparent;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-       /*For Book borrower*/
-        .nav-itemfordisabled a{
-                cursor: default;
-            color: inherit;
-            text-decoration: none;
-            list-style: none;
-            display: block;
-            width: 100%;
-            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
         }
 
             .nav-item a {
                 color: inherit;
                 text-decoration: none;
-                list-style: none;
                 display: block;
                 width: 100%;
                 font-size: 0.9rem;
             }
-            .submenu li {
-                list-style: none;
-            }
 
+            /* Icon alignment and color */
+            .nav-item i {
+                width: 25px;
+                text-align: center;
+                margin-right: 10px;
+                color: white;
+            }
 
             .nav-item:hover, .nav-active {
                 background: #2b3553;
                 color: white !important;
-                border-left: 4px solid #d92d20;
+                border-left: 4px solid #ed1e28;
             }
 
-       
+                .nav-item:hover i, .nav-active i {
+                    color: white !important;
+                }
 
         .main-content {
             flex: 1;
@@ -288,7 +140,7 @@
         .nav-group-label {
             font-size: 0.65rem;
             text-transform: uppercase;
-            padding: 15px 20px 5px 20px;
+            padding: 20px 20px 5px 20px;
             color: #6e7a91;
             font-weight: bold;
         }
@@ -305,78 +157,69 @@
 <body>
     <div class="top-banner">
         <div class="d-flex align-items-center">
-            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
             <img src="~/images/clirlogo.png" alt="Logo" class="logo" />
             <div class="brand-text">
                 CENTER FOR LEARNING AND INFORMATION RESOURCES<br />
                 <small style="font-weight: normal; opacity: 0.8; font-size: 11px;">MAPÚA MALAYAN COLLEGES LAGUNA</small>
             </div>
         </div>
-        <a asp-controller="Account" asp-action="Logout" class="logout-link">Logout</a>
+        <a asp-controller="Account" asp-action="Logout" class="logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
     </div>
 
     <div class="wrapper">
         <div class="sidebar" id="sidebar">
             <div class="nav-item @(currentAction == "Index" && currentController == "Dashboard" ? "nav-active" : "")">
-                <a asp-controller="Dashboard" asp-action="Index">🏠 Home</a>
+                <a asp-controller="Dashboard" asp-action="Index"><i class="fa-solid fa-house"></i> Home</a>
             </div>
 
             @if (role == "Admin")
             {
                 <div class="nav-group-label">System Admin</div>
-                <div class="nav-item"><a asp-controller="Account" asp-action="ManageStaff">👥 Manage Staffs</a></div>
-                <div class="nav-item"><a asp-controller="Account" asp-action="AuditLogs">📋 Audit Logs</a></div>
-                <div class="nav-item"><a asp-controller="Account" asp-action="SystemReports">📊 System Reports</a></div>
+                <div class="nav-item"><a asp-controller="Account" asp-action="ManageStaff"><i class="fa-solid fa-users-gear"></i> Manage Staffs</a></div>
+                <div class="nav-item"><a asp-controller="Account" asp-action="AuditLogs"><i class="fa-solid fa-clipboard-check"></i> Audit Logs</a></div>
+                <div class="nav-item"><a asp-controller="Account" asp-action="SystemReports"><i class="fa-solid fa-chart-line"></i> System Reports</a></div>
             }
 
             @if (role == "Librarian")
             {
                 <div class="nav-group-label">Library Management</div>
-                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons">👤 Patron Management</a></div>
-                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement">📚 Book Catalog</a></div>
-                <div class="nav-itemfordisabled"><a disabled>🤝 Book Borrowers</a></div>
-                <ul class="submenu">
-                    <li class ="nav-item">
-                        <a asp-controller="Transaction" asp-action="BookBorrowersRequest">📝Borrower Requests</a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Transaction" asp-action="BookBorrowers">🫴🏻Current Borrowers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Transaction" asp-action="BorrowersHistory">📜Borrower History</a>
-                    </li>
-                </ul>
-                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings">🪑 Seat Reservations</a></div>
-                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian">👨‍🏫 Book A Librarian</a></div>
-                <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS">📩 Digital Requests</a></div>
-                <div class="nav-item"><a asp-controller="Service" asp-action="ManageServices">🛠️ Service Requests</a></div>
-                <div class="nav-item"><a asp-controller="Report" asp-action="ReportDashboard">📈 Reports & Analytics</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-user-tag"></i> Patron Management</a></div>
+                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-bookmark"></i> Book Catalog</a></div>
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake"></i> Manage Borrowers</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings"><i class="fa-solid fa-chair"></i> Seat Reservations</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian"><i class="fa-solid fa-chalkboard-user"></i> Book A Librarian</a></div>
+                <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS"><i class="fa-solid fa-envelope-open-text"></i> Digital Requests</a></div>
+                <div class="nav-item"><a asp-controller="Service" asp-action="ManageServices"><i class="fa-solid fa-screwdriver-wrench"></i> Service Requests</a></div>
+                <div class="nav-item"><a asp-controller="Report" asp-action="ReportDashboard"><i class="fa-solid fa-chart-pie"></i> Reports & Analytics</a></div>
             }
 
             @if (role == "Student Assistant")
             {
                 <div class="nav-group-label">Assistant</div>
-                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons">👤 Patron Management</a></div>
-                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement">📖 View Catalog</a></div>
-                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers">🤝 View Borrowers</a></div>
-                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings">🪑 View Reservations</a></div>
-                <div class="nav-item"><a href="#">❓ Help Desk</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-users"></i> Patron Management</a></div>
+                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-open"></i> View Catalog</a></div>
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake-angle"></i> View Borrowers</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings"><i class="fa-solid fa-calendar-check"></i> View Reservations</a></div>
+                <div class="nav-item"><a href="#"><i class="fa-solid fa-circle-question"></i> Help Desk</a></div>
             }
 
             @if (role == "Patron")
             {
                 <div class="nav-group-label">My Services</div>
-                <div class="nav-item"><a asp-controller="Book" asp-action="PatronBorrow">📚 Borrow Books</a></div>
-                <div class="nav-item"><a asp-controller="Transaction" asp-action="Index">📖 My Borrowings</a></div>
-                <div class="nav-item"><a asp-controller="Facility" asp-action="BookASeat">🪑 Book a Seat</a></div>
-                <div class="nav-item"><a asp-controller="Request" asp-action="ServiceRequest">🛠️ Service Request</a></div>
-                <div class="nav-item"><a asp-controller="Request" asp-action="Odds">📄 Request Document</a></div>
-                <div class="nav-item"><a asp-controller="Facility" asp-action="BookALibrarian">👨‍🏫 Book a Librarian</a></div>
-                <div class="nav-item"><a asp-controller="Patron" asp-action="PatronActivity">📜 My Activity</a></div>
+                <div class="nav-item"><a asp-controller="Book" asp-action="PatronBorrow"><i class="fa-solid fa-book-medical"></i> Borrow Books</a></div>
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="Index"><i class="fa-solid fa-book-reader"></i> My Borrowings</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="BookASeat"><i class="fa-solid fa-couch"></i> Book a Seat</a></div>
+                <div class="nav-item"><a asp-controller="Request" asp-action="ServiceRequest"><i class="fa-solid fa-gears"></i> Service Request</a></div>
+                <div class="nav-item"><a asp-controller="Request" asp-action="Odds"><i class="fa-solid fa-file-pdf"></i> Request Document</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="BookALibrarian"><i class="fa-solid fa-person-chalkboard"></i> Book a Librarian</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="PatronActivity"><i class="fa-solid fa-receipt"></i> My Activity</a></div>
             }
 
             <div class="sidebar-footer">
-                ⚙ Options
+                <i class="fa-solid fa-gear"></i> Options
             </div>
         </div>
 
@@ -391,31 +234,24 @@
             sidebar.classList.toggle('collapsed');
         }
 
-        // Auto-collapse on small screens (like iPad in portrait)
         if (window.innerWidth < 992) {
             document.getElementById('sidebar').classList.add('collapsed');
-
         }
 
-
-        var userRole = "@role";  // retrieved from session
-
-        // Set timeout based on role
-        var sessionTimeout = (userRole === "Patron") ? 10 * 60 : 15 * 60; // 10mins for Patrons, 15mins for others
+        var userRole = "@role";
+        var sessionTimeout = (userRole === "Patron") ? 10 * 60 : 15 * 60;
         var idleTime = 0;
 
         function resetIdle() {
             idleTime = 0;
         }
 
-        // Listen for any user activity
         document.onmousemove = resetIdle;
         document.onkeypress = resetIdle;
         document.ontouchstart = resetIdle;
         document.onclick = resetIdle;
         document.onscroll = resetIdle;
 
-        // Check idle every second
         setInterval(() => {
             idleTime++;
             if (idleTime >= sessionTimeout) {

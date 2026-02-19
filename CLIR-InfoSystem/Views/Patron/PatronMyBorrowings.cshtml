@@ -53,15 +53,23 @@
                                 <td class="text-end">
                                     @if (loan.Status == "Reserved")
                                     {
-                                        <span class="badge bg-info text-dark px-3">Reserved</span>
+                                        <span class="capsule capsule-info">Reserved</span>
                                     }
                                     else if (loan.Status == "Overdue")
                                     {
-                                        <span class="badge bg-danger px-3">@loan.Status</span>
+                                        <span class="capsule capsule-danger">@loan.Status</span>
+                                    }
+                                    else if (loan.Status == "Borrowed")
+                                    {
+                                        <span class="capsule capsule-primary">@loan.Status</span>
+                                    }
+                                    else if (loan.Status == "Returned")
+                                    {
+                                        <span class="capsule capsule-success">@loan.Status</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning text-dark px-3">@loan.Status</span>
+                                        <span class="capsule capsule-warning">@loan.Status</span>
                                     }
                                 </td>
                             </tr>
@@ -106,5 +114,42 @@
             border-color: #1a2035;
             color: white;
         }
+
+        .capsule {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 80px; /* Ensures consistent width for different status text */
+            text-align: center;
+        }
+
+        .capsule-success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .capsule-primary {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .capsule-info {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+        .capsule-danger {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .capsule-warning {
+            background: #fff3cd;
+            color: #664d03;
+        }
     </style>
+
+
 }
