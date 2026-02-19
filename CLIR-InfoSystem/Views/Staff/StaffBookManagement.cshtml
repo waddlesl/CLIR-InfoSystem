@@ -1,21 +1,58 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
+
 <div class="container mt-3">
-    <div class="col-md-12 d-flex justify-content-around ">
-        <div class="col-sm-2 card p-3 shadow-sm border-1">
-            <h6 class="text-muted">Book Count</h6>
-            <h3>@ViewBag.BookCount</h3>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #1e2953 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-book fa-2x" style="color: #1e2953; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Book Count</h6>
+                        <h3 class="mb-0">@ViewBag.BookCount</h3>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-2 card p-3 shadow-sm border-1">
-            <h6 class="text-muted">Borrowed Books</h6>
-            <h3>@ViewBag.BorrowedBookCount</h3>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-hand-holding-hand fa-2x" style="color: #ed1e28; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Borrowed</h6>
+                        <h3 class="mb-0">@ViewBag.BorrowedBookCount</h3>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-2 card p-3 shadow-sm border-1">
-            <h6 class="text-muted">Available Books</h6>
-            <h3>@ViewBag.AvailableBookCount</h3>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #198754 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-circle-check fa-2x" style="color: #198754; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Available</h6>
+                        <h3 class="mb-0">@ViewBag.AvailableBookCount</h3>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-2 card p-3 shadow-sm border-1">
-            <h6 class="text-muted">Archived Books</h6>
-            <h3>@ViewBag.ArchivedBookCount</h3>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #6c757d !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-box-archive fa-2x" style="color: #6c757d; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Archived</h6>
+                        <h3 class="mb-0">@ViewBag.ArchivedBookCount</h3>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -29,7 +66,7 @@
 
         <div class="input-group" style="max-width: 500px;">
             <span class="input-group-text bg-white border-end-0">
-                <i class="bi bi-search text-muted"></i>
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
             </span>
             <input type="text"
                    id="bookSearch"
@@ -50,124 +87,79 @@
         </div>
     </div>
 
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Acc No.</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Availability</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="booksTable">
+                @if (ViewBag.IsStudentAssistant == false)
+                {
+                    @foreach (var book in Model)
+                    {
                         <tr>
-                            <th>Acc No.</th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Availability</th>
-                            <th>Action</th>
+                            <td>@book.AccessionId</td>
+                            <td>@book.Title</td>
+                            <td>@book.Author</td>
+                            <td>@book.AvailabilityStatus</td>
+
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('@book.AccessionId')">Edit</button>
+                                <span> | </span>
+
+                                @if (book.AvailabilityStatus == "Available" || book.AvailabilityStatus == "Archived")
+                                {
+                                    var isCurrentlyAvailable = book.AvailabilityStatus == "Available";
+                                    var nextStatus = isCurrentlyAvailable ? "Archived" : "Available";
+                                    var buttonClass = isCurrentlyAvailable ? "text-danger" : "text-success";
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-link p-0 @buttonClass"
+                                            onclick="confirmToggle('@book.AccessionId', '@nextStatus')">
+                                        Mark as @nextStatus
+                                    </button>
+                                }
+                                else
+                                {
+                                    <em class="small text-muted">Can not Archive</em>
+                                }
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody id="booksTable">
-                        @if (ViewBag.IsStudentAssistant == false)
-                        {
-                            @foreach (var book in Model)
-                            {
-                                <tr>
-                                    <td>@book.AccessionId</td>
-                                    <td>@book.Title</td>
-                                    <td>@book.Author</td>
-                                    <td>@book.AvailabilityStatus</td>
+                    }
+                }
+                else
+                {
+                    @foreach (var book in Model.Where(b => b.AvailabilityStatus != "Archived"))
+                    {
+                        <tr>
+                            <td>@book.AccessionId</td>
+                            <td>@book.Title</td>
+                            <td>@book.Author</td>
+                            <td>@book.AvailabilityStatus</td>
 
-                                    <td>
-                                        @if (ViewBag.IsStudentAssistant == false)
-                                        {
-                                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('@book.AccessionId')">Edit</button>
-                                            <span> | </span>
-
-                                            @if (book.AvailabilityStatus == "Available" || book.AvailabilityStatus == "Archived")
-                                            {
-                                                var isCurrentlyAvailable = book.AvailabilityStatus == "Available";
-                                                var nextStatus = isCurrentlyAvailable ? "Archived" : "Available";
-                                                var buttonClass = isCurrentlyAvailable ? "text-danger" : "text-success";
-
-                                                <button type="button"
-                                                        class="btn btn-sm btn-link p-0 @buttonClass"
-                                                        onclick="confirmToggle('@book.AccessionId', '@nextStatus')">
-                                                    Mark as @nextStatus
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <em class="small text-muted">Can not Archive</em>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted" title="Permission Denied">Edit</span>
-                                            <span> | </span>
-                                            <em class="small text-muted">No actions available</em>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            @foreach (var book in Model.Where(b => b.AvailabilityStatus != "Archived"))
-                            {
-                                <tr>
-                                    <td>@book.AccessionId</td>
-                                    <td>@book.Title</td>
-                                    <td>@book.Author</td>
-                                    <td>@book.AvailabilityStatus</td>
-
-                                    <td>
-                                        @if (ViewBag.IsStudentAssistant == false)
-                                        {
-                                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('@book.AccessionId')">Edit</button>
-                                            <span> | </span>
-
-                                            @if (book.AvailabilityStatus == "Available" || book.AvailabilityStatus == "Archived")
-                                            {
-                                                var isCurrentlyAvailable = book.AvailabilityStatus == "Available";
-                                                var nextStatus = isCurrentlyAvailable ? "Archived" : "Available";
-                                                var buttonClass = isCurrentlyAvailable ? "text-danger" : "text-success";
-
-                                                <button type="button"
-                                                        class="btn btn-sm btn-link p-0 @buttonClass"
-                                                        onclick="confirmToggle('@book.AccessionId', '@nextStatus')">
-                                                    Mark as @nextStatus
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <em class="small text-muted">No status actions</em>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted" title="Permission Denied">Edit</span>
-                                            
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        
-                    </tbody>
-                </table>
-        </div>
-        <div class="d-flex justify-content-between align-items-center">
-
-            <!-- PAGE INFO LEFT -->
-            <div id="pageInfo" class="small text-muted"></div>
-
-            <!-- PAGINATION RIGHT -->
-            <nav>
-                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
-            </nav>
-
-        </div>
+                            <td>
+                                <span class="text-muted" title="Permission Denied">Edit</span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 
-
-
-
-
+    <div class="d-flex justify-content-between align-items-center">
+        <div id="pageInfo" class="small text-muted"></div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
 
 <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -176,10 +168,8 @@
             <div class="modal-body">
                 <label class="small fw-bold">Accession ID</label>
                 <input type="text" id="bookId" class="form-control mb-2" placeholder="Accession ID" />
-
                 <input type="text" id="bookTitle" class="form-control mb-2" placeholder="Book Title" />
                 <input type="text" id="bookAuthor" class="form-control mb-2" placeholder="Book Author" />
-
                 <label class="small fw-bold">Book Availability</label>
                 <select id="bookAvailability" class="form-control mb-2">
                     <option value="">Select Status</option>
@@ -188,11 +178,9 @@
                     <option value="Reserved">Reserved</option>
                     <option value="Lost">Lost</option>
                 </select>
-
                 <input type="text" id="bookEdition" class="form-control mb-2" placeholder="Book Edition" />
                 <input type="text" id="bookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
                 <input type="text" id="bookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
-
                 <label class="small fw-bold">Book Collection</label>
                 <select id="bookCollection" class="form-control mb-2">
                     <option value="">Select Collection</option>
@@ -200,10 +188,8 @@
                     <option value="Circulation">Circulation</option>
                     <option value="Reference">Reference</option>
                 </select>
-
                 <input type="text" id="bookLocation" class="form-control mb-2" placeholder="Book Location" />
                 <input type="text" id="bookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
-
                 <label class="small fw-bold">Sourced From</label>
                 <select id="bookSource" class="form-control mb-2">
                     <option value="">Select Source</option>
@@ -211,10 +197,8 @@
                     <option value="Purchase">Purchase</option>
                     <option value="Subscription">Subscription</option>
                 </select>
-
                 <input type="number" id="bookPrice" class="form-control mb-2" placeholder="Book Price" />
                 <input type="number" id="bookDiscount" class="form-control mb-2" placeholder="Discount" />
-                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="AddBook()">Create</button>
@@ -230,10 +214,8 @@
             <div class="modal-body">
                 <label class="small fw-bold">Accession ID (Read Only)</label>
                 <input type="text" id="editAccessionId" class="form-control mb-2" readonly />
-
                 <input type="text" id="editBookTitle" class="form-control mb-2" placeholder="Book Title" />
                 <input type="text" id="editBookAuthor" class="form-control mb-2" placeholder="Book Author" />
-
                 <label class="small fw-bold">Book Availability</label>
                 <select id="editAvailability" class="form-control mb-2">
                     <option value="">Select Status</option>
@@ -242,11 +224,9 @@
                     <option value="Reserved">Reserved</option>
                     <option value="Lost">Lost</option>
                 </select>
-
                 <input type="text" id="editBookEdition" class="form-control mb-2" placeholder="Book Edition" />
                 <input type="text" id="editBookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
                 <input type="text" id="editBookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
-
                 <label class="small fw-bold">Book Collection</label>
                 <select id="editBookCollection" class="form-control mb-2">
                     <option value="">Select Collection</option>
@@ -254,10 +234,8 @@
                     <option value="Circulation">Circulation</option>
                     <option value="Reference">Reference</option>
                 </select>
-
                 <input type="text" id="editBookLocation" class="form-control mb-2" placeholder="Book Location" />
                 <input type="text" id="editBookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
-
                 <label class="small fw-bold">Sourced From</label>
                 <select id="editBookSource" class="form-control mb-2">
                     <option value="">Select Source</option>
@@ -265,11 +243,10 @@
                     <option value="Purchase">Purchase</option>
                     <option value="Subscription">Subscription</option>
                 </select>
-
                 <input type="number" id="editBookPrice" class="form-control mb-2" placeholder="Book Price" />
                 <input type="number" id="editBookDiscount" class="form-control mb-2" placeholder="Discount" />
                 <label class="small fw-bold">Subtotal(Read Only)</label>
-                <input type="number" id="editBookSubtotal" class="form-control mb-2" readonly/>
+                <input type="number" id="editBookSubtotal" class="form-control mb-2" readonly />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="saveBook()">Save Changes</button>
@@ -278,8 +255,6 @@
     </div>
 </div>
 
-
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -287,39 +262,29 @@
         let currentPage = 1;
 
         function updateTable() {
-                let rows = $("#booksTable tr:not(.filtered)");
+            let rows = $("#booksTable tr:not(.filtered)");
             let totalRows = rows.length;
             let totalPages = Math.ceil(totalRows / rowsPerPage);
-
-                $("#booksTable tr").hide();
-
+            $("#booksTable tr").hide();
             let start = (currentPage - 1) * rowsPerPage;
             let end = start + rowsPerPage;
-
             rows.slice(start, end).show();
-
-            // Page Info
             $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
 
-            // Generate Pagination
             let paginationHtml = "";
             for (let i = 1; i <= totalPages; i++) {
                 paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                        </li>`;
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                </li>`;
             }
             $("#pagination").html(paginationHtml);
         }
 
-        function goToPage(page) {
-            currentPage = page;
-            updateTable();
-        }
+        function goToPage(page) { currentPage = page; updateTable(); }
 
-        // Real-time Search
         $("#bookSearch").on("keyup", function() {
             var value = $(this).val().toLowerCase();
-                $("#booksTable tr").each(function() {
+            $("#booksTable tr").each(function() {
                 let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
                 $(this).toggleClass("filtered", !isMatch);
             });
@@ -327,28 +292,18 @@
             updateTable();
         });
 
-        // Initialize
-        $(document).ready(function() {
-            updateTable();
-        });
+        $(document).ready(function() { updateTable(); });
 
-   
-
-        
         function openAddBookModal() {
-            
             $('#addModal input').val('');
             $('#addModal select').val('');
             new bootstrap.Modal(document.getElementById('addModal')).show();
         }
+
         function AddBook() {
-            // So that we can calculate subtotal
             const price = parseFloat(document.getElementById('bookPrice').value) || 0;
             const discount = parseFloat(document.getElementById('bookDiscount').value) || 0;
-
             const bookData = {
-
-
                 AccessionId: document.getElementById('bookId').value,
                 Title: document.getElementById('bookTitle').value,
                 Author: document.getElementById('bookAuthor').value,
@@ -364,34 +319,22 @@
                 Discount: discount,
                 Subtotal : price - discount
             };
-
-            if (!bookData.Title) {
-                Swal.fire("Error", "Please enter a Book Title", "error");
-                return;
-            }
-
+            if (!bookData.Title) { Swal.fire("Error", "Please enter a Book Title", "error"); return; }
             fetch('/Book/AddBook', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(bookData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire("Saved!", "Book added successfully", "success").then(() => location.reload());
-                } else {
-                    Swal.fire("Error", "Could not save book", "error");
-                }
-            })
-            .catch(err => console.error(err));
+            }).then(response => {
+                if (response.ok) { Swal.fire("Saved!", "Book added successfully", "success").then(() => location.reload()); }
+                else { Swal.fire("Error", "Could not save book", "error"); }
+            }).catch(err => console.error(err));
         }
-
 
         function openEditModal(id) {
             fetch(`/Book/GetBookDetails?id=${id}`)
             .then(response => response.json())
             .then(book => {
-                
-                document.getElementById('editAccessionId').value = book.accessionId; 
+                document.getElementById('editAccessionId').value = book.accessionId;
                 document.getElementById('editBookTitle').value = book.title;
                 document.getElementById('editBookAuthor').value = book.author;
                 document.getElementById('editAvailability').value = book.availabilityStatus;
@@ -405,19 +348,14 @@
                 document.getElementById('editBookPrice').value = book.price;
                 document.getElementById('editBookDiscount').value = book.discount;
                 document.getElementById('editBookSubtotal').value = book.subtotal;
-
                 new bootstrap.Modal(document.getElementById('editModal')).show();
-            })
-            .catch(err => Swal.fire("Error", "Could not load book data", "error"));
+            }).catch(err => Swal.fire("Error", "Could not load book data", "error"));
         }
-
 
         function saveBook() {
             const price = parseFloat(document.getElementById('editBookPrice').value) || 0;
             const discount = parseFloat(document.getElementById('editBookDiscount').value) || 0;
-
             const bookData = {
-
                 AccessionId: document.getElementById('editAccessionId').value,
                 Title: document.getElementById('editBookTitle').value,
                 Author: document.getElementById('editBookAuthor').value,
@@ -433,24 +371,17 @@
                 Subtotal: price - discount,
                 YearOfPublication: parseInt(document.getElementById('editBookYearPublication').value)
             };
-
             fetch('/Book/UpdateBook', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(bookData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire("Updated!", "Changes saved successfully.", "success")
-                        .then(() => location.reload());
-                } else {
-                    Swal.fire("Error", "Update failed.", "error");
-                }
-            })
-            .catch(err => console.error("Update Error:", err));
+            }).then(response => {
+                if (response.ok) { Swal.fire("Updated!", "Changes saved successfully.", "success").then(() => location.reload()); }
+                else { Swal.fire("Error", "Update failed.", "error"); }
+            }).catch(err => console.error("Update Error:", err));
         }
 
-                function confirmToggle(id, nextStatus) {
+        function confirmToggle(id, nextStatus) {
             Swal.fire({
                 title: 'Change Book Status?',
                 text: `Are you sure you want to mark this book as ${nextStatus}?`,
@@ -460,7 +391,6 @@
                 confirmButtonText: `Yes, make it ${nextStatus}!`
             }).then((result) => {
                 if (result.isConfirmed) {
-                    
                     window.location.href = `/Book/ToggleAvailability?id=${id}&status=${nextStatus}`;
                 }
             });

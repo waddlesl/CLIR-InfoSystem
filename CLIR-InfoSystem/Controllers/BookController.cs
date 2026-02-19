@@ -34,11 +34,15 @@ namespace CLIR_InfoSystem.Controllers
             }
 
             var books = query.ToList();
-            return View(books);
+            return View("~/Views/Staff/StaffBookManagement.cshtml", books);
         }
 
         [HttpGet]
-        public IActionResult AddBook() => View();
+        public IActionResult AddBook()
+        {
+            // If you moved this to the Staff folder
+            return View("~/Views/Staff/StaffAddBook.cshtml");
+        }
 
         [HttpPost]
         public IActionResult AddBook([FromBody] Book newBook)
@@ -64,7 +68,7 @@ namespace CLIR_InfoSystem.Controllers
         {
             var book = _context.Books.Find(id);
             if (book == null) return NotFound();
-            return View(book);
+            return View("~/Views/Staff/StaffEditBook.cshtml", book);
         }
 
         [HttpPost]
@@ -168,7 +172,7 @@ namespace CLIR_InfoSystem.Controllers
                 LogAction($"Toggled availability of {id} to {status}", "book");
                 _context.SaveChanges();
             }
-            return RedirectToAction("BookManagement");
+            return RedirectToAction("BookManagement", "Book");
         }
 
         public IActionResult PatronBorrow()

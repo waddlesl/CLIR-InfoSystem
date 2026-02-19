@@ -1,70 +1,130 @@
-﻿<div class="container mt-3">
-<div id="reports-page-container">
-    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
+﻿<div class="container-fluid px-4 mt-2" id="reports-page-container">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div>
+            <h4 class="fw-bold mb-0" style="color: #1a2035;">Reports & Analytics</h4>
+            <small class="text-muted">Seat Reservation Insights (Rizal Campus)</small>
+        </div>
+        <div class="d-flex justify-content-end align-items-center filter-container">
+            <partial name="_ReportFilter" />
+        </div>
+    </div>
+
+    <div class="report-tabs mb-4 d-flex flex-wrap gap-1 p-1 bg-light rounded-pill shadow-sm" style="width: fit-content; border: 1px solid #dee2e6;">
+        <a asp-controller="Report" asp-action="ReportDashboard" class="nav-link px-3 py-1 rounded-pill fw-bold active-tab">Book A Seat (Rizal)</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">Book A Seat (Einstein)</a>
+        <a asp-controller="Report" asp-action="BookBorrowingReport" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">Book Borrowing</a>
+        <a asp-controller="Report" asp-action="BookALibrarianReport" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">Book a Librarian</a>
+        <a asp-controller="Report" asp-action="ODDSReports" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">ODDS</a>
+        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="nav-link px-3 py-1 rounded-pill fw-bold @(ViewBag.CurrentService == "Grammarly" ? "active-tab" : "text-muted")">Grammarly</a>
+        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="nav-link px-3 py-1 rounded-pill fw-bold @(ViewBag.CurrentService == "Turnitin" ? "active-tab" : "text-muted")">Turnitin</a>
+    </div>
+
+    <div class="row g-4">
         <div class="col-md-4">
-            <h2 class="fw-bold mb-1">Reports & Analytics</h2>
+            <div class="card h-100 border-0 shadow-sm text-white" style="background-color: #1e2953; border-radius: 15px;">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <span class="text-uppercase small fw-bold opacity-75">Total Seat Reservations</span>
+                    <h1 class="display-4 fw-bold my-2">@ViewBag.RBookingCount</h1>
+                    <p class="mb-0 opacity-75 small">Total Book a Seat for Rizal Campus.</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 d-flex justify-content-end">
-            <div class="col-md-12">
-                <partial name="_ReportFilter" />
+
+        <div class="col-md-8">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted text-uppercase small fw-bold">Average Visitors (Mon-Sat)</span>
+                        <i class="bi bi-graph-up text-danger"></i>
+                    </div>
+                    <div style="height: 200px;">
+                        <canvas id="visitorChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="report-tabs">
-        <a asp-controller="Report" asp-action="ReportDashboard" class="tab active">Book A Seat (Rizal)</a>
-        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
-        <a asp-controller="Report" asp-action="BookBorrowingReport" class="tab">Book Borrowing</a>
-        <a asp-controller="Report" asp-action="BookALibrarianReport" class="tab">Book a Librarian</a>
-        <a asp-controller="Report" asp-action="ODDSReports" class="tab">ODDS</a>
-        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="tab @(ViewBag.CurrentService == "Grammarly" ? "active" : "")">Grammarly</a>
-        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
-    </div>
-
-    <div class="dashboard-grid">
-        <div class="report-card dark-card d-flex flex-column justify-content-center py-4">
-            <span class="card-label opacity-75">Total Seat Reservations</span>
-            <h1 class="card-value">@ViewBag.RBookingCount</h1>
-            <p class="card-subtext">Total Book a Seat for Rizal Campus.</p>
-        </div>
-
-        <div class="report-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="card-label">Average Visitors (Mon-Sat)</span>
-                <i class="fas fa-chart-line text-danger"></i>
-            </div>
-            <div class="graph-box">
-                <canvas id="visitorChart"></canvas>
+    <div class="row g-4 mt-1">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm border-top border-4" style="border-top-color: #ed1e28 !important; border-radius: 12px;">
+                <div class="card-body p-3 text-center">
+                    <span class="text-muted small fw-bold d-block mb-1">College Level</span>
+                    <h2 class="fw-bold mb-0" style="color: #1e2953;">@ViewBag.RBookingCountForCollege</h2>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="stats-secondary-grid mt-4">
-        <div class="report-card border-top border-secondary border-4">
-            <span class="card-label">College Level</span>
-            <h2 class="card-value">@ViewBag.RBookingCountForCollege</h2>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm border-top border-4" style="border-top-color: #ed1e28 !important; border-radius: 12px;">
+                <div class="card-body p-3 text-center">
+                    <span class="text-muted small fw-bold d-block mb-1">SHS Level</span>
+                    <h2 class="fw-bold mb-0" style="color: #1e2953;">@ViewBag.RBookingCountForSHS</h2>
+                </div>
+            </div>
         </div>
 
-        <div class="report-card border-top border-secondary border-4">
-            <span class="card-label">SHS Level</span>
-            <h2 class="card-value">@ViewBag.RBookingCountForSHS</h2>
-        </div>
-
-        <div class="report-card border-top border-secondary border-4 text-center">
-            <span class="card-label">Top Department</span>
-            <h2 class="card-value" style="font-size: 1.4rem;">@ViewBag.RBookingTopDepartment</h2>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm border-top border-4" style="border-top-color: #1e2953 !important; border-radius: 12px;">
+                <div class="card-body p-3 text-center">
+                    <span class="text-muted small fw-bold d-block mb-1">Top Department</span>
+                    <h4 class="fw-bold mb-0 text-truncate" style="color: #ed1e28; font-size: 1.1rem;">@ViewBag.RBookingTopDepartment</h4>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-</div>
+
+<style>
+    /* Compact Filter/Export Buttons */
+    .filter-container .btn {
+        padding: 4px 12px !important;
+        font-size: 0.75rem !important;
+        height: auto !important;
+    }
+
+    .filter-container .form-control,
+    .filter-container .form-select {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+        height: auto !important;
+    }
+
+    /* Small Tab Buttons */
+    .report-tabs .nav-link {
+        font-size: 0.7rem !important;
+        padding: 4px 12px !important;
+        transition: all 0.2s ease;
+        border: none !important;
+    }
+
+    .active-tab {
+        background-color: #1e2953 !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(30, 41, 83, 0.2);
+    }
+
+    .nav-link:hover:not(.active-tab) {
+        color: #ed1e28 !important;
+    }
+
+    /* Card Hover */
+    .card {
+        transition: transform 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById('visitorChart').getContext('2d');
-
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, '#CC0000');
-        gradient.addColorStop(1, 'rgba(204, 0, 0, 0.4)');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, '#ed1e28');
+        gradient.addColorStop(1, 'rgba(237, 30, 40, 0.1)');
 
         new Chart(ctx, {
             type: 'bar',
@@ -74,8 +134,8 @@
                     label: 'Avg Visitors',
                     data: @Html.Raw(ViewBag.VisitorData ?? "[]"),
                     backgroundColor: gradient,
-                    borderRadius: 8,
-                    barThickness: 30
+                    borderRadius: 5,
+                    barThickness: 20
                 }]
             },
             options: {
@@ -83,15 +143,8 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#f0f0f0', drawBorder: false },
-                        ticks: { stepSize: 1, color: '#999' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#666', font: { weight: '600' } }
-                    }
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0', drawBorder: false }, ticks: { font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } }
                 }
             }
         });

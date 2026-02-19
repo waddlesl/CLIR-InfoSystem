@@ -185,7 +185,6 @@
 
             @if (role == "Librarian")
             {
-                <div class="nav-group-label">Library Management</div>
                 <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-user-tag"></i> Patron Management</a></div>
                 <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-bookmark"></i> Book Catalog</a></div>
                 <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake"></i> Manage Borrowers</a></div>
@@ -196,14 +195,16 @@
                 <div class="nav-item"><a asp-controller="Report" asp-action="ReportDashboard"><i class="fa-solid fa-chart-pie"></i> Reports & Analytics</a></div>
             }
 
+
+           
+
             @if (role == "Student Assistant")
             {
                 <div class="nav-group-label">Assistant</div>
-                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-users"></i> Patron Management</a></div>
-                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-open"></i> View Catalog</a></div>
-                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake-angle"></i> View Borrowers</a></div>
-                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings"><i class="fa-solid fa-calendar-check"></i> View Reservations</a></div>
-                <div class="nav-item"><a href="#"><i class="fa-solid fa-circle-question"></i> Help Desk</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons">👤 Patron Management</a></div>
+                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement">📖 View Catalog</a></div>
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers">🤝 View Borrowers</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings">🪑 View Reservations</a></div>
             }
 
             @if (role == "Patron")

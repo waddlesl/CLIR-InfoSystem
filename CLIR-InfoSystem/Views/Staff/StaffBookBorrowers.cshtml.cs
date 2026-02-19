@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CLIR_InfoSystem.Views.Facility
+namespace CLIR_InfoSystem.Views.Staff
 {
-    public class ManageBookaLibrarianModel : PageModel
+    public class BookBorrowersModel : PageModel
     {
         public void OnGet()
         {

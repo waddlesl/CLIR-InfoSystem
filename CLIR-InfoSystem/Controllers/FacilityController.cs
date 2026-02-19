@@ -104,7 +104,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.SelectedBuilding = building;
 
             var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
-            return View(activeBookings);
+            return View("~/Views/Staff/StaffManageBookings.cshtml", activeBookings);
         }
 
 
@@ -134,7 +134,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.BookingDate)
                 .ToList();
 
-            return View(librarian);
+            return View("~/Views/Staff/StaffHistoryBookaLibrarian.cshtml", librarian);
         }
         public IActionResult ManageBookaLibrarian()
         {
@@ -161,7 +161,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.BookingDate)
                 .ToList();
 
-            return View(librarian);
+            return View("~/Views/Staff/StaffManageBookaLibrarian.cshtml", librarian);
         }
 
         [HttpPost]

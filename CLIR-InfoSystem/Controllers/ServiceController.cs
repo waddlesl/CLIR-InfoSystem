@@ -23,7 +23,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
-            return View(odds);
+            return View("~/Views/Staff/StaffManageODDS.cshtml", odds);
         }
         
         public IActionResult ODDSHistory()
@@ -35,7 +35,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
-            return View(odds);
+            return View("~/Views/Staff/StaffManageODDS.cshtml", odds);
         }
 
         public IActionResult ManageServices()
@@ -63,7 +63,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
-            return View(services);
+            return View("~/Views/Staff/StaffManageServices.cshtml", services);
         }
 
         public IActionResult ServicesHistory()
@@ -91,7 +91,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
-            return View(services);
+            return View("~/Views/Staff/StaffServicesHistory.cshtml", services);
         }
 
 

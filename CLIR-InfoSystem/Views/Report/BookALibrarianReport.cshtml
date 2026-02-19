@@ -1,93 +1,133 @@
-﻿<div class="container-fluid mt-2">
-<div id="reports-page-container">
-    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
+﻿@model IEnumerable<CLIR_InfoSystem.Models.BookALibrarian>
+
+<div class="container-fluid px-4 mt-2" id="reports-page-container">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div>
+            <h4 class="fw-bold mb-0" style="color: #1a2035;">Reports & Analytics</h4>
+            <small class="text-muted">Librarian Consultation Insights</small>
+        </div>
+        <div class="d-flex justify-content-end align-items-center filter-container">
+            <partial name="_ReportFilter" />
+        </div>
+    </div>
+
+    <div class="report-tabs mb-4 d-flex flex-wrap gap-1 p-1 bg-light rounded-pill shadow-sm" style="width: fit-content; border: 1px solid #dee2e6;">
+        <a asp-controller="Report" asp-action="ReportDashboard" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">Book A Seat (Rizal)</a>
+        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">Book A Seat (Einstein)</a>
+        <a asp-controller="Report" asp-action="BookBorrowingReport" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">Book Borrowing</a>
+        <a asp-controller="Report" asp-action="BookALibrarianReport" class="nav-link px-3 py-1 rounded-pill fw-bold active-tab">Book a Librarian</a>
+        <a asp-controller="Report" asp-action="ODDSReports" class="nav-link px-3 py-1 rounded-pill fw-bold text-muted">ODDS</a>
+        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="nav-link px-3 py-1 rounded-pill fw-bold @(ViewBag.CurrentService == "Grammarly" ? "active-tab" : "text-muted")">Grammarly</a>
+        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="nav-link px-3 py-1 rounded-pill fw-bold @(ViewBag.CurrentService == "Turnitin" ? "active-tab" : "text-muted")">Turnitin</a>
+    </div>
+
+    <div class="row g-4">
         <div class="col-md-4">
-            <h2 class="fw-bold mb-1">Reports & Analytics</h2>
-            
-        </div>
-        <div class="col-md-6 d-flex justify-content-end">
-            <div class="col-md-12">
-                <partial name="_ReportFilter" />
-            </div>
-        </div>
-    </div>
-
-    <div class="report-tabs">
-        <a asp-controller="Report" asp-action="ReportDashboard" class="tab">Book A Seat (Rizal)</a>
-        <a asp-controller="Report" asp-action="BookASeatEinstienReport" class="tab">Book A Seat (Einstein)</a>
-        <a asp-controller="Report" asp-action="BookBorrowingReport" class="tab">Book Borrowing</a>
-        <a asp-controller="Report" asp-action="BookALibrarianReport" class="tab active">Book a Librarian</a>
-        <a asp-controller="Report" asp-action="ODDSReports" class="tab">ODDS</a>
-        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Grammarly" class="tab @(ViewBag.CurrentService == "Grammarly" ? "active" : "")">Grammarly</a>
-        <a asp-action="GrammarlyAndTurnitinReport" asp-route-service="Turnitin" class="tab @(ViewBag.CurrentService == "Turnitin" ? "active" : "")">Turnitin</a>
-    </div>
-
-    <div class="dashboard-grid">
-        <div class="report-card dark-card d-flex flex-column justify-content-center">
-            <span class="card-label">Total Appointments</span>
-            <h1 class="card-value">@ViewBag.LBookingCount</h1>
-            <p class="card-subtext">Total librarian consultations.</p>
-        </div>
-
-        <div class="report-card">
-            <span class="card-label">Breakdown by Academic Level</span>
-            <div class="mt-3">
-                @{
-                    var total = (double)(ViewBag.LBookingCount ?? 1);
-                    
-                }
-
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="fw-bold">College</span>
-                        <span class="fw-bold">@ViewBag.LBookingCountForCollege</span>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="fw-bold">Senior High School</span>
-                        <span class="fw-bold">@ViewBag.LBookingCountForSHS</span>
-                    </div>
+            <div class="card h-100 border-0 shadow-sm text-white" style="background-color: #1e2953; border-radius: 15px;">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <span class="text-uppercase small fw-bold opacity-75">Total Appointments</span>
+                    <h1 class="display-4 fw-bold my-2">@ViewBag.LBookingCount</h1>
+                    <p class="mb-0 opacity-75 small">Total librarian consultations recorded.</p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="stats-secondary-grid mt-4">
-        <div class="report-card d-flex flex-column border-top border-secondary border-4 justify-content-between">
-            <div>
-                <span class="card-label">Top Department</span>
-                <h2 class="card-value mt-2" style="font-size: 1.6rem;">@ViewBag.LBookingTopDepartment</h2>
-            </div>
-        </div>
-
-        <div class="report-card border-top border-secondary border-4" style="grid-column: span 2;">
-            <span class="card-label">Top Programs</span>
-
-            @if (ViewBag.LBookingTopProgram == null || !Enumerable.Any(ViewBag.LBookingTopProgram))
-            {
-                <div class="text-center py-4">
-                    <p class="text-muted">No program data available for this range.</p>
-                </div>
-            }
-            else
-            {
-                <div class="mt-3">
-                    @foreach (var item in ViewBag.LBookingTopProgram)
-                    {
-                        
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between small mb-1">
-                                <span class="fw-bold text-dark">@item.Program</span>
-                                <span class="badge bg-light text-dark border">@item.Count</span>
-                            </div>
-                                
+        <div class="col-md-8">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <span class="text-muted text-uppercase small fw-bold">Breakdown by Academic Level</span>
+                    <div class="row mt-4">
+                        <div class="col-6 text-center border-end">
+                            <h3 class="fw-bold mb-0" style="color: #ed1e28;">@ViewBag.LBookingCountForCollege</h3>
+                            <span class="text-muted small">College</span>
                         </div>
-                    }
+                        <div class="col-6 text-center">
+                            <h3 class="fw-bold mb-0" style="color: #1e2953;">@ViewBag.LBookingCountForSHS</h3>
+                            <span class="text-muted small">Senior High School</span>
+                        </div>
+                    </div>
                 </div>
-            }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm border-top border-4 h-100" style="border-top-color: #ed1e28 !important; border-radius: 12px;">
+                <div class="card-body p-4">
+                    <span class="text-muted text-uppercase small fw-bold">Top Department</span>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="bg-light p-2 rounded-circle me-3">
+                            <i class="bi bi-building text-danger fs-4"></i>
+                        </div>
+                        <h4 class="fw-bold mb-0 text-truncate" style="color: #1a2035; font-size: 1.1rem;">@ViewBag.LBookingTopDepartment</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm border-top border-4 h-100" style="border-top-color: #1e2953 !important; border-radius: 12px;">
+                <div class="card-body p-4">
+                    <span class="text-muted text-uppercase small fw-bold mb-3 d-block">Top Programs</span>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (ViewBag.LBookingTopProgram != null)
+                        {
+                            @foreach (var item in ViewBag.LBookingTopProgram)
+                            {
+                                <div class="p-2 px-3 border rounded bg-white d-flex align-items-center shadow-sm small">
+                                    <span class="fw-bold text-dark me-2">@item.Program</span>
+                                    <span class="badge" style="background-color: #1e2953;">@item.Count</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-</div>
+
+<style>
+    /* Ultra-Compact Filter & Action Buttons */
+    .filter-container .btn {
+        padding: 4px 12px !important;
+        font-size: 0.75rem !important;
+        height: auto !important;
+    }
+
+    .filter-container .form-control,
+    .filter-container .form-select {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+        height: auto !important;
+    }
+
+    /* Small Pill Tab Navigation */
+    .report-tabs .nav-link {
+        font-size: 0.7rem !important;
+        padding: 4px 12px !important;
+        transition: all 0.2s ease;
+        border: none !important;
+    }
+
+    .active-tab {
+        background-color: #1e2953 !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(30, 41, 83, 0.2);
+    }
+
+    .nav-link:hover:not(.active-tab) {
+        color: #ed1e28 !important;
+    }
+
+    /* Card Hover Animations */
+    .card {
+        transition: transform 0.2s;
+        border-radius: 12px;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+</style>

@@ -24,12 +24,14 @@ namespace CLIR_InfoSystem.Controllers
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var userId = HttpContext.Session.GetString("UserId");
+            var controller = context.RouteData.Values["controller"]?.ToString();
             var action = context.RouteData.Values["action"]?.ToString();
 
-            // Add "SeedData" to the list of allowed actions for non-logged-in users
-            if (string.IsNullOrEmpty(userId) && action != "Login" && action != "SeedData")
+            // Allow access to the Login page and SeedData without redirecting
+            if (string.IsNullOrEmpty(userId) && controller != "Account")
             {
                 context.Result = new RedirectToActionResult("Login", "Account", null);
+                return;
             }
 
             base.OnActionExecuting(context);

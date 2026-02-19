@@ -34,7 +34,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(c => c.BookingDate)
                 .ToList();
 
-            return View();
+            return View("~/Views/Patron/PatronActivity.cshtml");
         }
 
         [HttpGet]
@@ -121,7 +121,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.MyLoansCount = _context.BookBorrowings.Count(b => b.PatronId == userIdString && b.Status != "Returned");
             ViewBag.MyPendingODDS = _context.Odds.Count(o => o.PatronId == userIdString && o.RequestStatus == "Pending");
 
-            return View();
+            return View("~/Views/Patron/PatronDashboard.cshtml");
         }
 
         private bool IsValidDeptProgById(int? deptId, int? progId)

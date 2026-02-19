@@ -1,0 +1,181 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.OddsRequest>
+
+<div class="container-fluid px-4 mt-3">
+    <div class="report-tabs mb-4 d-flex gap-2 p-1 bg-light rounded-pill" style="width: fit-content; border: 1px solid #dee2e6;">
+        <a asp-controller="Service" asp-action="ManageODDS"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "ManageODDS" ? "active-tab" : "text-muted")">
+            <i class="bi bi-file-earmark-arrow-down me-2"></i>Requests
+        </a>
+        <a asp-controller="Service" asp-action="ODDSHistory"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "ODDSHistory" ? "active-tab" : "text-muted")">
+            <i class="bi bi-clock-history me-2"></i>History
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h5 class="fw-bold mb-0" style="color: #1a2035; font-size: 1.1rem;">Document Delivery Requests</h5>
+            <small class="text-muted">Generated: @DateTime.Now.ToString("MMM dd, yyyy | hh:mm tt")</small>
+        </div>
+
+        <div class="d-flex gap-2">
+            <div class="input-group input-group-sm" style="width: 300px;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="roddsSearch" class="form-control border-start-0" placeholder="Search patron or material...">
+            </div>
+         
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th class="ps-4">Patron ID</th>
+                            <th>Patron Details</th>
+                            <th>Material Type</th>
+                            <th>Service</th>
+                            <th>Request Date</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="oddsRequestTable">
+                        @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus == "Pending"))
+                        {
+                            <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
+                                <td class="ps-4 fw-semibold">@ServiceRequest.PatronId</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-dark">@(ServiceRequest.Patron.FirstName + " " + ServiceRequest.Patron.LastName)</span>
+                                        <small class="text-muted">@ServiceRequest.Patron.Department.DeptCode • @ServiceRequest.Patron.Email</small>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@ServiceRequest.MaterialType</span></td>
+                                <td>@ServiceRequest.ServiceType</td>
+                                <td class="small">@ServiceRequest.RequestDate.ToString("MMM dd, yyyy")</td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-3">
+                                        @ServiceRequest.RequestStatus
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <form asp-action="UpdateOddsStatus" method="post">
+                                            <input type="hidden" name="requestId" value="@ServiceRequest.RequestId" />
+                                            <input type="hidden" name="status" value="Fulfilled" />
+                                            <button type="submit" class="btn btn-sm btn-success px-3">Fulfilled</button>
+                                        </form>
+
+                                        <form asp-action="UpdateOddsStatus" method="post">
+                                            <input type="hidden" name="requestId" value="@ServiceRequest.RequestId" />
+                                            <input type="hidden" name="status" value="Cancelled" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="pageInfo" class="small text-muted"></div>
+                <nav><ul class="pagination pagination-sm mb-0" id="pagination"></ul></nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let rowsPerPage = 10;
+        let currentPage = 1;
+
+        function updateTable() {
+            let rows = $("#oddsRequestTable tr:not(.filtered)");
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            $("#oddsRequestTable tr").hide();
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+            rows.slice(start, end).show();
+
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+
+            let paginationHtml = "";
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+                </li>`;
+            }
+            $("#pagination").html(paginationHtml);
+        }
+
+        window.goToPage = function(page) {
+            currentPage = page;
+            updateTable();
+        }
+
+        $("#roddsSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#oddsRequestTable tr").each(function() {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggleClass("filtered", !isMatch);
+            });
+            currentPage = 1;
+            updateTable();
+        });
+
+        $("#btnClearFilters").on("click", function() {
+            $("#roddsSearch").val("");
+            $("#oddsRequestTable tr").removeClass("filtered");
+            currentPage = 1;
+            updateTable();
+        });
+
+        $(document).ready(() => updateTable());
+    </script>
+
+    <style>
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ed1e28 !important;
+            background-color: rgba(237, 30, 40, 0.05);
+        }
+
+        .active-tab {
+            background-color: #1e2953 !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2);
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-top: none;
+        }
+
+        .page-link {
+            color: #1a2035;
+            font-weight: bold;
+            border: none;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035 !important;
+            border-color: #1a2035 !important;
+            color: white !important;
+            border-radius: 4px;
+        }
+    </style>
+}

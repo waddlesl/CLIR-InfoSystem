@@ -67,7 +67,7 @@ namespace CLIR_InfoSystem.Controllers
                 .AsQueryable();
             var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
 
-            return View(results);
+            return View("~/Views/Staff/StaffBorrowersHistory.cshtml", results);
         }
 
         public IActionResult BookBorrowers(string searchTerm)
@@ -107,8 +107,7 @@ namespace CLIR_InfoSystem.Controllers
 
             var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
 
-            return View(results);
-
+            return View("~/Views/Staff/StaffBookBorrowers.cshtml", results);
 
 
         }
@@ -151,7 +150,7 @@ namespace CLIR_InfoSystem.Controllers
 
             var results = query.OrderByDescending(b => b.BorrowDate).ToList() ?? new List<BookBorrowing>();
 
-            return View(results);
+            return View("~/Views/Staff/StaffBookBorrowersRequest.cshtml", results);
 
         }
 

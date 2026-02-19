@@ -1,0 +1,233 @@
+﻿@model IEnumerable<CLIR_InfoSystem.Models.BookALibrarian>
+
+<div class="container-fluid px-4 mt-3">
+    <div class="report-tabs mb-4 d-flex gap-2 p-1 bg-light rounded-pill" style="width: fit-content; border: 1px solid #dee2e6;">
+        <a asp-controller="Facility" asp-action="ManageBookaLibrarian"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "ManageBookaLibrarian" ? "active-tab" : "text-muted")">
+            <i class="bi bi-envelope-open me-2"></i>Requests
+        </a>
+        <a asp-controller="Facility" asp-action="HistoryBookaLibrarian"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "HistoryBookaLibrarian" ? "active-tab" : "text-muted")">
+            <i class="bi bi-clock-history me-2"></i>History
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h5 class="fw-bold mb-0" style="color: #1a2035; font-size: 1.1rem;">Book a Librarian Management</h5>
+            <small class="text-muted">Generated: @DateTime.Now.ToString("MMM dd, yyyy | hh:mm tt")</small>
+        </div>
+
+        <div class="d-flex gap-2 align-items-center">
+            <div class="input-group input-group-sm" style="width: 300px;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="unifiedSearch" class="form-control border-start-0" placeholder="Search patron, topic, or status...">
+            </div>
+            <select id="sectionToggle" class="form-select form-select-sm" style="width: 160px;">
+                <option value="pending">Requests</option>
+                <option value="approved">Approved</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="pendingSection" class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th class="ps-4">Patron ID</th>
+                            <th>Booking Date</th>
+                            <th>Topic</th>
+                            <th>Description</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestLibTable">
+                        @foreach (var librarian in Model.Where(sb => sb.Status == "Pending"))
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold">@librarian.PatronId</td>
+                                <td class="small">@librarian.BookingDate.ToShortDateString()</td>
+                                <td>@librarian.Topic</td>
+                                <td class="text-truncate" style="max-width: 250px;">@librarian.Description</td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-3">@librarian.Status</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <form asp-action="LibrarianCheckIn" method="post">
+                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                            <button type="submit" class="btn btn-sm btn-success px-3">Approve</button>
+                                        </form>
+                                        <form asp-action="CancelLibrarianBooking" method="post">
+                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="pageInfo" class="small text-muted"></div>
+                <nav><ul class="pagination pagination-sm mb-0" id="pagination"></ul></nav>
+            </div>
+        </div>
+    </div>
+
+    <div id="approvedSection" class="card shadow-sm border-0 mb-4" style="display: none;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="small text-muted">
+                        <tr>
+                            <th class="ps-4">Patron ID</th>
+                            <th>Booking Date</th>
+                            <th>Topic</th>
+                            <th>Description</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsLibTable">
+                        @foreach (var librarian in Model.Where(sb => sb.Status == "Approved"))
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold">@librarian.PatronId</td>
+                                <td class="small">@librarian.BookingDate.ToShortDateString()</td>
+                                <td>@librarian.Topic</td>
+                                <td class="text-truncate" style="max-width: 250px;">@librarian.Description</td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-primary px-3" style="background-color: #1e2953 !important;">@librarian.Status</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <form asp-action="LibrarianComplete" method="post">
+                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                            <button type="submit" class="btn btn-sm btn-success px-3">Complete</button>
+                                        </form>
+                                        <form asp-action="CancelLibrarianBooking" method="post">
+                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="pageBookingInfo" class="small text-muted"></div>
+                <nav><ul class="pagination pagination-sm mb-0" id="paginationbooking"></ul></nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let rowsPerPage = 5;
+        let pendingPage = 1;
+        let approvedPage = 1;
+
+        function updatePagination(tableId, paginationId, infoId, currentPage) {
+            let rows = $(`#${tableId} tr:not(.filtered)`);
+            let totalRows = rows.length;
+            let totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            $(`#${tableId} tr`).hide();
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+            rows.slice(start, end).show();
+
+            $(`#${infoId}`).text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows}`);
+
+            let html = "";
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage('${tableId}', ${i})">${i}</a>
+                         </li>`;
+            }
+            $(`#${paginationId}`).html(html);
+        }
+
+        window.goToPage = function(tableId, page) {
+            if (tableId === 'requestLibTable') {
+                pendingPage = page;
+                updatePagination('requestLibTable', 'pagination', 'pageInfo', pendingPage);
+            } else {
+                approvedPage = page;
+                updatePagination('bookingsLibTable', 'paginationbooking', 'pageBookingInfo', approvedPage);
+            }
+        };
+
+        // Section Toggle
+        $("#sectionToggle").on("change", function() {
+            const isPending = $(this).val() === "pending";
+            $("#pendingSection").toggle(isPending);
+            $("#approvedSection").toggle(!isPending);
+        });
+
+        // Unified Search
+        $("#unifiedSearch").on("keyup", function() {
+            let val = $(this).val().toLowerCase();
+            $("tbody tr").each(function() {
+                let match = $(this).text().toLowerCase().indexOf(val) > -1;
+                $(this).toggleClass("filtered", !match);
+            });
+            pendingPage = 1; approvedPage = 1;
+            updatePagination('requestLibTable', 'pagination', 'pageInfo', pendingPage);
+            updatePagination('bookingsLibTable', 'paginationbooking', 'pageBookingInfo', approvedPage);
+        });
+
+        $(document).ready(function() {
+            updatePagination('requestLibTable', 'pagination', 'pageInfo', pendingPage);
+            updatePagination('bookingsLibTable', 'paginationbooking', 'pageBookingInfo', approvedPage);
+        });
+    </script>
+
+    <style>
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ed1e28 !important;
+            background-color: rgba(237, 30, 40, 0.05);
+        }
+
+        .active-tab {
+            background-color: #1e2953 !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2);
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-top: none;
+        }
+
+        .page-link {
+            color: #1a2035;
+            font-weight: 600;
+            border: none;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035;
+            border-color: #1a2035;
+            color: white;
+            border-radius: 4px;
+        }
+    </style>
+}
