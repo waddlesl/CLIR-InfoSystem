@@ -51,10 +51,10 @@
             transition: 0.3s;
         }
 
-            .logout-link:hover {
-                color: #ed1e28;
-                opacity: 1;
-            }
+        .logout-link:hover {
+            color: #ed1e28;
+            opacity: 1;
+        }
 
         .hamburger {
             background: none;
@@ -84,9 +84,9 @@
             z-index: 1000;
         }
 
-            .sidebar.collapsed {
-                margin-left: -260px;
-            }
+        .sidebar.collapsed {
+            margin-left: -260px;
+        }
 
         .nav-item {
             padding: 12px 20px;
@@ -152,6 +152,20 @@
             color: #6e7a91;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
+
+        /*Drop down for yes*/
+        .nav-sub-item-container .nav-link {
+            font-size: 0.9rem;
+            padding-left: 35px; 
+            color: #b5b5b5;
+        }
+
+        .nav-sub-item-container .nav-link:hover {
+            background: #2b3553;
+            color: white !important;
+            border-left: 4px solid #ed1e28;
+        }
+
     </style>
 </head>
 <body>
@@ -185,9 +199,35 @@
 
             @if (role == "Librarian")
             {
+                bool isBorrowerMenuOpen = currentController == "Transaction";
+
                 <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-user-tag"></i> Patron Management</a></div>
                 <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-bookmark"></i> Book Catalog</a></div>
-                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake"></i> Manage Borrowers</a></div>
+
+                <div class="nav-item">
+                    <a class="d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse"
+                       href="#bookBorrowMenu"
+                       role="button"
+                       aria-expanded="@(isBorrowerMenuOpen ? "true" : "false")">
+                        <span><i class="fa-solid fa-handshake"></i> Book Borrowers</span>
+                        <i class="fa-solid fa-chevron-down small"></i>
+                    </a>
+                </div>
+                <div class="collapse @(isBorrowerMenuOpen ? "show" : "")" id="bookBorrowMenu">
+                    <div class="nav-sub-item-container ms-3">
+                        <a class="nav-link small py-2" asp-controller="Transaction" asp-action="BookBorrowersRequest">
+                            <i class="fa-solid fa-file-circle-plus"></i> Borrow Request
+                        </a>
+                        <a class="nav-link small py-2" asp-controller="Transaction" asp-action="BookBorrowers">
+                            <i class="fa-solid fa-user-clock"></i> Current Borrowers
+                        </a>
+                        <a class="nav-link small py-2" asp-controller="Transaction" asp-action="BorrowersHistory">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Borrower History
+                        </a>
+                    </div>
+                </div>
+
                 <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookings"><i class="fa-solid fa-chair"></i> Seat Reservations</a></div>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian"><i class="fa-solid fa-chalkboard-user"></i> Book A Librarian</a></div>
                 <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS"><i class="fa-solid fa-envelope-open-text"></i> Digital Requests</a></div>
