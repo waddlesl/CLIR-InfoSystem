@@ -3,11 +3,22 @@ using CLIR_InfoSystem.Data;
 using CLIR_InfoSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Playwright;
+//using Microsoft.Playwright;
 using System;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
+using System.Runtime.Intrinsics.X86;
+using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 using System.Text.Json;
 using System.Threading.Tasks;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using QuestPDF.Previewer;
+using QuestDocument = QuestPDF.Fluent.Document;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -19,7 +30,7 @@ namespace CLIR_InfoSystem.Controllers
         }
 
         //repeatable filter
-        private (DateTime Start, DateTime End, int Year) GetTermDates(int selectedYear, int selectedTerm)
+        /*private (DateTime Start, DateTime End, int Year) GetTermDates(int selectedYear, int selectedTerm)
         {
             // Default to current Academic Year if none selected
             if (selectedYear == 0)
@@ -48,6 +59,49 @@ namespace CLIR_InfoSystem.Controllers
                     startDate = new DateTime(selectedYear, 8, 1);
                     endDate = new DateTime(selectedYear + 1, 7, 31);
                     break;
+            }
+
+            return (startDate, endDate, selectedYear);
+        }*/
+
+        private (DateTime Start, DateTime End, int Year) GetTermDates(int selectedYear, int selectedTerm)
+        {
+            // 1. Robust Year Check: If year is 0, use the current Academic Year
+            if (selectedYear <= 0)
+            {
+                selectedYear = (DateTime.Now.Month >= 8) ? DateTime.Now.Year : DateTime.Now.Year - 1;
+            }
+
+            DateTime startDate;
+            DateTime endDate;
+
+            try
+            {
+                switch (selectedTerm)
+                {
+                    case 1: // Aug - Nov
+                        startDate = new DateTime(selectedYear, 8, 1);
+                        endDate = new DateTime(selectedYear, 11, 30);
+                        break;
+                    case 2: // Dec - Mar
+                        startDate = new DateTime(selectedYear, 12, 1);
+                        endDate = new DateTime(selectedYear + 1, 3, 31);
+                        break;
+                    case 3: // May - July
+                        startDate = new DateTime(selectedYear + 1, 5, 1);
+                        endDate = new DateTime(selectedYear + 1, 7, 31);
+                        break;
+                    default: // Full Academic Year (Aug - July)
+                        startDate = new DateTime(selectedYear, 8, 1);
+                        endDate = new DateTime(selectedYear + 1, 7, 31);
+                        break;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // Fallback to current year if the math produces an impossible date
+                startDate = new DateTime(DateTime.Now.Year, 8, 1);
+                endDate = new DateTime(DateTime.Now.Year + 1, 7, 31);
             }
 
             return (startDate, endDate, selectedYear);
@@ -90,7 +144,7 @@ namespace CLIR_InfoSystem.Controllers
                 .Include(s => s.Patron).ThenInclude(p => p.Department)
                 .Where(s => s.BookingDate >= dateRange.Start && s.BookingDate <= dateRange.End);
             ViewBag.RBookingCount = bookings.Count(sb => sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
-            ViewBag.RBookingCountForCollege = bookings.Count(sb =>sb.Patron.DeptId != 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
+            ViewBag.RBookingCountForCollege = bookings.Count(sb => sb.Patron.DeptId != 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
             ViewBag.RBookingCountForSHS = bookings.Count(sb => sb.Patron.DeptId == 9 && sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building" && sb.BookingDate >= dateRange.Start && sb.BookingDate <= dateRange.End);
 
 
@@ -106,7 +160,7 @@ namespace CLIR_InfoSystem.Controllers
 
             return View();
         }
-  
+
 
         public IActionResult BookASeatEinstienReport(int selectedYear, int selectedTerm)
         {
@@ -261,7 +315,7 @@ namespace CLIR_InfoSystem.Controllers
                 .FirstOrDefault();
             return View();
         }
-
+        /*
         [HttpGet("download-stats")]
         public async Task<IActionResult> DownloadReport(int selectedYear, int? selectedTerm)
         {
@@ -290,16 +344,65 @@ namespace CLIR_InfoSystem.Controllers
                     endDate = new DateTime(selectedYear + 1, 7, 31);
                 }
 
-                var pdfBuffer = await ExportPdfAsync(startDate, endDate, selectedYear, selectedTerm ?? 0);
+               var pdfBuffer = await ExportPdfAsync(startDate, endDate, selectedYear, selectedTerm ?? 0);
 
-                return File(pdfBuffer, "application/pdf", $"UsageReport.pdf_{selectedYear}_Term{selectedTerm}.pdf");
+               return File(pdfBuffer, "application/pdf", $"UsageReport.pdf_{selectedYear}_Term{selectedTerm}.pdf");
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error generating PDF: {ex.Message}");
             }
-        }
+        }*/
 
+        [HttpGet("download-stats")]
+        public IActionResult DownloadReport(int selectedYear, int? selectedTerm)
+        {
+            // FIX: If "Select AY" was chosen, selectedYear will be 0.
+            // We must force it to a valid year before doing any DateTime math.
+            if (selectedYear <= 0)
+            {
+                // Logic: If we are in August or later, it's the current year. 
+                // Otherwise, it's the previous year (Academic Year logic).
+                selectedYear = (DateTime.Now.Month >= 8) ? DateTime.Now.Year : DateTime.Now.Year - 1;
+            }
+
+            try
+            {
+                // Now that selectedYear is guaranteed to be something like 2024 or 2025,
+                // these calculations will no longer crash.
+                DateTime startDate;
+                DateTime endDate;
+
+                if (selectedTerm == 1)
+                {
+                    startDate = new DateTime(selectedYear, 8, 1);
+                    endDate = new DateTime(selectedYear, 11, 30);
+                }
+                else if (selectedTerm == 2)
+                {
+                    startDate = new DateTime(selectedYear, 12, 1);
+                    endDate = new DateTime(selectedYear + 1, 3, 31);
+                }
+                else if (selectedTerm == 3)
+                {
+                    startDate = new DateTime(selectedYear + 1, 5, 1);
+                    endDate = new DateTime(selectedYear + 1, 7, 31);
+                }
+                else
+                {
+                    startDate = new DateTime(selectedYear, 8, 1);
+                    endDate = new DateTime(selectedYear + 1, 7, 31);
+                }
+
+                byte[] pdfBuffer = ExportPdfWithQuest(startDate, endDate, selectedYear, selectedTerm);
+                return File(pdfBuffer, "application/pdf", $"UsageReport_{selectedYear}.pdf");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+        /*
         private async Task<byte[]> ExportPdfAsync(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
         {
             Microsoft.Playwright.Program.Main(new[] { "install", "chromium" });
@@ -326,7 +429,181 @@ namespace CLIR_InfoSystem.Controllers
             await browser.CloseAsync();
             return pdfBytes;
         }
+        */
 
+
+
+        private byte[] ExportPdfWithQuest(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+            var fontPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", "TIMES.ttf");
+            // --- 1. DATA GATHERING (Exact logic from your GetHtmlContent) ---
+            var patrons = _context.Patrons.Include(p => p.Program).ToList();
+            var patronTotal = patrons.Count;
+            var patronSHS = patrons.Count(p => p.DeptId == 9);
+            var patronCollege = patrons.Count(p => p.DeptId != 9);
+            var patronTopProgram = patrons.Where(p => p.Program != null)
+                .GroupBy(p => p.Program.ProgramCode)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key).FirstOrDefault() ?? "N/A";
+
+            var requests = _context.Services.Include(r => r.Patron)
+                .Where(x => x.RequestDate >= startDate && x.RequestDate <= endDate).ToList();
+            var grammarlyCol = requests.Count(gat => gat.Patron?.DeptId != 9 && gat.ServiceType == "Grammarly");
+            var grammarlySHS = requests.Count(gat => gat.Patron?.DeptId == 9 && gat.ServiceType == "Grammarly");
+            var turnitinCol = requests.Count(gat => gat.Patron?.DeptId != 9 && gat.ServiceType == "Turnitin");
+            var turnitinSHS = requests.Count(gat => gat.Patron?.DeptId == 9 && gat.ServiceType == "Turnitin");
+
+            var lBookings = _context.BookALibrarians.Include(b => b.Patron)
+                .Where(x => x.BookingDate >= startDate && x.BookingDate <= endDate).ToList();
+            var lCol = lBookings.Count(sb => sb.Patron?.DeptId != 9);
+            var lSHS = lBookings.Count(sb => sb.Patron?.DeptId == 9);
+
+            var sBookings = _context.SeatBookings.Include(s => s.LibrarySeat).Include(s => s.Patron)
+                .Where(x => x.BookingDate >= startDate && x.BookingDate <= endDate).ToList();
+            var rCol = sBookings.Count(sb => sb.Patron?.DeptId != 9 && sb.LibrarySeat?.Building == "Rizal Building");
+            var rSHS = sBookings.Count(sb => sb.Patron?.DeptId == 9 && sb.LibrarySeat?.Building == "Rizal Building");
+            var eCol = sBookings.Count(sb => sb.Patron?.DeptId != 9 && sb.LibrarySeat?.Building == "Einstein Building");
+            var eSHS = sBookings.Count(sb => sb.Patron?.DeptId == 9 && sb.LibrarySeat?.Building == "Einstein Building");
+
+            var odds = _context.Odds.Include(r => r.Patron)
+                .Where(x => x.RequestDate >= startDate && x.RequestDate <= endDate).ToList();
+            var oddsScanning = odds.Count(sb => sb.ServiceType == "Scanning");
+            var oddsThesis = odds.Count(sb => sb.MaterialType == "Thesis");
+
+            // --- 2. PDF GENERATION ---
+            return QuestDocument.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Verdana"));
+
+                    // HEADER (Matches your HTML Header Styles)
+                    page.Header().Row(row =>
+                    {
+                        row.RelativeItem().Column(col =>
+                        {
+                            col.Item().Text("MAPÚA MCL").FontSize(20).SemiBold().FontColor("#CC0000");
+                            col.Item().Text("CENTER FOR LEARNING AND INFORMATION RESOURCES").FontSize(8);
+                        });
+                        row.RelativeItem().AlignRight().Column(col =>
+                        {
+                            col.Item().Text($"AY {yearReport}-{yearReport + 1} - TERM {termReport ?? 0}").FontSize(11).SemiBold();
+                            col.Item().Text("USAGE STATISTICS REPORT").FontSize(22).ExtraBold();
+                        });
+                    });
+
+                    page.Content().PaddingVertical(10).Column(mainCol =>
+                    {
+                        mainCol.Spacing(10);
+
+                        // ROW 1: Patrons & Book-A-Seat
+                        mainCol.Item().Row(row =>
+                        {
+                            // Patrons Block
+                            row.RelativeItem(4).Element(BlockStyle).Column(col =>
+                            {
+                                col.Item().Element(BlockHeader).Text("PATRONS");
+                                col.Item().PaddingTop(10).AlignCenter().Text($"{patronTotal}").FontSize(36).ExtraBold();
+                                col.Item().AlignCenter().Text("Total Number of Patrons").FontSize(7).Bold().FontColor(Colors.Grey.Darken2);
+
+                                col.Item().PaddingVertical(10).Row(r => {
+                                    r.RelativeItem().Element(StatSubItem).Column(c => {
+                                        c.Item().Text($"{patronCollege}").Bold();
+                                        c.Item().Element(LabelBadge).Text("COLLEGE");
+                                    });
+                                    r.RelativeItem().Element(StatSubItem).Column(c => {
+                                        c.Item().Text($"{patronSHS}").Bold();
+                                        c.Item().Element(LabelBadge).Text("SHS");
+                                    });
+                                });
+                                col.Item().AlignCenter().PaddingBottom(5).Text(t => {
+                                    t.Span("Top Program: ").FontSize(7);
+                                    t.Span(patronTopProgram).FontSize(7).Bold();
+                                });
+                            });
+
+                            row.ConstantItem(10);
+
+                            // Book-A-Seat Block
+                            row.RelativeItem(8).Element(BlockStyle).Column(col =>
+                            {
+                                col.Item().Element(BlockHeader).Text("BOOK-A-SEAT SERVICE");
+                                col.Item().PaddingTop(5).AlignCenter().Text("Total number of reservations").FontSize(8).Bold();
+                                col.Item().Padding(10).Row(r => {
+                                    r.RelativeItem().Column(c => {
+                                        c.Item().AlignCenter().Text($"{eCol}").Bold();
+                                        c.Item().AlignCenter().Element(LabelBadge).Text("EINSTEIN (COL)");
+                                    });
+                                    r.RelativeItem().Column(c => {
+                                        c.Item().AlignCenter().Text($"{rCol}").Bold();
+                                        c.Item().AlignCenter().Element(LabelBadge).Text("RIZAL (COL)");
+                                    });
+                                    r.RelativeItem().Column(c => {
+                                        c.Item().AlignCenter().Text($"{eSHS}").Bold();
+                                        c.Item().AlignCenter().Element(LabelBadge).Text("EINSTEIN (SHS)");
+                                    });
+                                    r.RelativeItem().Column(c => {
+                                        c.Item().AlignCenter().Text($"{rSHS}").Bold();
+                                        c.Item().AlignCenter().Element(LabelBadge).Text("RIZAL (SHS)");
+                                    });
+                                });
+                            });
+                        });
+
+                        // ROW 2: ODDS & Library Services
+                        mainCol.Item().Row(row => {
+                            // ODDS Block
+                            row.RelativeItem().Element(BlockStyle).Column(col => {
+                                col.Item().Element(BlockHeader).Text("ONLINE DOCUMENT DELIVERY SERVICE");
+                                col.Item().Padding(10).Row(r => {
+                                    r.RelativeItem().AlignCenter().Text(t => { t.Span($"{oddsScanning}\n").Bold(); t.Span("Scanning Requests").FontSize(7); });
+                                    r.RelativeItem().AlignCenter().Text(t => { t.Span($"{oddsThesis}\n").Bold(); t.Span("Thesis Access").FontSize(7); });
+                                });
+                            });
+
+                            row.ConstantItem(10);
+
+                            // Book-A-Librarian
+                            row.RelativeItem().Element(BlockStyle).Column(col => {
+                                col.Item().Element(BlockHeader).Text("BOOK-A-LIBRARIAN");
+                                col.Item().Padding(10).Row(r => {
+                                    r.RelativeItem().AlignCenter().Text(t => { t.Span($"{lCol}\n").Bold(); t.Span("College").FontSize(7); });
+                                    r.RelativeItem().AlignCenter().Text(t => { t.Span($"{lSHS}\n").Bold(); t.Span("SHS").FontSize(7); });
+                                });
+                            });
+                        });
+
+                        // ROW 3: Grammarly & Turnitin
+                        mainCol.Item().Element(BlockStyle).Column(col => {
+                            col.Item().Element(BlockHeader).Text("GRAMMARLY & TURNITIN SERVICES");
+                            col.Item().Padding(10).Row(r => {
+                                r.RelativeItem().AlignCenter().Text(t => { t.Span($"{grammarlyCol}\n").Bold(); t.Span("Grammarly (Col)").FontSize(7); });
+                                r.RelativeItem().AlignCenter().Text(t => { t.Span($"{grammarlySHS}\n").Bold(); t.Span("Grammarly (SHS)").FontSize(7); });
+                                r.RelativeItem().AlignCenter().Text(t => { t.Span($"{turnitinCol}\n").Bold(); t.Span("Turnitin (Col)").FontSize(7); });
+                                r.RelativeItem().AlignCenter().Text(t => { t.Span($"{turnitinSHS}\n").Bold(); t.Span("Turnitin (SHS)").FontSize(7); });
+                            });
+                        });
+                    });
+
+                    page.Footer().AlignCenter().Text(x => {
+                        x.Span("Generated on: ").FontSize(8);
+                        x.Span(DateTime.Now.ToString("f")).FontSize(8);
+                        x.Span("  |  Page ").FontSize(8);
+                        x.CurrentPageNumber();
+                    });
+                });
+            }).GeneratePdf();
+
+            // --- Helper Styles (Reusable) ---
+            static IContainer BlockStyle(IContainer container) => container.Border(1).BorderColor(Colors.Grey.Lighten2).Background(Colors.White);
+            static IContainer BlockHeader(IContainer container) => container.Background("#CC0000").Padding(3).AlignCenter().DefaultTextStyle(x => x.FontColor(Colors.White).FontSize(8).Bold());
+            static IContainer StatSubItem(IContainer container) => container.AlignCenter().PaddingVertical(5);
+            static IContainer LabelBadge(IContainer container) => container.Background("#CC0000").PaddingHorizontal(4).PaddingVertical(1).DefaultTextStyle(x => x.FontColor(Colors.White).FontSize(6).Bold());
+        }
         private string GetHtmlContent(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
         {
             var patrons = _context.Patrons

@@ -29,8 +29,8 @@
         const currentYear = new Date().getFullYear();
         const yearsToInclude = 5;
 
-        // Clear existing options
-        selectElement.innerHTML = '';
+        // Preserve the placeholder
+        selectElement.innerHTML = '<option value="">Select AY</option>';
 
         for (let i = 0; i <= yearsToInclude; i++) {
             const year = currentYear - i;
@@ -38,9 +38,8 @@
             option.value = year;
             option.text = year;
 
+            // Only auto-select if there is a match in the URL
             if (selectedYearFromUrl == year) {
-                option.selected = true;
-            } else if (!selectedYearFromUrl && i === 0) {
                 option.selected = true;
             }
 

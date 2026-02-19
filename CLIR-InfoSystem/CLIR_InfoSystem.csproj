@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CLIR_InfoSystem</RootNamespace>
-    <UserSecretsId>6ae73e55-6ef8-4a84-9c00-0d337d062464</UserSecretsId>
+    <UserSecretsId>48950a0e-91d0-41d4-9ca3-2cdcf1b9c9a1</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
@@ -23,6 +23,8 @@
     <PackageReference Include="Microsoft.Playwright" Version="1.58.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    <PackageReference Include="QuestPDF" Version="2026.2.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2" />
   </ItemGroup>
 
 </Project>

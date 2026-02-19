@@ -75,6 +75,8 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult AddPatron([FromBody] Patron p)
         {
             if (p == null) return Json(new { success = false, message = "No data provided." });
+            if (_context.Patrons.Any(x => x.PatronId == p.PatronId))
+                return Json(new { success = false, message = "Patron ID already exists!" });
 
             if (!IsValidDeptProgById(p.DeptId, p.ProgramId))
                 return Json(new { success = false, message = "Invalid Department and Program combination." });
