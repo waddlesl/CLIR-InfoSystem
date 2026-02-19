@@ -8,9 +8,6 @@
             <form autocomplete="off">
                 <div class="input-group" style="width: 350px;">
                     <input type="text" id="staffSearch" placeholder="Search by ID or Username..." class="form-control" autocomplete="off" />
-                    <button type="button" class="btn btn-secondary px-3">
-                        <i class="bi bi-search"></i>
-                    </button>
                 </div>
             </form>
 
@@ -50,10 +47,12 @@
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-primary px-3" onclick="openEditModal(@staff.StaffId)">
+                                    <button class="btn btn-sm px-3 text-white" style="background-color: #1e2953;" onclick="openEditModal(@staff.StaffId)">
                                         Edit
                                     </button>
-                                    <button class="btn btn-sm @(staff.Status == "Active" ? "btn-danger" : "btn-success") px-3"
+
+                                    <button class="btn btn-sm px-3 @(staff.Status == "Active" ? "" : "btn-success")"
+                                            style="@(staff.Status == "Active" ? "border: 1px solid #ec1e28; color: #ec1e28; background-color: white;" : "")"
                                             onclick="confirmToggle(@staff.StaffId, '@(staff.Status == "Active" ? "Archive" : "Activate")')">
                                         @(staff.Status == "Active" ? "Archive" : "Activate")
                                     </button>
@@ -76,55 +75,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Staff</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="text" id="addFirst" class="form-control mb-2" placeholder="First Name" />
-                <input type="text" id="addLast" class="form-control mb-2" placeholder="Last Name" />
-                <input type="text" id="addUser" class="form-control mb-2" placeholder="Username" />
-                <input type="password" id="addPass" class="form-control mb-2" placeholder="Password" />
-                <select id="addRole" class="form-select">
-                    <option value="Librarian">Librarian</option>
-                    <option value="Student Assistant">Student Assistant</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="createStaff()">Create</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Staff</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="editId" />
-                <input type="text" id="editFirst" class="form-control mb-2" placeholder="First Name" />
-                <input type="text" id="editLast" class="form-control mb-2" placeholder="Last Name" />
-                <input type="text" id="editUser" class="form-control mb-2" placeholder="Username" />
-                <input type="password" id="editPass" class="form-control mb-2" placeholder="New Password (optional)" />
-                <select id="editRole" class="form-select">
-                    <option value="Librarian">Librarian</option>
-                    <option value="Student Assistant">Student Assistant</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="updateStaff()">Save Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -134,14 +84,13 @@
         $(document).ready(function() {
             updateTable();
 
-            // Catch TempData Alerts (like the Self-Lockout warning)
             var alertMsg = '@TempData["AlertMessage"]';
             if (alertMsg) {
                 Swal.fire({
                     icon: alertMsg.includes('cannot') || alertMsg.includes('denied') ? 'warning' : 'success',
                     title: 'System Notification',
                     text: alertMsg,
-                    confirmButtonColor: '#1a2035'
+                    confirmButtonColor: '#1e2953'
                 });
             }
         });
@@ -195,12 +144,11 @@
                 $('#editLast').val(data.lastName);
                 $('#editUser').val(data.username);
                 $('#editRole').val(data.typeOfUser);
-                $('#editPass').val(''); // Clear password field
+                $('#editPass').val('');
                 new bootstrap.Modal(document.getElementById('editModal')).show();
             });
         }
 
-        // Action Handlers
         function createStaff() {
             const data = {
                 FirstName: $('#addFirst').val(),
@@ -225,7 +173,6 @@
             submitStaffData('/Account/UpdateStaff', data);
         }
 
-        // Generic AJAX function to handle success/error messages
         function submitStaffData(url, data) {
             $.ajax({
                 url: url,
@@ -242,7 +189,6 @@
                             showConfirmButton: false
                         }).then(() => location.reload());
                     } else {
-                        // Triggers the "Username is already taken" alert
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error',
@@ -263,8 +209,8 @@
                 text: `Do you want to ${action} this staff member?`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#1a2035',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#1e2953',
+                cancelButtonColor: '#ec1e28',
                 confirmButtonText: `Yes, ${action}!`
             }).then((result) => {
                 if (result.isConfirmed) {
