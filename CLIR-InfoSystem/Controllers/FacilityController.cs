@@ -80,6 +80,27 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageBookings(DateTime? selectedDate, string? building)
         {
+            var today = DateTime.Now;
+            var reservedRequest = _context.SeatBookings
+                .Include(s => s.TimeSlot)
+                .Where(b => b.Status == "Reserved")
+                .ToList();
+
+            if (reservedRequest.Any())
+            {
+                foreach (var service in reservedRequest)
+                {
+                    TimeSpan startTime = service.TimeSlot.StartTime;
+                    TimeSpan endTime = startTime.Add(new TimeSpan(1, 30, 0));
+
+                    if (DateTime.Now.TimeOfDay > endTime)
+                    {
+                        service.Status = "Completed";
+
+                        LogAction($"Booking #{service.BookingId} (Slot: {service.TimeSlot.DisplayText}) automatically completed.", "System");
+                    }
+                }
+            }
             var query = _context.SeatBookings
                 .Include(b => b.TimeSlot)
                 .AsQueryable();
@@ -107,8 +128,38 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Staff/StaffManageBookings.cshtml", activeBookings);
         }
 
+        public IActionResult BookingsHistory(DateTime? selectedDate, string? building)
+        {
+            var query = _context.SeatBookings
+                .Include(b => b.TimeSlot)
+                .AsQueryable();
+            if (selectedDate.HasValue)
+            {
+                query = query.Where(b => b.BookingDate.Date == selectedDate.Value.Date);
+            }
+            if (!string.IsNullOrEmpty(building))
+            {
+                if (building == "Einstein")
+                {
+                    query = query.Where(b => b.SeatId > 14);
+                }
+                else
+                {
+                    query = query.Where(b => b.SeatId < 15);
+                }
 
-        
+            }
+
+            // Pass filters back to the view to keep the dropdowns synced
+            ViewBag.SelectedDate = selectedDate?.ToString("yyyy-MM-dd");
+            ViewBag.SelectedBuilding = building;
+
+            var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
+            return View("~/Views/Staff/StaffBookingsHistory.cshtml", activeBookings);
+        }
+
+
+
         public IActionResult HistoryBookaLibrarian()
         {
             var today = DateTime.Now;
@@ -279,6 +330,18 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("ManageBookaLibrarian");
         }
 
+        [HttpGet]
+        public IActionResult ToggleAvailability(int id, string status)
+        {
+
+            if (status == "approve")
+            {
+                return RedirectToAction("LibrarianComplete", new { sessionId = id });
+            }
+            return RedirectToAction("CancelLibrarianBooking", new { sessionId = id });
+        }
+
+        [HttpGet]
         public IActionResult LibrarianComplete(int sessionId)
         {
             var booking = _context.BookALibrarians.Find(sessionId);
@@ -292,7 +355,7 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("ManageBookaLibrarian");
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult CancelLibrarianBooking(int sessionId)
         {
             var booking = _context.BookALibrarians.Find(sessionId);
@@ -304,6 +367,24 @@ namespace CLIR_InfoSystem.Controllers
                 TempData["Info"] = "Booking has been cancelled.";
             }
             return RedirectToAction("ManageBookaLibrarian");
+        }
+        [HttpGet]
+        public IActionResult Updatebooking(int id, string status)
+        {
+            var request = _context.SeatBookings.Find(id);
+            if (request == null)
+            {
+                TempData["Error"] = "Service request not found.";
+                return RedirectToAction("ManageBookings");
+            }
+
+            request.Status = status;
+
+            _context.SaveChanges();
+            // AUDIT LOG
+            LogAction($"Updated Book a Seat Request #{id} status to: {status}", "book_a_seat");
+
+            return RedirectToAction("ManageBookings");
         }
     }
 }

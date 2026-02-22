@@ -1,8 +1,5 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
-<div class="container mt-3">
-
-
-
+<div class="container-fluid px-4 mt-3">
 
     @if (ViewBag.IsStudentAssistant == false)
     {
@@ -61,8 +58,8 @@
                                         @if (ViewBag.IsStudentAssistant == false)
                                         {
                                             <td>
-                                                <button class="btn btn-sm btn-success" onclick="confirmRequest('@bb.BorrowId')">Confirm</button> |
-                                                <button class="btn btn-sm btn-danger" onclick="denyRequest('@bb.BorrowId')">Deny</button>
+                                                <button class="btn btn-sm btn-success" onclick="confirmToggle('@bb.BorrowId','confirm')">Confirm</button> |
+                                            <button class="btn btn-sm btn-danger" onclick="confirmToggle('@bb.BorrowId', 'deny')">Deny</button>
                                             </td>
                                         }
                                         else
@@ -153,6 +150,20 @@
         $(document).ready(function() {
             updateTable();
         });
+
+        function confirmToggle(id, nextStatus) {
+            Swal.fire({
+                title: 'Confirm Action?',
+                text: `Are you sure you want to ${nextStatus} this borrow?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: `Yes, ${nextStatus} it.`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/Transaction/ToggleAvailability?id=${id}&status=${nextStatus}`;
+                }
+            });
+        }
 
     </script>
     <style>

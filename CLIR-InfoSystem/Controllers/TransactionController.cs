@@ -154,11 +154,22 @@ namespace CLIR_InfoSystem.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
+        public IActionResult ToggleAvailability(int id, string status)
+        {
+
+            if (status == "confirm")
+            {
+                return RedirectToAction("ApproveRequest", new { id = id });
+            }
+            return RedirectToAction("DenyRequest", new { id = id });
+        }
+
+        [HttpGet]
         public IActionResult ApproveRequest(int id)
         {
             var request = _context.BookBorrowings.Include(b => b.Book).Include(b => b.Patron).FirstOrDefault(r => r.BorrowId == id);
-            if (request != null && request.Book != null)
+            if (request != null)
             {
                 request.Status = "Borrowed";
                 request.Book.AvailabilityStatus = "Borrowed";
@@ -170,8 +181,11 @@ namespace CLIR_InfoSystem.Controllers
 
                 // AUDIT LOG
                 LogAction($"Approved borrowing request #{id} for {request.Patron?.FirstName} {request.Patron?.LastName}", "Transactions");
+                return RedirectToAction("BookBorrowers");
             }
-            return RedirectToAction("BookBorrowers");
+            else {
+            }
+            return RedirectToAction("BookBorrowersRequest");
         }
 
         [HttpPost]
@@ -195,7 +209,7 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("BookBorrowers");
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult DenyRequest(int id)
         {
             var request = _context.BookBorrowings.Include(b => b.Book).FirstOrDefault(r => r.BorrowId == id);
@@ -209,7 +223,7 @@ namespace CLIR_InfoSystem.Controllers
                 // AUDIT LOG
                 LogAction($"Rejected borrowing request #{id}", "Transactions");
             }
-            return RedirectToAction("BookBorrowers");
+            return RedirectToAction("BookBorrowersRequest");
         }
     }
 }

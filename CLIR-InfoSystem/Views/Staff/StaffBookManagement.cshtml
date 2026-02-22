@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.Book>
 
-<div class="container mt-3">
+<div class="container-fluid px-4 mt-3">
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #1e2953 !important;">
@@ -120,7 +120,7 @@
                                     var buttonClass = isCurrentlyAvailable ? "text-danger" : "text-success";
 
                                     <button type="button"
-                                            class="btn btn-sm btn-link p-0 @buttonClass"
+                                            class="btn btn-sm p-0 @buttonClass"
                                             onclick="confirmToggle('@book.AccessionId', '@nextStatus')">
                                         Mark as @nextStatus
                                     </button>
@@ -319,16 +319,20 @@
                 Discount: discount,
                 Subtotal : price - discount
             };
-            if (!bookData.Title) { Swal.fire("Error", "Please enter a Book Title", "error"); return; }
-            fetch('/Book/AddBook', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookData)
-            }).then(response => {
-                if (response.ok) { Swal.fire("Saved!", "Book added successfully", "success").then(() => location.reload()); }
-                else { Swal.fire("Error", "Could not save book", "error"); }
-            }).catch(err => console.error(err));
+
+                $.ajax({
+                url: '/Book/AddBook',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(bookData),
+                success: function(res) {
+                    if(res.success) location.reload();
+                    else Swal.fire('Error', res.message, 'error');
+                }
+            });
+                
         }
+
 
         function openEditModal(id) {
             fetch(`/Book/GetBookDetails?id=${id}`)

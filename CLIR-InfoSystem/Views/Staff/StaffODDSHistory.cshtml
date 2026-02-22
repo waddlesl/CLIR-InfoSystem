@@ -43,7 +43,7 @@
                         </tr>
                     </thead>
                     <tbody id="oddsHistoryTable">
-                        @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus != "Pending"))
+                        @foreach (var ServiceRequest in Model.Where(r => r.RequestStatus == "Fulfilled" || r.RequestStatus == "Cancelled"))
                         {
                             <tr style="@(ServiceRequest.PatronId == "Inactive" ? "opacity: 0.6;" : "")">
                                 <td class="ps-4 fw-semibold">@ServiceRequest.PatronId</td>

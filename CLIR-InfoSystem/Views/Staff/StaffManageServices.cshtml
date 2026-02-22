@@ -63,17 +63,8 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-2 justify-content-center">
-                                        <form asp-action="UpdateServiceStatus" method="post">
-                                            <input type="hidden" name="requestId" value="@ServiceRequest.ServiceId" />
-                                            <input type="hidden" name="status" value="Approved" />
-                                            <button type="submit" class="btn btn-sm btn-success px-3">Approve</button>
-                                        </form>
-
-                                        <form asp-action="UpdateServiceStatus" method="post">
-                                            <input type="hidden" name="requestId" value="@ServiceRequest.ServiceId" />
-                                            <input type="hidden" name="status" value="Rejected" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
-                                        </form>
+                                        <button class="btn btn-sm btn-success px-3" onclick="confirmToggle('@ServiceRequest.ServiceId','Approved')">Approve</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmToggle('@ServiceRequest.ServiceId','Rejected')">Reject</button>
                                     </div>
                                 </td>
                             </tr>
@@ -142,6 +133,20 @@
         });
 
         $(document).ready(() => updateTable());
+
+        function confirmToggle(id, nextStatus) {
+            Swal.fire({
+                title: 'Confirm Action?',
+                text: `Mark as ${nextStatus}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: `Yes`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/Service/UpdateServiceStatus?requestId=${id}&status=${nextStatus}`;
+                }
+            });
+        }
     </script>
 
     <style>

@@ -35,7 +35,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(o => o.RequestDate)
                 .ToList();
 
-            return View("~/Views/Staff/StaffManageODDS.cshtml", odds);
+            return View("~/Views/Staff/StaffODDSHistory.cshtml", odds);
         }
 
         public IActionResult ManageServices()
@@ -95,11 +95,16 @@ namespace CLIR_InfoSystem.Controllers
         }
 
 
-        [HttpPost]
-        public IActionResult UpdateOddsStatus(int requestId, string status)
+        [HttpGet]
+        public IActionResult UpdateOddsStatus(int id, string status)
         {
-            var request = _context.Odds.Find(requestId);
-            if (request == null) return NotFound();
+            var request = _context.Odds.Find(id);
+            if(request == null)
+            {
+                TempData["Error"] = "Service request not found.";
+                return RedirectToAction("ManageODDS"); 
+            }
+
 
             request.RequestStatus = status;
             if (status == "Fulfilled")
@@ -110,7 +115,7 @@ namespace CLIR_InfoSystem.Controllers
             _context.SaveChanges();
 
             // AUDIT LOG
-            LogAction($"Updated ODDS Request #{requestId} status to: {status}", "Services");
+            LogAction($"Updated ODDS Request #{id} status to: {status}", "Services");
 
             return RedirectToAction("ManageODDS");
         }
@@ -127,7 +132,7 @@ namespace CLIR_InfoSystem.Controllers
             return View(requests);
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult UpdateServiceStatus(int requestId, string status)
         {
             var request = _context.Services.Find(requestId);

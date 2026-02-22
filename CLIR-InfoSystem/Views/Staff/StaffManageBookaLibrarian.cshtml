@@ -57,14 +57,8 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-2 justify-content-center">
-                                        <form asp-action="LibrarianCheckIn" method="post">
-                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
-                                            <button type="submit" class="btn btn-sm btn-success px-3">Approve</button>
-                                        </form>
-                                        <form asp-action="CancelLibrarianBooking" method="post">
-                                            <input type="hidden" name="sessionId" value="@librarian.SessionId" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                                        </form>
+                                        <button class="btn btn-sm btn-success px-3" onclick=" confirmToggle('@librarian.SessionId', 'approve' )">Approve</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick=" confirmToggle('@librarian.SessionId', 'deny' )">Cancel</button>
                                     </div>
                                 </td>
                             </tr>
@@ -194,6 +188,24 @@
             updatePagination('requestLibTable', 'pagination', 'pageInfo', pendingPage);
             updatePagination('bookingsLibTable', 'paginationbooking', 'pageBookingInfo', approvedPage);
         });
+
+        function confirmToggle(id, nextStatus) {
+            Swal.fire({
+                title: 'Confirm Action?',
+                text: `Are you sure you want to ${nextStatus} this booking?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: `Yes, ${nextStatus} it.`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/Facility/ToggleAvailability?id=${id}&status=${nextStatus}`;
+                }
+            });
+        }
+
+
+
+
     </script>
 
     <style>

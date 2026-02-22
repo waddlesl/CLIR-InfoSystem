@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -81,6 +82,25 @@ namespace CLIR_InfoSystem.Controllers
             if (!IsValidDeptProgById(p.DeptId, p.ProgramId))
                 return Json(new { success = false, message = "Invalid Department and Program combination." });
 
+            if (string.IsNullOrEmpty(p.FirstName) || string.IsNullOrEmpty(p.LastName) || string.IsNullOrEmpty(p.Email))
+                return Json(new { success = false, message = "First Name, Last Name, and Email are required." });
+
+            var emailchecker = new EmailAddressAttribute();
+
+            if(!emailchecker.IsValid(p.Email))
+                return Json(new { success = false, message = "Invalid email format." });
+
+
+            if (p.PatronId == null)
+            {
+                return Json(new { success = false, message = "Patron ID is required." });
+            }
+            else
+            {
+                if (_context.Patrons.Any(existing => existing.PatronId == p.PatronId))
+                    return Json(new { success = false, message = "Patron ID already exists." });
+            }
+
             _context.Patrons.Add(p);
 
             LogAction($"Registered new patron: {p.FirstName} {p.LastName} ({p.PatronId})", "patrons");
@@ -99,6 +119,15 @@ namespace CLIR_InfoSystem.Controllers
 
             if (!IsValidDeptProgById(updatedPatron.DeptId, updatedPatron.ProgramId))
                 return Json(new { success = false, message = "Invalid Department and Program combination." });
+
+            if (string.IsNullOrEmpty(updatedPatron.FirstName) || string.IsNullOrEmpty(updatedPatron.LastName) || string.IsNullOrEmpty(updatedPatron.Email))
+                return Json(new { success = false, message = "First Name, Last Name, and Email are required." });
+
+            var emailchecker = new EmailAddressAttribute();
+
+            if (!emailchecker.IsValid(updatedPatron.Email))
+                return Json(new { success = false, message = "Invalid email format." });
+
 
             patron.FirstName = updatedPatron.FirstName;
             patron.LastName = updatedPatron.LastName;

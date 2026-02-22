@@ -37,17 +37,12 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Staff/StaffBookManagement.cshtml", books);
         }
 
-        [HttpGet]
-        public IActionResult AddBook()
-        {
-            // If you moved this to the Staff folder
-            return View("~/Views/Staff/StaffAddBook.cshtml");
-        }
 
         [HttpPost]
         public IActionResult AddBook([FromBody] Book newBook)
         {
-            if (newBook == null) return BadRequest();
+            if (newBook == null)
+                return Json(new { success = false, message = "Please Insert Book Info." });
 
             bool exists = _context.Books.Any(b => b.AccessionId == newBook.AccessionId);
             if (exists) return BadRequest("Accession ID already exists.");
@@ -249,5 +244,6 @@ namespace CLIR_InfoSystem.Controllers
 
             return Ok(query);
         }
+
     }
 }
