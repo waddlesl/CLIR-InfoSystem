@@ -80,11 +80,116 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageBookings()
         {
-            var activeBookings = _context.SeatBookings
-                .Include(b => b.TimeSlot)
+            var today = DateTime.Now;
+            var reservedRequest = _context.SeatBookings
+                .Include(s => s.TimeSlot)
+                .Where(b => b.Status == "Reserved")
                 .ToList();
 
-            return View(activeBookings);
+            if (reservedRequest.Any())
+            {
+                foreach (var service in reservedRequest)
+                {
+                    TimeSpan startTime = service.TimeSlot.StartTime;
+                    TimeSpan endTime = startTime.Add(new TimeSpan(1, 30, 0));
+
+                    if (DateTime.Now.TimeOfDay > endTime)
+                    {
+                        service.Status = "Completed";
+
+                        LogAction($"Booking #{service.BookingId} (Slot: {service.TimeSlot.DisplayText}) automatically completed.", "System");
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            var query = _context.SeatBookings
+                .Include(b => b.TimeSlot)
+                .Where(b => b.Status == "Reserved")
+                .AsQueryable();
+            if (selectedDate.HasValue)
+            {
+                query = query.Where(b => b.BookingDate.Date == selectedDate.Value.Date);
+            }
+            if (!string.IsNullOrEmpty(building))
+            {
+                if (building == "Einstein") {
+                    query = query.Where(b => b.SeatId > 14);
+                }
+                else
+                {
+                    query = query.Where(b => b.SeatId < 15);
+                }
+
+            }
+
+            // Pass filters back to the view to keep the dropdowns synced
+            ViewBag.SelectedDate = selectedDate?.ToString("yyyy-MM-dd");
+            ViewBag.SelectedBuilding = building;
+
+            var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
+            return View("~/Views/Staff/StaffManageBookings.cshtml", activeBookings);
+        }
+
+        public IActionResult BookingsHistory(DateTime? selectedDate, string? building)
+        {
+            var query = _context.SeatBookings
+                .Include(b => b.TimeSlot)
+                .AsQueryable();
+            if (selectedDate.HasValue)
+            {
+                query = query.Where(b => b.BookingDate.Date == selectedDate.Value.Date);
+            }
+            if (!string.IsNullOrEmpty(building))
+            {
+                if (building == "Einstein")
+                {
+                    query = query.Where(b => b.SeatId > 14);
+                }
+                else
+                {
+                    query = query.Where(b => b.SeatId < 15);
+                }
+
+            }
+
+            // Pass filters back to the view to keep the dropdowns synced
+            ViewBag.SelectedDate = selectedDate?.ToString("yyyy-MM-dd");
+            ViewBag.SelectedBuilding = building;
+
+            var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
+            return View("~/Views/Staff/StaffBookingsHistory.cshtml", activeBookings);
+        }
+
+
+
+        public IActionResult HistoryBookaLibrarian()
+        {
+            var today = DateTime.Now;
+            var completedRequest = _context.BookALibrarians
+                .Where(b => b.Status == "Approved" && today > b.BookingDate)
+                .ToList();
+
+            if (completedRequest.Any())
+            {
+                foreach (var service in completedRequest)
+                {
+                    service.Status = "Completed";
+                    LogAction($"Booking #{service.SessionId} automatically completed.", "System");
+                    _context.SaveChanges();
+                }
+                
+            }
+
+            string userId = HttpContext.Session.GetString("UserId");
+            var librarian = _context.BookALibrarians
+                .Include(s => s.Patron)
+                    .ThenInclude(p => p.Department)
+                .Include(s => s.Staff)
+                .Where(s => s.Staff.StaffId == Convert.ToInt32(userId))
+                .OrderByDescending(o => o.BookingDate)
+                .ToList();
+
+            return View("~/Views/Staff/StaffHistoryBookaLibrarian.cshtml", librarian);
         }
 
         public IActionResult ManageBookaLibrarian()

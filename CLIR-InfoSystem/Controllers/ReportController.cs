@@ -390,9 +390,10 @@ namespace CLIR_InfoSystem.Controllers
                 }
                 else
                 {
-                    startDate = new DateTime(selectedYear, 8, 1);
-                    endDate = new DateTime(selectedYear + 1, 7, 31);
+                    startDate = new DateTime(DateTime.Now.Year, 8, 1);
+                    endDate = new DateTime(DateTime.Now.Year + 1, 7, 31);
                 }
+
 
                 byte[] pdfBuffer = ExportPdfWithQuest(startDate, endDate, selectedYear, selectedTerm);
                 return File(pdfBuffer, "application/pdf", $"UsageReport_{selectedYear}.pdf");
