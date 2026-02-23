@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    // Inherit from BaseController to enable universal logging
     public class BookController : BaseController
     {
         public BookController(LibraryDbContext context) : base(context) { }
@@ -27,7 +26,6 @@ namespace CLIR_InfoSystem.Controllers
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                // Safety: Handling potential NULL values in the database for string search
                 query = query.Where(p => (p.Title != null && p.Title.Contains(searchTerm)) ||
                                          (p.Author != null && p.Author.Contains(searchTerm)) ||
                                          p.AccessionId == searchTerm);
@@ -44,25 +42,31 @@ namespace CLIR_InfoSystem.Controllers
             if (newBook == null)
                 return Json(new { success = false, message = "Please Insert Book Info." });
 
+            if (string.IsNullOrEmpty(newBook.AccessionId))
+                return Json(new { success = false, message = "Accession ID is required." });
+
             bool exists = _context.Books.Any(b => b.AccessionId == newBook.AccessionId);
-            if (exists) return BadRequest("Accession ID already exists.");
+            if (exists)
+                return Json(new { success = false, message = "Accession ID already exists." });
 
             if (ModelState.IsValid)
             {
                 _context.Books.Add(newBook);
-                LogAction($"Added new book: {newBook.Title}", "book");
                 _context.SaveChanges();
-                return Ok();
+                LogAction($"Added new book: {newBook.Title}", "Book Management");
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Book added successfully!" });
             }
 
             return BadRequest(ModelState);
         }
-
+        /*
         [HttpGet]
         public IActionResult EditBook(string id)
         {
             var book = _context.Books.Find(id);
-            if (book == null) return NotFound();
+            if (book == null)
+                return Json(new { success = false, message = "Book Does not Exist" });
             return View("~/Views/Staff/StaffEditBook.cshtml", book);
         }
 
@@ -85,7 +89,7 @@ namespace CLIR_InfoSystem.Controllers
             }
             return View(updatedBook);
         }
-
+        */
         [HttpGet]
         public IActionResult GetBookDetails(string id)
         {
@@ -97,10 +101,12 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult UpdateBook([FromBody] Book updatedBook)
         {
-            if (updatedBook == null) return BadRequest();
+            if (updatedBook == null)
+                return Json(new { success = false, message = "Book not Found." });
 
             var existingBook = _context.Books.Find(updatedBook.AccessionId);
-            if (existingBook == null) return NotFound();
+            if (existingBook == null)
+                return Json(new { success = false, message = "Book Does not exist" });
 
             existingBook.Title = updatedBook.Title;
             existingBook.Author = updatedBook.Author;
@@ -114,10 +120,10 @@ namespace CLIR_InfoSystem.Controllers
             existingBook.SourcedFrom = updatedBook.SourcedFrom;
             existingBook.Price = updatedBook.Price;
             existingBook.Discount = updatedBook.Discount;
-
+            _context.SaveChanges();
             LogAction($"Updated book via Management UI: {updatedBook.AccessionId}", "book");
             _context.SaveChanges();
-            return Ok();
+            return Json(new { success = true, message = "Book Updated." });
         }
 
         [HttpPost]
@@ -136,9 +142,9 @@ namespace CLIR_InfoSystem.Controllers
 
                 LogAction($"Processed Return for BorrowId: {id}", "book_borrowing");
                 _context.SaveChanges();
-                return Ok();
+                return Json(new { success = true, message = "Book Returned." });
             }
-            return BadRequest();
+            return Json(new { success = false, message = "Errored occurred" });
         }
 
         [HttpPost]
@@ -149,7 +155,7 @@ namespace CLIR_InfoSystem.Controllers
             {
                 borrowing.DueDate = newDate;
                 borrowing.Status = "Borrowed";
-
+                _context.SaveChanges();
                 LogAction($"Extended due date for BorrowId: {id} to {newDate.ToShortDateString()}", "book_borrowing");
                 _context.SaveChanges();
                 return Ok();
@@ -217,6 +223,7 @@ namespace CLIR_InfoSystem.Controllers
                 request.BorrowDate = DateTime.Now;
                 request.DueDate = DateTime.Now.AddDays(7);
                 _context.SaveChanges();
+                LogAction($"Borrow request {request.BorrowId} approved.", "book_borrowing");
             }
 
             var query = _context.BookBorrowings
@@ -235,6 +242,7 @@ namespace CLIR_InfoSystem.Controllers
             {
                 request.Status = "Denied";
                 _context.SaveChanges();
+                LogAction($"Borrow request {request.BorrowId} denied.", "book_borrowing");
             }
 
             var query = _context.BookBorrowings

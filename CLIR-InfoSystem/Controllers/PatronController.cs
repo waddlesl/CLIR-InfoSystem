@@ -8,7 +8,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CLIR_InfoSystem.Controllers
 {
-    // Inherit from BaseController to use shared _context and LogAction
     public class PatronController : BaseController
     {
         public PatronController(LibraryDbContext context) : base(context) { }
@@ -66,7 +65,6 @@ namespace CLIR_InfoSystem.Controllers
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                // Safety null-checks for strings during search
                 query = query.Where(p => (p.FirstName != null && p.FirstName.Contains(searchTerm)) ||
                                          (p.LastName != null && p.LastName.Contains(searchTerm)) ||
                                          p.PatronId == searchTerm);
@@ -100,13 +98,14 @@ namespace CLIR_InfoSystem.Controllers
                 if (_context.Patrons.Any(existing => existing.PatronId == p.PatronId))
                     return Json(new { success = false, message = "Patron ID already exists." });
             }
-
+            
             _context.Patrons.Add(p);
+            _context.SaveChanges();
 
             LogAction($"Registered new patron: {p.FirstName} {p.LastName} ({p.PatronId})", "patrons");
             _context.SaveChanges();
 
-            return Json(new { success = true });
+            return Json(new { success = true, message = "Patron registered successfully!" });
         }
 
         [HttpPost]
@@ -135,10 +134,11 @@ namespace CLIR_InfoSystem.Controllers
             patron.DeptId = updatedPatron.DeptId;
             patron.ProgramId = updatedPatron.ProgramId;
 
+            _context.SaveChanges();
             LogAction($"Updated profile for patron: {patron.PatronId}", "patrons");
             _context.SaveChanges();
 
-            return Json(new { success = true });
+            return Json(new { success = true, message = "Patron updated!" });
         }
 
         public IActionResult PatronDashboard()
