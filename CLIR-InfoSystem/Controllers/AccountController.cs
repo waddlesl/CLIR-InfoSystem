@@ -12,65 +12,6 @@ namespace CLIR_InfoSystem.Controllers
     {
         public AccountController(LibraryDbContext context) : base(context) { }
 
-        #region Authentication
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            // If already logged in, skip the login page
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
-            {
-                var role = HttpContext.Session.GetString("UserRole");
-                if (role == "Patron") return RedirectToAction("PatronDashboard", "Dashboard");
-                return RedirectToAction(role.Replace(" ", "") + "Dashboard", "Dashboard");
-            }
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(string username, string password)
-        {
-            // 1. Staff Login
-            var staff = _context.Staff.FirstOrDefault(u =>
-                u.Username == username &&
-                u.Password == password &&
-                u.Status == "Active");
-
-            if (staff != null)
-            {
-                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
-                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
-                HttpContext.Session.SetInt32("StaffId", staff.StaffId);
-                HttpContext.Session.SetString("UserName", staff.FirstName);
-
-                LogAction("Logged into the system", "staff");
-                _context.SaveChanges();
-
-                string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
-                return RedirectToAction(dashboardAction, "Dashboard");
-            }
-
-            // 2. Patron Login (ID + Last Name)
-            var patron = _context.Patrons
-                .Include(p => p.Department)
-                .Include(p => p.Program)
-                .FirstOrDefault(p => p.PatronId == username);
-
-            if (patron != null && patron.LastName.ToLower() == password.ToLower())
-            {
-                HttpContext.Session.SetString("UserRole", "Patron");
-                HttpContext.Session.SetString("UserName", patron.FirstName);
-                HttpContext.Session.SetString("UserId", patron.PatronId);
-
-                LogAction("Logged into Kiosk", "patron");
-                _context.SaveChanges();
-
-                return RedirectToAction("PatronDashboard", "Dashboard");
-            }
-
-            ViewBag.Error = "Invalid ID or Surname. Please try again.";
-            return View();
-        }
 
         public IActionResult Logout()
         {
@@ -172,6 +113,50 @@ namespace CLIR_InfoSystem.Controllers
         #endregion
 
         #region Admin Features
+        #region Authentication
+
+
+        [HttpGet]
+        public IActionResult Login() => View();
+
+        [HttpPost]
+        public IActionResult Login(string username, string password)
+        {
+            // 1. Staff Login
+            var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Password == password);
+            if (staff != null)
+            {
+                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
+                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+
+                string dashboardAction = staff.TypeOfUser.Replace(" ", "") + "Dashboard";
+                return RedirectToAction(dashboardAction, "Dashboard");
+            }
+
+            // 2. Patron Login (ID Only)
+            var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == username);
+            if (patron != null)
+            {
+                HttpContext.Session.SetString("UserRole", "Patron");
+                HttpContext.Session.SetString("UserName", patron.FirstName);
+                HttpContext.Session.SetString("UserId", patron.PatronId);
+
+                return RedirectToAction("PatronDashboard", "Dashboard");
+            }
+
+            ViewBag.Error = "ID not found in system.";
+            return View();
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+        #endregion
+
+        #region Audit Logs & Reports
 
         public IActionResult AuditLogs()
         {
