@@ -78,7 +78,7 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Patron/PatronBookALibrarian.cshtml");
         }
 
-        public IActionResult ManageBookings(DateTime? selectedDate, string? building)
+        /*public IActionResult ManageBookings(DateTime? selectedDate, string? building)
         {
             var today = DateTime.Now;
             var reservedRequest = _context.SeatBookings
@@ -126,10 +126,31 @@ namespace CLIR_InfoSystem.Controllers
 
             var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
             return View("~/Views/Staff/StaffManageBookings.cshtml", activeBookings);
-        }
+        }*/
 
         public IActionResult BookingsHistory(DateTime? selectedDate, string? building)
         {
+            var today = DateTime.Now;
+            var reservedRequest = _context.SeatBookings
+                .Include(s => s.TimeSlot)
+                .Where(b => b.Status == "Reserved")
+                .ToList();
+
+            if (reservedRequest.Any())
+            {
+                foreach (var service in reservedRequest)
+                {
+                    TimeSpan startTime = service.TimeSlot.StartTime;
+                    TimeSpan endTime = startTime.Add(new TimeSpan(1, 30, 0));
+
+                    if (DateTime.Now.TimeOfDay > endTime)
+                    {
+                        service.Status = "Completed";
+
+                        LogAction($"Booking #{service.BookingId} (Slot: {service.TimeSlot.DisplayText}) automatically completed.", "System");
+                    }
+                }
+            }
             var query = _context.SeatBookings
                 .Include(b => b.TimeSlot)
                 .AsQueryable();
