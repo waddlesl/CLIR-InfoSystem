@@ -188,12 +188,16 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult ProcessBorrow(string patronId, string accessionId)
         {
             var book = _context.Books.Find(accessionId);
+            var currentuser = HttpContext.Session.GetString("UserId");
             var patronExists = _context.Patrons.Any(p => p.PatronId == patronId);
 
             if (book == null || book.AvailabilityStatus != "Available")
                 return Json(new { success = false, message = "Book is no longer available." });
 
             if (!patronExists)
+                return Json(new { success = false, message = "Invalid Patron ID." });
+
+            if (currentuser != patronId)
                 return Json(new { success = false, message = "Invalid Patron ID." });
 
             var borrowRequest = new BookBorrowing

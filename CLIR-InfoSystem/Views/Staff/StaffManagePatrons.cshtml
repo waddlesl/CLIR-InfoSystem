@@ -17,18 +17,11 @@
                    id="patronSearch"
                    class="form-control border-start-0"
                    placeholder="Search Patron">
-            @if (ViewBag.IsStudentAssistant == false)
-            {
+           
                 <button type="button" class="btn btn-success d-flex align-items-center" onclick="openAddModal()">
                     <b class="me-1" style="font-size: 1.2rem;">+</b> Add Patron
                 </button>
-            }
-            else
-            {
-                <button type="button" class="btn btn-secondary d-flex align-items-center" onclick="openAddModal()" disabled>
-                    <b class="me-1" style="font-size: 1.2rem;">+</b> Add Patron
-                </button>
-            }
+          
         </div>
     </div>
     <table class="table align-middle">

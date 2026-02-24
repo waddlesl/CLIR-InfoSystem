@@ -43,7 +43,7 @@ namespace CLIR_InfoSystem.Controllers
             }
 
             booking.PatronId = loggedInId;
-            booking.Status = "Reserved";
+            booking.Status = "Completed";
 
             ModelState.Remove("Patron");
             ModelState.Remove("LibrarySeat");
@@ -78,7 +78,7 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Patron/PatronBookALibrarian.cshtml");
         }
 
-        /*public IActionResult ManageBookings(DateTime? selectedDate, string? building)
+        public IActionResult ManageBookings(DateTime? selectedDate, string? building)
         {
             var today = DateTime.Now;
             var reservedRequest = _context.SeatBookings
@@ -126,7 +126,7 @@ namespace CLIR_InfoSystem.Controllers
 
             var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
             return View("~/Views/Staff/StaffManageBookings.cshtml", activeBookings);
-        }*/
+        }
 
         public IActionResult BookingsHistory(DateTime? selectedDate, string? building)
         {
@@ -224,6 +224,8 @@ namespace CLIR_InfoSystem.Controllers
                 _context.SaveChanges();
             }
 
+            
+
             string userId = HttpContext.Session.GetString("UserId");
             var librarian = _context.BookALibrarians
                 .Include(s => s.Patron)
@@ -232,8 +234,26 @@ namespace CLIR_InfoSystem.Controllers
                 .Where(s => s.Staff.StaffId == Convert.ToInt32(userId))
                 .OrderByDescending(o => o.BookingDate)
                 .ToList();
-
-            return View("~/Views/Staff/StaffManageBookaLibrarian.cshtml", librarian);
+            if (librarian.Any())
+            {
+                var specificlibrarian = _context.BookALibrarians
+                .Include(s => s.Patron)
+                    .ThenInclude(p => p.Department)
+                .Include(s => s.Staff)
+                .Where(s => s.Staff.StaffId == Convert.ToInt32(userId) || s.Staff.StaffId == null)
+                .OrderByDescending(o => o.BookingDate)
+                .ToList();
+                return View("~/Views/Staff/StaffManageBookaLibrarian.cshtml", specificlibrarian);
+            }
+                var librarians = _context.BookALibrarians
+                    .Include(s => s.Patron)
+                        .ThenInclude(p => p.Department)
+                    .Include(s => s.Staff)
+                    .OrderByDescending(o => o.BookingDate)
+                    .ToList();
+            
+             
+            return View("~/Views/Staff/StaffManageBookaLibrarian.cshtml", librarians);
         }
 
         [HttpPost]

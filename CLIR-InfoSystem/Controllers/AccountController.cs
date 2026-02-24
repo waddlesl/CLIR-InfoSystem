@@ -26,7 +26,9 @@ namespace CLIR_InfoSystem.Controllers
             {
                 new Staff { FirstName = "Melard", LastName = "Salapare", Username = "admin", Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"), TypeOfUser = "Admin", Status = "Active" },
                 new Staff { FirstName = "Maria", LastName = "Clara", Username = "mclara", Password = BCrypt.Net.BCrypt.HashPassword("staff456"), TypeOfUser = "Librarian", Status = "Active" },
-                new Staff { FirstName = "Jose", LastName = "Rizal", Username = "jrizal", Password = BCrypt.Net.BCrypt.HashPassword("student789"), TypeOfUser = "Student Assistant", Status = "Active" }
+                new Staff { FirstName = "Jose", LastName = "Rizal", Username = "jrizal", Password = BCrypt.Net.BCrypt.HashPassword("student789"), TypeOfUser = "Student Assistant", Status = "Active" },
+                new Staff { FirstName = "Josa", LastName = "Rizal", Username = "jrizala", Password = BCrypt.Net.BCrypt.HashPassword("ohmagad"), TypeOfUser = "Student Assistant", Status = "Active" },
+                new Staff { FirstName = "HEHE", LastName = "HAHA", Username = "lib1", Password = BCrypt.Net.BCrypt.HashPassword("lib1"), TypeOfUser = "Librarian", Status = "Active" }
             };
 
             _context.Staff.AddRange(staffList);
@@ -175,20 +177,25 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult Login(string username, string password)
         {
             var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Status == "Active");
-
-            if (staff != null && BCrypt.Net.BCrypt.Verify(password, staff.Password))
+            try
             {
-                HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
-                HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
-                HttpContext.Session.SetInt32("StaffId", staff.StaffId);
-                HttpContext.Session.SetString("UserName", staff.FirstName);
+                if (staff != null && BCrypt.Net.BCrypt.Verify(password, staff.Password))
+                {
+                    HttpContext.Session.SetString("UserRole", staff.TypeOfUser);
+                    HttpContext.Session.SetString("UserId", staff.StaffId.ToString());
+                    HttpContext.Session.SetInt32("StaffId", staff.StaffId);
+                    HttpContext.Session.SetString("UserName", staff.FirstName);
 
-                LogAction("Logged into the system", "staff");
-                _context.SaveChanges();
+                    LogAction("Logged into the system", "staff");
+                    _context.SaveChanges();
 
-                return RedirectToAction(staff.TypeOfUser.Replace(" ", "") + "Dashboard", "Dashboard");
+                    return RedirectToAction(staff.TypeOfUser.Replace(" ", "") + "Dashboard", "Dashboard");
+                }
             }
-
+            catch {
+                ViewBag.Error = "Invalid ID or Surname.";
+                return View();
+            }
             var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == username);
             if (patron != null && patron.LastName.ToLower() == password.ToLower())
             {

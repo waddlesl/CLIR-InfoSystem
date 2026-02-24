@@ -1,15 +1,6 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.SeatBooking>
 <div class="container-fluid px-4 mt-3">
-    <div class="report-tabs mb-4 d-flex gap-2 p-1 bg-light rounded-pill" style="width: fit-content; border: 1px solid #dee2e6;">
-        <a asp-controller="Facility" asp-action="ManageBookings"
-           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "ManageBookings" ? "active-tab" : "text-muted")">
-            <i class="bi bi-envelope-open me-2"></i>Requests
-        </a>
-        <a asp-controller="Facility" asp-action="BookingsHistory"
-           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BookingsHistory" ? "active-tab" : "text-muted")">
-            <i class="bi bi-clock-history me-2"></i>History
-        </a>
-    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h5 class="fw-bold mb-0" style="color: #1a2035; font-size: 1.1rem;">Book a Seat History</h5>
