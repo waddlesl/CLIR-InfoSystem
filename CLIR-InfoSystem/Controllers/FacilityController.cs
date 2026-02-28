@@ -98,6 +98,7 @@ namespace CLIR_InfoSystem.Controllers
                         service.Status = "Completed";
 
                         LogAction($"Booking #{service.BookingId} (Slot: {service.TimeSlot.DisplayText}) automatically completed.", "System");
+                        _context.SaveChanges();
                     }
                 }
             }
@@ -148,6 +149,7 @@ namespace CLIR_InfoSystem.Controllers
                         service.Status = "Completed";
 
                         LogAction($"Booking #{service.BookingId} (Slot: {service.TimeSlot.DisplayText}) automatically completed.", "System");
+                        _context.SaveChanges();
                     }
                 }
             }
@@ -421,10 +423,10 @@ namespace CLIR_InfoSystem.Controllers
 
             request.Status = status;
 
-            _context.SaveChanges();
+
             // AUDIT LOG
             LogAction($"Updated Book a Seat Request #{id} status to: {status}", "book_a_seat");
-
+            _context.SaveChanges();
             return RedirectToAction("ManageBookings");
         }
     }

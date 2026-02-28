@@ -16,6 +16,7 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageODDS()
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var odds = _context.Odds
                 .Include(s => s.Patron)
                 .ThenInclude(p => p.Department)
@@ -40,6 +41,7 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageServices()
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var today = DateTime.Now;
             var expiredRequest = _context.Services
                 .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(7))
@@ -98,6 +100,7 @@ namespace CLIR_InfoSystem.Controllers
         [HttpGet]
         public IActionResult UpdateOddsStatus(int id, string status)
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var request = _context.Odds.Find(id);
             if(request == null)
             {
@@ -112,11 +115,9 @@ namespace CLIR_InfoSystem.Controllers
                 request.DateOfAccessProvided = DateTime.Now;
             }
 
-            _context.SaveChanges();
-
             // AUDIT LOG
-            LogAction($"Updated ODDS Request #{id} status to: {status}", "Services");
-
+            LogAction($"Updated ODDS Request #{id} status to: {status}", "System");
+            _context.SaveChanges();
             return RedirectToAction("ManageODDS");
         }
 
@@ -124,6 +125,7 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ManageServiceRequests()
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var requests = _context.Services
                 .Include(s => s.Patron)
                 .OrderByDescending(s => s.RequestDate)
@@ -135,15 +137,16 @@ namespace CLIR_InfoSystem.Controllers
         [HttpGet]
         public IActionResult UpdateServiceStatus(int requestId, string status)
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var request = _context.Services.Find(requestId);
             if (request == null) return NotFound();
 
             request.RequestStatus = status;
-            _context.SaveChanges();
+
 
             // AUDIT LOG
             LogAction($"Updated Service Request #{requestId} ({request.ServiceType}) status to: {status}", "Services");
-
+            _context.SaveChanges();
             return RedirectToAction("ManageServices");
         }
     }

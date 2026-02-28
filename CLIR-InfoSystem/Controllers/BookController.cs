@@ -21,6 +21,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.AvailableBookCount = _context.Books.Count(b => b.AvailabilityStatus == "Available");
             ViewBag.BorrowedBookCount = _context.Books.Count(b => b.AvailabilityStatus == "Borrowed");
             ViewBag.ArchivedBookCount = _context.Books.Count(b => b.AvailabilityStatus == "Archived");
+            ViewBag.OverdueCount = _context.BookBorrowings.Count(bb => bb.Status == "Overdue");
 
             var query = _context.Books.AsQueryable();
 
@@ -52,7 +53,6 @@ namespace CLIR_InfoSystem.Controllers
             if (ModelState.IsValid)
             {
                 _context.Books.Add(newBook);
-                _context.SaveChanges();
                 LogAction($"Added new book: {newBook.Title}", "Book Management");
                 _context.SaveChanges();
                 return Json(new { success = true, message = "Book added successfully!" });
@@ -120,7 +120,6 @@ namespace CLIR_InfoSystem.Controllers
             existingBook.SourcedFrom = updatedBook.SourcedFrom;
             existingBook.Price = updatedBook.Price;
             existingBook.Discount = updatedBook.Discount;
-            _context.SaveChanges();
             LogAction($"Updated book via Management UI: {updatedBook.AccessionId}", "book");
             _context.SaveChanges();
             return Json(new { success = true, message = "Book Updated." });
@@ -155,7 +154,6 @@ namespace CLIR_InfoSystem.Controllers
             {
                 borrowing.DueDate = newDate;
                 borrowing.Status = "Borrowed";
-                _context.SaveChanges();
                 LogAction($"Extended due date for BorrowId: {id} to {newDate.ToShortDateString()}", "book_borrowing");
                 _context.SaveChanges();
                 return Ok();
@@ -220,14 +218,15 @@ namespace CLIR_InfoSystem.Controllers
         }
         public IActionResult confirmRequest(int id)
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var request = _context.BookBorrowings.Find(id);
             if (request != null)
             {
                 request.Status = "Borrowed";
                 request.BorrowDate = DateTime.Now;
                 request.DueDate = DateTime.Now.AddDays(7);
-                _context.SaveChanges();
                 LogAction($"Borrow request {request.BorrowId} approved.", "book_borrowing");
+                _context.SaveChanges();
             }
 
             var query = _context.BookBorrowings
@@ -241,12 +240,13 @@ namespace CLIR_InfoSystem.Controllers
         //accept deny
         public IActionResult denyRequest(int id)
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var request = _context.BookBorrowings.Find(id);
             if (request != null)
             {
                 request.Status = "Denied";
-                _context.SaveChanges();
                 LogAction($"Borrow request {request.BorrowId} denied.", "book_borrowing");
+                _context.SaveChanges();
             }
 
             var query = _context.BookBorrowings

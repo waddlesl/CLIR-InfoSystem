@@ -2,7 +2,7 @@
 
 <div class="container-fluid px-4 mt-3">
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #1e2953 !important;">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 me-3">
@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 me-3">
@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #198754 !important;">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 me-3">
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #6c757d !important;">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 me-3">
@@ -50,6 +50,19 @@
                     <div>
                         <h6 class="text-muted mb-1 small text-uppercase fw-bold">Archived</h6>
                         <h3 class="mb-0">@ViewBag.ArchivedBookCount</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-exclamation fa-2x" style="color: #ed1e28; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Overdued Books</h6>
+                        <h3 class="mb-0">@ViewBag.OverdueCount</h3>
                     </div>
                 </div>
             </div>

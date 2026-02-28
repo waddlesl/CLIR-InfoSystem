@@ -77,8 +77,28 @@ namespace CLIR_InfoSystem.Controllers
         {
             if (p == null) return Json(new { success = false, message = "No data provided." });
 
-            if (!IsValidDeptProgById(p.DeptId, p.ProgramId))
-                return Json(new { success = false, message = "Invalid Department and Program combination." });
+            if (string.IsNullOrWhiteSpace(p.PatronId))
+            {
+                return Json(new { success = false, message = "Patron ID is required." });
+            }
+
+            if (_context.Patrons.Any(existing => existing.PatronId == p.PatronId))
+            {
+                return Json(new { success = false, message = "Patron ID already exists." });
+            }
+
+            if (!_context.Departments.Any(d => d.DeptId == p.DeptId))
+{
+                return Json(new { success = false, message = "Please select a valid Department." });
+            }
+
+           
+            if (p.ProgramId == null || p.ProgramId <= 0)
+            {
+                return Json(new { success = false, message = "Please select a valid Program." });
+            }
+            
+
 
             if (string.IsNullOrEmpty(p.FirstName) || string.IsNullOrEmpty(p.LastName) || string.IsNullOrEmpty(p.Email))
                 return Json(new { success = false, message = "First Name, Last Name, and Email are required." });
@@ -88,19 +108,9 @@ namespace CLIR_InfoSystem.Controllers
             if(!emailchecker.IsValid(p.Email))
                 return Json(new { success = false, message = "Invalid email format." });
 
-
-            if (p.PatronId == null)
-            {
-                return Json(new { success = false, message = "Patron ID is required." });
-            }
-            else
-            {
-                if (_context.Patrons.Any(existing => existing.PatronId == p.PatronId))
-                    return Json(new { success = false, message = "Patron ID already exists." });
-            }
             
+
             _context.Patrons.Add(p);
-            _context.SaveChanges();
 
             LogAction($"Registered new patron: {p.FirstName} {p.LastName} ({p.PatronId})", "patrons");
             _context.SaveChanges();
@@ -116,8 +126,6 @@ namespace CLIR_InfoSystem.Controllers
             var patron = _context.Patrons.Find(updatedPatron.PatronId);
             if (patron == null) return Json(new { success = false, message = "Patron not found" });
 
-            if (!IsValidDeptProgById(updatedPatron.DeptId, updatedPatron.ProgramId))
-                return Json(new { success = false, message = "Invalid Department and Program combination." });
 
             if (string.IsNullOrEmpty(updatedPatron.FirstName) || string.IsNullOrEmpty(updatedPatron.LastName) || string.IsNullOrEmpty(updatedPatron.Email))
                 return Json(new { success = false, message = "First Name, Last Name, and Email are required." });
@@ -134,7 +142,6 @@ namespace CLIR_InfoSystem.Controllers
             patron.DeptId = updatedPatron.DeptId;
             patron.ProgramId = updatedPatron.ProgramId;
 
-            _context.SaveChanges();
             LogAction($"Updated profile for patron: {patron.PatronId}", "patrons");
             _context.SaveChanges();
 
