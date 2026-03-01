@@ -12,7 +12,9 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: white; /* Updated to your Navy #1e2953 */
+            display: flex;
+            flex-direction: column;
+            background-color: white;
             font-family: 'Segoe UI', sans-serif;
         }
 
@@ -20,7 +22,7 @@
         .top-header {
             background-color: #1a2035;
             color: white;
-            padding: 15px 30px;
+            padding: 8px 25px;
             display: flex;
             align-items: center;
             width: 100%;
@@ -58,12 +60,12 @@
 
         .login-box {
             border-radius: 12px;
-            width: 450px;
+            width: 450px; 
             background-color: white;
-            padding: 40px;
+            padding: 30px; 
             color: #1e2953;
             box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.4);
-            margin-top: 60px; /* Space for the header */
+            margin-top: 60px;
         }
 
         .logomain {
@@ -133,13 +135,10 @@
         }
 
         .login-footer {
-            position: fixed;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            color: black;
-            font-size: 0.75rem;
-        }
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.75rem;
+}
     </style>
 </head>
 <body>
