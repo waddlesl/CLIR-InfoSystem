@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -89,7 +90,7 @@ namespace CLIR_InfoSystem.Controllers
                 return Json(new { success = false, message = "Invalid email format." });
 
 
-            if (p.PatronId == null)
+            if (string.IsNullOrEmpty(p.PatronId))
             {
                 return Json(new { success = false, message = "Patron ID is required." });
             }
