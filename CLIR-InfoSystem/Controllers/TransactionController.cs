@@ -50,17 +50,20 @@ namespace CLIR_InfoSystem.Controllers
 
             book.AvailabilityStatus = "Reserved";
             _context.BookBorrowings.Add(request);
-            _context.SaveChanges();
+
 
             // AUDIT LOG
             LogAction($"Requested book: {book.Title} (Acc# {accessionId})", "Transactions");
-
+            _context.SaveChanges();
             TempData["Success"] = "Book requested successfully!";
             return RedirectToAction("Index");
         }
 
         public IActionResult BorrowersHistory()
         {
+            var role = HttpContext.Session.GetString("UserRole");
+            ViewBag.IsStudentAssistant = role == "Student Assistant";
+
             var query = _context.BookBorrowings
                 .Include(bb => bb.Book)
                 .Include(bb => bb.Patron)
@@ -114,7 +117,6 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult BookBorrowersRequest(string searchTerm)
         {
-
             var today = DateTime.Now;
             var overdueBooks = _context.BookBorrowings
                 .Where(b => b.Status == "Borrowed" && b.DueDate < today)
@@ -168,6 +170,7 @@ namespace CLIR_InfoSystem.Controllers
         [HttpGet]
         public IActionResult ApproveRequest(int id)
         {
+            if (!IsAuthorized("Librarian")) return Unauthorized();
             var request = _context.BookBorrowings.Include(b => b.Book).Include(b => b.Patron).FirstOrDefault(r => r.BorrowId == id);
             if (request != null)
             {
@@ -177,10 +180,11 @@ namespace CLIR_InfoSystem.Controllers
                 request.DueDate = DateTime.Now.AddDays(7);
                 request.Book.AvailabilityStatus = "Borrowed";
 
-                _context.SaveChanges();
+
 
                 // AUDIT LOG
                 LogAction($"Approved borrowing request #{id} for {request.Patron?.FirstName} {request.Patron?.LastName}", "Transactions");
+                _context.SaveChanges();
                 return RedirectToAction("BookBorrowers");
             }
             else {
@@ -199,11 +203,11 @@ namespace CLIR_InfoSystem.Controllers
                 request.ReturnDate = DateTime.Now;
                 request.Book.AvailabilityStatus = "Available";
 
-                _context.SaveChanges();
+
 
                 // AUDIT LOG
                 LogAction($"Processed return for book: {request.Book.Title} (BorrowID: {id})", "Transactions");
-
+                _context.SaveChanges();
                 TempData["Success"] = "Book returned successfully.";
             }
             return RedirectToAction("BookBorrowers");
@@ -218,10 +222,9 @@ namespace CLIR_InfoSystem.Controllers
                 request.Status = "Denied";
                 if (request.Book != null) request.Book.AvailabilityStatus = "Available";
 
-                _context.SaveChanges();
-
                 // AUDIT LOG
                 LogAction($"Rejected borrowing request #{id}", "Transactions");
+                _context.SaveChanges();
             }
             return RedirectToAction("BookBorrowersRequest");
         }

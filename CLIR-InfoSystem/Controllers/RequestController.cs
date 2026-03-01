@@ -16,6 +16,7 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult ServiceRequest(string? type)
         {
+
             string? patronId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(patronId)) return RedirectToAction("Login", "Account");
 

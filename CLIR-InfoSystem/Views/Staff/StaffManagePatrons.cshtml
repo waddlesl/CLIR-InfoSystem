@@ -71,7 +71,7 @@
         <div class="modal-content">
             <div class="modal-header"><h5>Add New Patron</h5></div>
             <div class="modal-body">
-                <input type="text" id="addId" class="form-control mb-2" placeholder="Patron ID (Max 10 chars)" maxlength="10" />
+                <input type="text" id="addId" class="form-control mb-2" placeholder="Patron ID (Max 10 chars)" maxlength="10" required'/>
                 <input type="text" id="addFirst" class="form-control mb-2" placeholder="First Name" />
                 <input type="text" id="addLast" class="form-control mb-2" placeholder="Last Name" />
                 <input type="email" id="addEmail" class="form-control mb-2" placeholder="Email" />
@@ -83,7 +83,7 @@
                 </select>
 
                 <label class="small fw-bold">Department</label>
-                <select id="addDept" class="form-control mb-2">
+                <select id="addDept" class="form-control mb-2" required>
                     <option value="">Select Department</option>
                     <option value=1>CAS</option>
                     <option value=2>CCIS</option>
@@ -169,10 +169,8 @@
 
             rows.slice(start, end).show();
 
-            // Page Info
             $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
 
-            // Generate Pagination
             let paginationHtml = "";
             for (let i = 1; i <= totalPages; i++) {
                 paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -186,8 +184,6 @@
             currentPage = page;
             updateTable();
         }
-
-        // Real-time Search
         $("#patronSearch").on("keyup", function() {
             var value = $(this).val().toLowerCase();
                 $("#patronTable tr").each(function() {
@@ -198,7 +194,6 @@
             updateTable();
         });
 
-        // Initialize
         $(document).ready(function() {
             updateTable();
         });
@@ -209,7 +204,7 @@
                 $(deptSelector).prop('disabled', false);
                 $(progSelector).prop('disabled', false);
             } else {
-                $(deptSelector).prop('disabled', true).val("");
+                $(deptSelector).prop('disabled', false).val("");
                 $(progSelector).empty().append('<option value="">N/A</option>').prop('disabled', true);
             }
         }
@@ -269,7 +264,6 @@
             ]
         };
 
-        // Helper function to fill program dropdowns
         function updateProgramDropdown(deptSelector, progSelector, selectedProgId = 0) {
                 const deptId = $(deptSelector).val();
                 const $progDropdown = $(progSelector);
@@ -300,12 +294,11 @@
                 $(deptSelector).prop('disabled', false);
                 $(progSelector).prop('disabled', false);
             } else {
-                $(deptSelector).prop('disabled', true).val("");
+                $(deptSelector).prop('disabled', false);
                 $(progSelector).empty().append('<option value="">N/A</option>').prop('disabled', true);
             }
         }
 
-        // Logic for Adding
         function createPatron() {
             const isStudent = $('#addType').val() === "Student";
 
@@ -314,6 +307,7 @@
                 FirstName: $('#addFirst').val(),
                 LastName: $('#addLast').val(),
                 Email: $('#addEmail').val(),
+                PatronType: $('#addType').val(),
                 
                 DeptId: isStudent ? parseInt($('#addDept').val()) : null,
                 ProgramId: isStudent ? parseInt($('#addProg').val()) : null
@@ -348,7 +342,7 @@
                         $('#editProg').prop('disabled', false);
                     } else {
                         $('#editType').val("NonStudent");
-                        $('#editDept').val("").prop('disabled', true);
+                        $('#editDept').val("").prop('disabled', false);
                         $('#editProg').empty().append('<option value="">N/A</option>').prop('disabled', true);
                     }
                     new bootstrap.Modal(document.getElementById('editModal')).show();

@@ -200,43 +200,14 @@
             @if (role == "Librarian")
             {
                 bool isBorrowerMenuOpen = currentController == "Transaction";
-
                 <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-user-tag"></i> Patron Management</a></div>
                 <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-bookmark"></i> Book Catalog</a></div>
-
-                <div class="nav-item">
-                    <a class="d-flex justify-content-between align-items-center"
-                       data-bs-toggle="collapse"
-                       href="#bookBorrowMenu"
-                       role="button"
-                       aria-expanded="@(isBorrowerMenuOpen ? "true" : "false")">
-                        <span><i class="fa-solid fa-handshake"></i> Book Borrowers</span>
-                        <i class="fa-solid fa-chevron-down small"></i>
-                    </a>
-                </div>
-                <div class="collapse @(isBorrowerMenuOpen ? "show" : "")" id="bookBorrowMenu">
-                    <div class="nav-sub-item-container ms-3">
-                        <a class="nav-link small py-2" asp-controller="Transaction" asp-action="BookBorrowersRequest">
-                            <i class="fa-solid fa-file-circle-plus"></i> Borrow Request
-                        </a>
-                        <a class="nav-link small py-2" asp-controller="Transaction" asp-action="BookBorrowers">
-                            <i class="fa-solid fa-user-clock"></i> Current Borrowers
-                        </a>
-                        <a class="nav-link small py-2" asp-controller="Transaction" asp-action="BorrowersHistory">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Borrower History
-                        </a>
-                    </div>
-                </div>
-
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake"></i> Book Borrowers</a></div>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="BookingsHistory"><i class="fa-solid fa-chair"></i> Seat Reservations</a></div>
                 <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian"><i class="fa-solid fa-chalkboard-user"></i> Book A Librarian</a></div>
                 <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS"><i class="fa-solid fa-envelope-open-text"></i> Digital Requests</a></div>
                 <div class="nav-item"><a asp-controller="Service" asp-action="ManageServices"><i class="fa-solid fa-screwdriver-wrench"></i> Service Requests</a></div>
                 }
-
-           
-
-
 
             @if (role == "Student Assistant")
             {

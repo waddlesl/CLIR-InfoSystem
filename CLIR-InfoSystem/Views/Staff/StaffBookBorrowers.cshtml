@@ -1,23 +1,57 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
 <div class="container-fluid px-4 mt-3">
-<div class="row g-4 mt-2">
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Borrowed Books</h6>
-            <h3>@ViewBag.BorrowedBookCount</h3>
+
+    <div class="report-tabs d-flex gap-2 p-1 bg-light rounded-pill" style="width: fit-content; border: 1px solid #dee2e6;">
+        <a asp-controller="Transaction" asp-action="BookBorrowers"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BookBorrowers" ? "active-tab" : "text-muted")">
+            <i class="bi bi-envelope-open me-2"></i>Current Borrowers
+        </a>
+        @if (ViewBag.IsStudentAssistant == false)
+        {
+            <a asp-controller="Transaction" asp-action="BookBorrowersRequest"
+            class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BookBorrowersRequest" ? "active-tab" : "text-muted")">
+                <i class="bi bi-clock-history me-2"></i>Borrow Requests
+            </a>            
+        }
+        <a asp-controller="Transaction" asp-action="BorrowersHistory"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BorrowersHistory" ? "active-tab" : "text-muted")">
+            <i class="bi bi-clock-history me-2"></i>Borrow History
+        </a>
+
+
+    </div>
+    <div class="row g-4 mt-1">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-hand-holding-hand fa-2x" style="color: #ed1e28; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Borrowed</h6>
+                        <h3 class="mb-0">@ViewBag.BorrowedBookCount</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="fa-solid fa-exclamation fa-2x" style="color: #ed1e28; opacity: 0.8;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Overdued Books</h6>
+                        <h3 class="mb-0">@ViewBag.OverdueBookCount</h3>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6 class="text-muted">Overdue Books</h6>
-            <h3>@ViewBag.OverdueBookCount</h3>
-        </div>
-    </div>
-</div>
-<br />
+    <br/>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="fw-bold mb-0">Current Borrowers</h4>
+            <h5 class="fw-bold mb-0" style="color: #1a2035; font-size: 1.1rem;">Current Borrowers</h5>
             <small class="text-muted">
                 @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
             </small>
@@ -74,16 +108,16 @@
                                     <td>
                                         @if (bb.Status == "Overdue")
                                         {
-                                            <span class="text-danger">P@(bb.Book?.Subtotal + 50 ?? 0)</span>
+                                        var totaldate = (DateTime.Now - @bb.DueDate)?.Days;
+                                        <span class="text-danger">P@((bb.Book?.Subtotal ?? 0) + (10 * totaldate))</span>
                                         }
                                         else
                                         {
                                             <span>P@(bb.Book?.Subtotal ?? 0)</span>
                                         }
 
-
                                     </td>
-                                    @if (ViewBag.IsStudentAssistant == false)
+                                @if (ViewBag.IsStudentAssistant == false && bb.Status != "Overdue")
                                     {
                                         <td>
                                             <button class="btn btn-sm btn-success" onclick="returnBook('@bb.BorrowId')">Return</button>
@@ -263,6 +297,25 @@
             background-color: #1a2035;
             border-color: #1a2035;
             color: white;
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ed1e28 !important;
+            background-color: rgba(237, 30, 40, 0.05);
+        }
+
+        .active-tab {
+            background-color: #1e2953 !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2);
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-top: none;
         }
     </style>
 

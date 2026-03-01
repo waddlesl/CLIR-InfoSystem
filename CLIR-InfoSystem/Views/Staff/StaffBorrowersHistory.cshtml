@@ -1,9 +1,27 @@
 ﻿@model IEnumerable<CLIR_InfoSystem.Models.BookBorrowing>
 
 <div class="container-fluid px-4 mt-3">
+
+    <div class="report-tabs mb-4 d-flex gap-2 p-1 bg-light rounded-pill" style="width: fit-content; border: 1px solid #dee2e6;">
+        <a asp-controller="Transaction" asp-action="BookBorrowers"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BookBorrowers" ? "active-tab" : "text-muted")">
+            <i class="bi bi-envelope-open me-2"></i>Current Borrowers
+        </a>
+        @if (ViewBag.IsStudentAssistant == false)
+        {
+            <a asp-controller="Transaction" asp-action="BookBorrowersRequest"
+               class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BookBorrowersRequest" ? "active-tab" : "text-muted")">
+                <i class="bi bi-clock-history me-2"></i>Borrow Requests
+            </a>
+        }
+        <a asp-controller="Transaction" asp-action="BorrowersHistory"
+           class="nav-link px-4 py-2 rounded-pill fw-bold transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "BorrowersHistory" ? "active-tab" : "text-muted")">
+            <i class="bi bi-clock-history me-2"></i>Borrow History
+        </a>
+    </div>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="fw-bold mb-0">Borrower History</h4>
+            <h5 class="fw-bold mb-0" style="color: #1a2035; font-size: 1.1rem;">Borrower History</h5>
             <small class="text-muted">
                 @DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")
             </small>
@@ -154,5 +172,26 @@
             border-color: #1a2035;
             color: white;
         }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ed1e28 !important;
+            background-color: rgba(237, 30, 40, 0.05);
+        }
+
+        .active-tab {
+            background-color: #1e2953 !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2);
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-top: none;
+        }
     </style>
+
 }
