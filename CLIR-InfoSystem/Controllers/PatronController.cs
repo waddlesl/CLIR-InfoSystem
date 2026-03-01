@@ -76,6 +76,11 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult AddPatron([FromBody] Patron p)
         {
+            if (p.PatronId.Length != 10)
+            {
+                return Json(new { success = false, message = "Patron ID must be 10 characters long." });
+            }
+
             if (p == null) return Json(new { success = false, message = "No data provided." });
 
             if (string.IsNullOrWhiteSpace(p.PatronId))

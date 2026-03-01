@@ -40,6 +40,11 @@ namespace CLIR_InfoSystem.Controllers
         [HttpPost]
         public IActionResult AddBook([FromBody] Book newBook)
         {
+            if (newBook.AccessionId.Length != 10)
+            {
+                return Json(new { success = false, message = "Accession ID must be 10 characters long." });
+            }
+
             if (newBook == null)
                 return Json(new { success = false, message = "Please Insert Book Info." });
 
