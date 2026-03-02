@@ -24,9 +24,12 @@ namespace CLIR_InfoSystem.Controllers
 
             var staffList = new List<Staff>
             {
-                new Staff { FirstName = "Melard", LastName = "Salapare", Username = "admin", Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"), TypeOfUser = "Admin", Status = "Active" },
+                new Staff { FirstName = "Melard", LastName = "Salapare", Username = "msalapare", Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"), TypeOfUser = "Admin", Status = "Active" },
+                new Staff { FirstName = "Admin", LastName = "User", Username = "admin", Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"), TypeOfUser = "Admin", Status = "Active" },
                 new Staff { FirstName = "Maria", LastName = "Clara", Username = "mclara", Password = BCrypt.Net.BCrypt.HashPassword("staff456"), TypeOfUser = "Librarian", Status = "Active" },
-               
+                new Staff { FirstName = "Andres", LastName = "Bonifacio", Username = "abonifacio", Password = BCrypt.Net.BCrypt.HashPassword("staff456"), TypeOfUser = "Librarian", Status = "Active" },
+                new Staff { FirstName = "Jose", LastName = "Rizal", Username = "jrizal", Password = BCrypt.Net.BCrypt.HashPassword("student789"), TypeOfUser = "Student Assistant", Status = "Active" },
+
             };
 
             _context.Staff.AddRange(staffList);
