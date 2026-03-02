@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -138,16 +140,54 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult UpdateServiceStatus(int requestId, string status)
         {
             if (!IsAuthorized("Librarian")) return Unauthorized();
-            var request = _context.Services.Find(requestId);
+
+            
+            var request = _context.Services
+                .Include(s => s.Patron)
+                .FirstOrDefault(s => s.ServiceId == requestId);
+
             if (request == null) return NotFound();
 
             request.RequestStatus = status;
 
+            // Trigger real email on Approval
+            if (status == "Approved" && !string.IsNullOrEmpty(request.Patron?.Email))
+            {
+                SendServiceEmail(request.Patron.Email, request.ServiceType, request.Patron.FirstName);
+            }
 
-            // AUDIT LOG
-            LogAction($"Updated Service Request #{requestId} ({request.ServiceType}) status to: {status}", "Services");
+            LogAction($"Updated Service Request #{requestId} ({request.ServiceType}) to {status}", "Services");
             _context.SaveChanges();
+
             return RedirectToAction("ManageServices");
         }
+
+        private void SendServiceEmail(string toEmail, string serviceName, string patronName)
+        {
+            try
+            {
+                var senderEmail = "clirnotifications@gmail.com";
+                var appPassword = "zbdwacfjpfvtolpe"; 
+
+                var mail = new MailMessage();
+                mail.From = new MailAddress(senderEmail, "CLIR Library System");
+                mail.To.Add(new MailAddress(toEmail));
+                mail.Subject = $"Access Approved: {serviceName}";
+                mail.IsBodyHtml = true;
+                mail.Body = $"<p>Hello {patronName}, your request for {serviceName} is approved!</p>";
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.Credentials = new NetworkCredential(senderEmail, appPassword);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogAction($"Email Error: {ex.Message}", "System");
+            }
+        }
+
     }
 }
