@@ -15,16 +15,8 @@ namespace CLIR_InfoSystem.Controllers
 
         public IActionResult Index()
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
 
-            var myLoans = _context.BookBorrowings
-                .Include(b => b.Book)
-                .Where(b => b.PatronId == userId && b.Status != "Returned" && b.Status != "Denied")
-                .OrderByDescending(b => b.BorrowDate)
-                .ToList();
-
-            return View("~/Views/Patron/PatronMyBorrowings.cshtml",myLoans);
+            return View("~/Views/Patron/PatronActivity.cshtml");
         }
 
         [HttpPost]

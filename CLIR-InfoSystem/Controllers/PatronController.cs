@@ -18,6 +18,14 @@ namespace CLIR_InfoSystem.Controllers
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
 
+            // Get the main Model (Book Borrowings)
+            var myLoans = _context.BookBorrowings
+                .Include(b => b.Book)
+                .Where(b => b.PatronId == userId)
+                .OrderByDescending(b => b.BorrowDate)
+                .ToList();
+
+            // viewbags
             ViewBag.SeatHistory = _context.SeatBookings
                 .Include(s => s.TimeSlot)
                 .Include(s => s.LibrarySeat)
@@ -35,7 +43,7 @@ namespace CLIR_InfoSystem.Controllers
                 .OrderByDescending(c => c.BookingDate)
                 .ToList();
 
-            return View("~/Views/Patron/PatronActivity.cshtml");
+            return View("~/Views/Patron/PatronActivity.cshtml", myLoans);
         }
 
         [HttpGet]

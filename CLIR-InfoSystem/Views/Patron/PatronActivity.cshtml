@@ -5,12 +5,20 @@
             <h4 class="fw-bold mb-0">Activity History</h4>
             <small class="text-muted">@DateTime.Now.ToString("MMM dd, yyyy | dddd, h:mm tt")</small>
         </div>
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" id="unifiedSearch" class="form-control border-start-0" placeholder="Search history...">
+        </div>
     </div>
 
     <div class="card shadow-sm border-0">
-
         <div class="d-flex bg-light p-2 gap-2 justify-content-center rounded">
-            <button class="gray-tab-btn rounded-pill active-gray" onclick="showTab(event,'seats')">
+            <button class="gray-tab-btn rounded-pill active-gray" onclick="showTab(event,'books')">
+                <i class="fa-solid fa-book me-1"></i> Books
+            </button>
+            <button class="gray-tab-btn rounded-pill" onclick="showTab(event,'seats')">
                 <i class="fa-solid fa-chair me-1"></i> Seats
             </button>
             <button class="gray-tab-btn rounded-pill" onclick="showTab(event,'odds')">
@@ -23,7 +31,49 @@
 
         <div class="card-body p-4">
 
-            <div id="seats" class="tab-pane-custom">
+            <div id="books" class="tab-pane-custom">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0" id="booksTable">
+                        <thead class="small text-muted">
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Borrow Date</th>
+                                <th>Due Date</th>
+                                <th class="text-end">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksBody">
+                            @foreach (var loan in Model)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@loan.Book?.Title</td>
+                                    <td>@loan.BorrowDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@(loan.Status == "Reserved" ? "---" : loan.DueDate?.ToString("MMM dd, yyyy"))</td>
+                                    <td class="text-end">
+                                        @{
+                                            string bookClass = loan.Status switch
+                                            {
+                                                "Returned" => "success",
+                                                "Borrowed" => "info",
+                                                "Reserved" => "warning",
+                                                "Overdue" or "Cancelled" or "Rejected" or "Denied" => "danger",
+                                                _ => "secondary"
+                                            };
+                                        }
+                                        <span class="capsule capsule-@bookClass">@loan.Status</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div id="booksPageInfo" class="small text-muted"></div>
+                    <ul class="pagination pagination-sm mb-0" id="booksPagination"></ul>
+                </div>
+            </div>
+
+            <div id="seats" class="tab-pane-custom" style="display:none">
                 <div class="table-responsive">
                     <table class="table align-middle mb-0" id="seatsTable">
                         <thead class="small text-muted">
@@ -42,7 +92,10 @@
                                         <td>@item.BookingDate.ToShortDateString()</td>
                                         <td>@item.TimeSlot?.DisplayText</td>
                                         <td class="text-center">
-                                            <span class="capsule capsule-@(item.Status == "Completed" ? "success" : "primary")">@item.Status</span>
+                                            @{
+                                                string seatClass = item.Status == "Completed" ? "success" : (item.Status == "Cancelled" || item.Status == "Rejected" || item.Status == "Denied" ? "danger" : "primary");
+                                            }
+                                            <span class="capsule capsule-@seatClass">@item.Status</span>
                                         </td>
                                     </tr>
                                 }
@@ -75,7 +128,10 @@
                                         <td>@item.MaterialType</td>
                                         <td>@item.RequestDate.ToShortDateString()</td>
                                         <td class="text-center">
-                                            <span class="capsule capsule-info">@item.RequestStatus</span>
+                                            @{
+                                                string oddsClass = (item.RequestStatus == "Fulfilled" || item.RequestStatus == "Completed") ? "success" : (item.RequestStatus == "Cancelled" || item.RequestStatus == "Rejected" || item.RequestStatus == "Denied" ? "danger" : (item.RequestStatus == "Pending" ? "warning" : "info"));
+                                            }
+                                            <span class="capsule capsule-@oddsClass">@item.RequestStatus</span>
                                         </td>
                                     </tr>
                                 }
@@ -106,11 +162,15 @@
                                 foreach (var item in ViewBag.ConsultationHistory)
                                 {
                                     <tr>
-                                        <td>@item.Topic</td>
+                                        <td class="fw-semibold">@item.Topic</td>
                                         <td>@item.BookingDate.ToString("MMM dd, yyyy")</td>
                                         <td>@(item.Staff?.FirstName ?? "TBD")</td>
                                         <td class="text-center">
-                                            <span class="capsule capsule-@(item.Status == "Approved" ? "success" : "info")">@item.Status</span>
+                                            @{
+                                                string cClass = (item.Status == "Approved" || item.Status == "Completed") ? "success" :
+                                                (item.Status == "Cancelled" || item.Status == "Rejected") ? "danger" : "info";
+                                            }
+                                            <span class="capsule capsule-@cClass">@item.Status</span>
                                         </td>
                                     </tr>
                                 }
@@ -130,7 +190,6 @@
 
 @section Scripts {
     <script>
-        // Tab switching
         function showTab(evt, tabName) {
             document.querySelectorAll(".tab-pane-custom").forEach(t => t.style.display = "none");
             document.querySelectorAll(".gray-tab-btn").forEach(b => b.classList.remove("active-gray"));
@@ -138,11 +197,18 @@
             evt.currentTarget.classList.add("active-gray");
         }
 
-        // Pagination function
-        function paginateTable(tableBodyId, paginationId, pageInfoId, rowsPerPage=5) {
+        document.getElementById("unifiedSearch").addEventListener("keyup", function () {
+            let val = this.value.toLowerCase();
+            let activeTable = document.querySelector(".tab-pane-custom:not([style*='none'])");
+            let rows = activeTable.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+            });
+        });
+
+        function paginateTable(tableBodyId, paginationId, pageInfoId, rowsPerPage = 5) {
             let tbody = document.getElementById(tableBodyId);
             if (!tbody) return;
-
             let rows = Array.from(tbody.querySelectorAll("tr"));
             let totalRows = rows.length;
             let totalPages = Math.ceil(totalRows / rowsPerPage);
@@ -150,40 +216,37 @@
             let pageInfo = document.getElementById(pageInfoId);
 
             function showPage(page) {
-                rows.forEach((r,i) => r.style.display = (i >= (page-1)*rowsPerPage && i < page*rowsPerPage) ? "" : "none");
+                rows.forEach((r, i) => r.style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none");
                 if (pageInfo) {
-                    let start = totalRows > 0 ? (page-1)*rowsPerPage+1 : 0;
-                    let end = Math.min(page*rowsPerPage,totalRows);
+                    let start = totalRows > 0 ? (page - 1) * rowsPerPage + 1 : 0;
+                    let end = Math.min(page * rowsPerPage, totalRows);
                     pageInfo.textContent = `Showing ${start} to ${end} of ${totalRows} entries`;
                 }
             }
 
             pagination.innerHTML = "";
-            for (let i=1;i<=totalPages;i++){
+            for (let i = 1; i <= totalPages; i++) {
                 let li = document.createElement("li");
                 li.className = "page-item";
                 let btn = document.createElement("button");
                 btn.className = "page-link";
                 btn.innerText = i;
-                btn.addEventListener("click", ()=>{
-                    document.querySelectorAll("#"+paginationId+" .page-item").forEach(p=>p.classList.remove("active"));
+                btn.addEventListener("click", () => {
+                    pagination.querySelectorAll(".page-item").forEach(p => p.classList.remove("active"));
                     li.classList.add("active");
                     showPage(i);
                 });
                 li.appendChild(btn);
                 pagination.appendChild(li);
             }
-
-            if (totalPages > 0){
-                pagination.querySelector("li").classList.add("active");
-                showPage(1);
-            }
+            if (totalPages > 0) { pagination.querySelector("li").classList.add("active"); showPage(1); }
         }
 
-        document.addEventListener("DOMContentLoaded", function(){
-            paginateTable("seatsBody","seatPagination","seatPageInfo");
-            paginateTable("oddsBody","oddsPagination","oddsPageInfo");
-            paginateTable("consultBody","consultPagination","consultPageInfo");
+        document.addEventListener("DOMContentLoaded", function () {
+            paginateTable("booksBody", "booksPagination", "booksPageInfo");
+            paginateTable("seatsBody", "seatPagination", "seatPageInfo");
+            paginateTable("oddsBody", "oddsPagination", "oddsPageInfo");
+            paginateTable("consultBody", "consultPagination", "consultPageInfo");
         });
     </script>
 
@@ -195,7 +258,6 @@
             border: none;
             font-weight: 600;
             transition: all 0.3s;
-            outline: none !important;
             color: #6c757d;
         }
 
@@ -207,23 +269,8 @@
             .gray-tab-btn.active-gray {
                 background: #ffffff !important;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                color: #1e2953; /* Using your primary navy color */
+                color: #1e2953;
             }
-
-        .rounded-pill {
-            border-radius: 50px !important;
-        }
-
-        /* Your Custom Pagination Styles */
-        .page-link {
-            color: #1a2035;
-        }
-
-        .page-item.active .page-link {
-            background-color: #1a2035 !important;
-            border-color: #1a2035 !important;
-            color: white !important;
-        }
 
         .capsule {
             padding: 4px 12px;
@@ -231,6 +278,8 @@
             font-size: 0.75rem;
             font-weight: 600;
             display: inline-block;
+            min-width: 85px;
+            text-align: center;
         }
 
         .capsule-success {
@@ -246,6 +295,26 @@
         .capsule-info {
             background: #cff4fc;
             color: #055160;
+        }
+
+        .capsule-warning {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        .capsule-danger {
+            background: #f8d7da;
+            color: #842029;
+        }
+        /* Red for Rejected/Cancelled */
+        .page-item.active .page-link {
+            background-color: #1a2035 !important;
+            border-color: #1a2035 !important;
+            color: white !important;
+        }
+
+        .page-link {
+            color: #1a2035;
         }
     </style>
 }
