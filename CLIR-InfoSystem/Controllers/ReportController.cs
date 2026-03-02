@@ -249,7 +249,15 @@ namespace CLIR_InfoSystem.Controllers
             string activeService = string.IsNullOrEmpty(service) ? "Grammarly" : service;
             ViewBag.CurrentService = activeService;
             var dateRange = GetTermDates(selectedYear, selectedTerm);
-            var requests = _context.Services.Include(b => b.Patron).ThenInclude(p => p.Program).ThenInclude(p => p.Department).Where(s => s.RequestDate >= dateRange.Start && s.RequestDate <= dateRange.End && s.ServiceType == activeService).ToList();
+            var requests = _context.Services
+    .Include(s => s.Patron)
+        .ThenInclude(p => p.Department) 
+    .Include(s => s.Patron)
+        .ThenInclude(p => p.Program)
+    .Where(s => s.RequestDate >= dateRange.Start
+             && s.RequestDate <= dateRange.End
+             && s.ServiceType == activeService)
+    .ToList();
 
 
             ViewBag.GATCount = requests.Count();
