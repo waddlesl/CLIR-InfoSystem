@@ -10,7 +10,7 @@
         </div>
 
         <div class="filter-wrapper" style="max-width: 600px;">
-            <form method="get" asp-action="ManageBookings" class="d-flex gap-2 align-items-end">
+            <form method="get" asp-action="BookingsHistory" class="d-flex gap-2 align-items-end">
                 <div class="flex-grow-1">
                     <label class="small fw-bold text-muted ms-1">Select Date</label>
                     <input type="date" name="selectedDate" class="form-control form-control-sm" value="@ViewBag.SelectedDate" />
@@ -27,7 +27,7 @@
                     <button type="submit" class="btn btn-sm btn-primary" style="background-color: #1e2953; border-color: #1e2953;">
                         <i class="bi bi-filter"></i> Filter
                     </button>
-                    <a asp-action="ManageBookings" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    <a asp-action="BookingsHistory" class="btn btn-sm btn-outline-secondary">Reset</a>
                 </div>
             </form>
         </div>
