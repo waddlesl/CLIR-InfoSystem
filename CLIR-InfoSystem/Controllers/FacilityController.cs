@@ -126,7 +126,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.SelectedBuilding = building;
 
             var activeBookings = query.OrderByDescending(b => b.BookingDate).ToList();
-            return View("~/Views/Staff/StaffManageBookings.cshtml", activeBookings);
+            return View("~/Views/Staff/StaffBookingsHistory.cshtml", activeBookings);
         }
 
         public IActionResult BookingsHistory(DateTime? selectedDate, string? building)
@@ -331,33 +331,33 @@ namespace CLIR_InfoSystem.Controllers
             return Json(seats);
         }
 
-        [HttpPost]
-        public IActionResult CheckIn(int bookingId)
-        {
-            var booking = _context.SeatBookings.Find(bookingId);
-            if (booking != null)
-            {
-                booking.Status = "Completed";
-                LogAction($"Checked in patron for Seat Booking #{bookingId}", "book_a_seat");
-                _context.SaveChanges();
-                TempData["Success"] = "Patron checked in successfully.";
-            }
-            return RedirectToAction("ManageBookings");
-        }
+        //[HttpPost]
+        //public IActionResult CheckIn(int bookingId)
+        //{
+        //    var booking = _context.SeatBookings.Find(bookingId);
+        //    if (booking != null)
+        //    {
+        //        booking.Status = "Completed";
+        //        LogAction($"Checked in patron for Seat Booking #{bookingId}", "book_a_seat");
+        //        _context.SaveChanges();
+        //        TempData["Success"] = "Patron checked in successfully.";
+        //    }
+        //    return RedirectToAction("ManageBookings");
+        //}
 
-        [HttpPost]
-        public IActionResult CancelBooking(int bookingId)
-        {
-            var booking = _context.SeatBookings.Find(bookingId);
-            if (booking != null)
-            {
-                booking.Status = "Cancelled";
-                LogAction($"Cancelled Seat Booking #{bookingId}", "book_a_seat");
-                _context.SaveChanges();
-                TempData["Info"] = "Booking has been cancelled.";
-            }
-            return RedirectToAction("ManageBookings");
-        }
+        //[HttpPost]
+        //public IActionResult CancelBooking(int bookingId)
+        //{
+        //    var booking = _context.SeatBookings.Find(bookingId);
+        //    if (booking != null)
+        //    {
+        //        booking.Status = "Cancelled";
+        //        LogAction($"Cancelled Seat Booking #{bookingId}", "book_a_seat");
+        //        _context.SaveChanges();
+        //        TempData["Info"] = "Booking has been cancelled.";
+        //    }
+        //    return RedirectToAction("ManageBookings");
+        //}
 
         [HttpPost]
         public IActionResult LibrarianCheckIn(int sessionId)
@@ -411,23 +411,23 @@ namespace CLIR_InfoSystem.Controllers
             }
             return RedirectToAction("ManageBookaLibrarian");
         }
-        [HttpGet]
-        public IActionResult Updatebooking(int id, string status)
-        {
-            var request = _context.SeatBookings.Find(id);
-            if (request == null)
-            {
-                TempData["Error"] = "Service request not found.";
-                return RedirectToAction("ManageBookings");
-            }
+        //[HttpGet]
+        //public IActionResult Updatebooking(int id, string status)
+        //{
+        //    var request = _context.SeatBookings.Find(id);
+        //    if (request == null)
+        //    {
+        //        TempData["Error"] = "Service request not found.";
+        //        return RedirectToAction("ManageBookings");
+        //    }
 
-            request.Status = status;
+        //    request.Status = status;
 
 
-            // AUDIT LOG
-            LogAction($"Updated Book a Seat Request #{id} status to: {status}", "book_a_seat");
-            _context.SaveChanges();
-            return RedirectToAction("ManageBookings");
-        }
+        //    // AUDIT LOG
+        //    LogAction($"Updated Book a Seat Request #{id} status to: {status}", "book_a_seat");
+        //    _context.SaveChanges();
+        //    return RedirectToAction("ManageBookings");
+        //}
     }
 }
