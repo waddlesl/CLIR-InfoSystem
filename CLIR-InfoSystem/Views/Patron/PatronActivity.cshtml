@@ -168,7 +168,8 @@
                                         <td class="text-center">
                                             @{
                                                 string cClass = (item.Status == "Approved" || item.Status == "Completed") ? "success" :
-                                                (item.Status == "Cancelled" || item.Status == "Rejected") ? "danger" : "info";
+                                                (item.Status == "Cancelled" || item.Status == "Rejected") ? "danger" :
+                                                (item.Status == "Pending" ? "warning" : "info");
                                             }
                                             <span class="capsule capsule-@cClass">@item.Status</span>
                                         </td>

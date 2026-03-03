@@ -116,7 +116,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.PendingConsultations = _context.BookALibrarians.Count(b => b.Status == "Pending");
             ViewBag.PendingOdds = _context.Odds.Count(o => o.RequestStatus == "Pending");
             ViewBag.DigitalQueue = ViewBag.PendingServices + ViewBag.PendingOdds;
-            ViewBag.TodaySeats = _context.SeatBookings.Count(s => s.BookingDate == DateTime.Today && s.Status == "Reserved");
+          
 
             ViewBag.RecentTransactions = _context.BookBorrowings
                 .OrderByDescending(b => b.BorrowDate)

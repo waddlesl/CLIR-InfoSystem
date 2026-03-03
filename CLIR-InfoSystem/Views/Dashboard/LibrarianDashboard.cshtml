@@ -101,7 +101,7 @@
                 <div class="card-body">
                     @if (ViewBag.OverdueCount > 0)
                     {
-                        <div class="alert-item d-flex align-items-center mb-3 text-danger p-3 bg-danger-soft">
+                        <div class="alert-item d-flex align-items-center mb-3 text-danger p-3 bg-danger-soft rounded-3">
                             <div class="fs-4 me-3"><i class="fa-solid fa-circle-exclamation"></i></div>
                             <div>
                                 <div class="fw-bold small">Overdue Detected</div>
@@ -110,13 +110,46 @@
                         </div>
                     }
 
-                    <div class="alert-item d-flex align-items-center mb-3 text-info p-3 bg-info-soft">
-                        <div class="fs-4 me-3"><i class="fa-solid fa-couch"></i></div>
-                        <div>
-                            <div class="fw-bold small">Today's Seat Traffic</div>
-                            <p class="mb-0 small">@ViewBag.TodaySeats active reservations.</p>
+                    @if (ViewBag.PendingOdds > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 p-3 bg-warning-soft rounded-3">
+                            <div class="fs-4 me-3"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <div>
+                                <div class="fw-bold small">ODDS Requests</div>
+                                <p class="mb-0 small">@ViewBag.PendingOdds pending materials.</p>
+                            </div>
                         </div>
-                    </div>
+                    }
+
+                    @if (ViewBag.PendingServices > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 text-primary p-3 bg-primary-soft rounded-3">
+                            <div class="fs-4 me-3"><i class="fa-solid fa-microchip"></i></div>
+                            <div>
+                                <div class="fw-bold small">Service Requests</div>
+                                <p class="mb-0 small">@ViewBag.PendingServices Grammarly/Turnitin pending.</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (ViewBag.PendingConsultations > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 text-info p-3 bg-info-soft rounded-3">
+                            <div class="fs-4 me-3"><i class="fa-solid fa-chalkboard-user"></i></div>
+                            <div>
+                                <div class="fw-bold small">Consultations</div>
+                                <p class="mb-0 small">@ViewBag.PendingConsultations new bookings.</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if ((ViewBag.OverdueCount ?? 0) == 0 && (ViewBag.PendingOdds ?? 0) == 0 && (ViewBag.PendingServices ?? 0) == 0 && (ViewBag.PendingConsultations ?? 0) == 0)
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-circle-check fs-2 mb-2 opacity-25"></i>
+                            <p class="small mb-0">No actions required.</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -124,7 +157,7 @@
 </div>
 
 <style>
-    /* New Font Stack: Clean and Professional */
+    
     .dashboard-font {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
@@ -140,7 +173,7 @@
     .stat-card {
         border-radius: 12px;
         border: none;
-        /* Hover transform removed as requested */
+       
     }
 
     /* Capsuling Status for consistency with your other pages */
@@ -177,8 +210,36 @@
         color: #0369a1;
     }
 
-    /* Removed table-hover effects */
     .table-hover tbody tr:hover {
         background-color: transparent !important;
+    }
+
+    .bg-danger-soft {
+        background-color: #fff1f2;
+        border: 1px solid #fee2e2;
+        color: #dc3545;
+    }
+
+    .bg-warning-soft {
+        background-color: #f1f5f9; 
+        border: 1px solid #cbd5e1; 
+        color: #0f172a; 
+    }
+
+    .bg-primary-soft {
+        background-color: #eff6ff;
+        border: 1px solid #dbeafe;
+        color: #1e40af;
+    }
+
+    .bg-info-soft {
+        background-color: #f0fdf4;
+        border: 1px solid #dcfce7;
+        color: #166534;
+    }
+
+    .alert-item {
+        border-radius: 10px;
+        transition: transform 0.2s ease;
     }
 </style>
