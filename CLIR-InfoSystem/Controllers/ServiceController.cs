@@ -46,7 +46,7 @@ namespace CLIR_InfoSystem.Controllers
             if (!IsAuthorized("Librarian")) return Unauthorized();
             var today = DateTime.Now;
             var expiredRequest = _context.Services
-                .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(7))
+                .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(90))
                 .ToList();
 
             if (expiredRequest.Any())
@@ -74,7 +74,7 @@ namespace CLIR_InfoSystem.Controllers
         {
             var today = DateTime.Now;
             var expiredRequest = _context.Services
-                .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(7))
+                .Where(b => b.RequestStatus == "Approved" && today > b.RequestDate.AddDays(90))
                 .ToList();
 
             if (expiredRequest.Any())
