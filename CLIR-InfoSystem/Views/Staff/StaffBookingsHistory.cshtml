@@ -89,41 +89,70 @@
         let currentPage = 1;
 
         function updateTable() {
+            // Select rows and calculate totals
             let rows = $("#seatsTable tr:not(.filtered)");
             let totalRows = rows.length;
-            let totalPages = Math.ceil(totalRows / rowsPerPage);
+                    let totalPages = Math.ceil(totalRows / rowsPerPage);
 
+                    // Hide all rows initially
             $("#seatsTable tr").hide();
 
+                    // Slicing logic
             let start = (currentPage - 1) * rowsPerPage;
-            let end = start + rowsPerPage;
-
+                    let end = start + rowsPerPage;
             rows.slice(start, end).show();
 
+            // Update Entries Info Text
             $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
 
-            let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                </li>`;
-            }
-            $("#pagination").html(paginationHtml);
-        }
+                    // Generate "Remembered" Pagination HTML
+                    let paginationHtml = "";
 
-        function goToPage(page) {
-            currentPage = page;
-            updateTable();
-        }
+            // 1. First and Previous
+            paginationHtml += `
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+                </li>
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+                        </li>`;
 
-        $(document).ready(function() {
-            updateTable();
-        });
+            // 2. Current Page Number
+            if (totalPages > 0) {
+                    paginationHtml += `
+                            <li class="page-item active">
+                                <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+                            </li>`;
+                    }
+
+                    // 3. Next and Last
+                    paginationHtml += `
+                        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+                        </li>
+                        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+                        </li>`;
+
+                    $("#pagination").html(paginationHtml);
+                }
+
+                function goToPage(page) {
+                    let rows = $("#seatsTable tr:not(.filtered)");
+                    let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+                    if (page < 1) page = 1;
+                    if (page > totalPages && totalPages > 0) page = totalPages;
+
+                    currentPage = page;
+                    updateTable();
+                }
+
+                $(document).ready(function() {
+                    updateTable();
+                });
     </script>
     <style>
-        .transition-all {
-            transition: all 0.3s ease;
-        }
 
         .nav-link:hover {
             color: #ed1e28 !important;
@@ -136,10 +165,6 @@
             box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2);
         }
 
-        .table thead th {
-            background-color: #f8f9fa;
-            border-top: none;
-        }
 
         .page-link {
             color: #1a2035;
@@ -149,9 +174,18 @@
 
         .page-item.active .page-link {
             background-color: #1a2035 !important;
-            border-color: #1a2035 !important;
             color: white !important;
             border-radius: 4px;
+        }
+
+        .page-item.disabled .page-link {
+            color: #ccc;
+            pointer-events: none;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-top: none;
         }
     </style>
 }

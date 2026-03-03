@@ -97,35 +97,59 @@
             let end = start + rowsPerPage;
             rows.slice(start, end).show();
 
+            // Info text
             $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
 
+            // Pagination UI (<< < 1 > >>)
             let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                </li>`;
+
+            // First and Previous
+            paginationHtml += `
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+                        </li>
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+                        </li>`;
+
+            // Active Page
+            if (totalPages > 0) {
+                paginationHtml += `
+                            <li class="page-item active">
+                                <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+                            </li>`;
             }
+
+            // Next and Last
+            paginationHtml += `
+                        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+                        </li>
+                        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+                        </li>`;
+
             $("#pagination").html(paginationHtml);
         }
 
-        window.goToPage = function(page) {
+        window.goToPage = function (page) {
+            let rows = $("#serviceTable tr:not(.filtered)");
+            let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
             currentPage = page;
             updateTable();
         }
 
-        $("#hServiceSearch").on("keyup", function() {
+        // Search logic
+        $("#hServiceSearch").on("keyup", function () {
             var value = $(this).val().toLowerCase();
-            $("#serviceTable tr").each(function() {
+            $("#serviceTable tr").each(function () {
                 let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
                 $(this).toggleClass("filtered", !isMatch);
             });
-            currentPage = 1;
-            updateTable();
-        });
-
-        $("#btnClearFilters").on("click", function() {
-            $("#hServiceSearch").val("");
-            $("#serviceTable tr").removeClass("filtered");
             currentPage = 1;
             updateTable();
         });
@@ -134,6 +158,23 @@
     </script>
 
     <style>
+        .page-link {
+            color: #1a2035;
+            font-weight: bold;
+            border: none;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035 !important;
+            color: white !important;
+            border-radius: 4px;
+        }
+
+        .page-item.disabled .page-link {
+            color: #ccc;
+            pointer-events: none;
+        }
+
         .transition-all {
             transition: all 0.3s ease;
         }
@@ -152,19 +193,6 @@
         .table thead th {
             background-color: #f8f9fa;
             border-top: none;
-        }
-
-        .page-link {
-            color: #1a2035;
-            font-weight: bold;
-            border: none;
-        }
-
-        .page-item.active .page-link {
-            background-color: #1a2035 !important;
-            border-color: #1a2035 !important;
-            color: white !important;
-            border-radius: 4px;
         }
     </style>
 }

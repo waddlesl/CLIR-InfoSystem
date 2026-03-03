@@ -64,17 +64,17 @@
             </div>
         </div>
         <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Add New Staff</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="text" id="addFirst" class="form-control mb-2" placeholder="First Name" />
-                        <input type="text" id="addLast" class="form-control mb-2" placeholder="Last Name" />
-                        <input type="text" id="addUser" class="form-control mb-2" placeholder="Username" />
-                        <input type="password" id="addPass" class="form-control mb-2" placeholder="Password" />
+                        <input type="text" maxlength="25" id="addFirst" class="form-control mb-2" placeholder="First Name" />
+                        <input type="text" maxlength="25" id="addLast" class="form-control mb-2" placeholder="Last Name" />
+                        <input type="text" maxlength="25" id="addUser" class="form-control mb-2" placeholder="Username" />
+                        <input type="password" maxlength="50" id="addPass" class="form-control mb-2" placeholder="Password" />
                         <select id="addRole" class="form-select">
                             <option value="Librarian">Librarian</option>
                             <option value="Student Assistant">Student Assistant</option>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Staff</h5>
@@ -96,10 +96,10 @@
                     </div>
                     <div class="modal-body">
                         <input type="hidden" id="editId" />
-                        <input type="text" id="editFirst" class="form-control mb-2" placeholder="First Name" />
-                        <input type="text" id="editLast" class="form-control mb-2" placeholder="Last Name" />
-                        <input type="text" id="editUser" class="form-control mb-2" placeholder="Username" />
-                        <input type="password" id="editPass" class="form-control mb-2" placeholder="New Password (optional)" />
+                        <input type="text" maxlength="25" id="editFirst" class="form-control mb-2" placeholder="First Name" />
+                        <input type="text" maxlength="25" id="editLast" class="form-control mb-2" placeholder="Last Name" />
+                        <input type="text" maxlength="25" id="editUser" class="form-control mb-2" placeholder="Username" />
+                        <input type="password" maxlength="50" id="editPass" class="form-control mb-2" placeholder="New Password (optional)" />
                         <select id="editRole" class="form-select">
                             <option value="Librarian">Librarian</option>
                             <option value="Student Assistant">Student Assistant</option>

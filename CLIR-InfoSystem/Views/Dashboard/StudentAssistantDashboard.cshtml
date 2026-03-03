@@ -1,23 +1,146 @@
 ﻿@{
     ViewData["Title"] = "Assistant Dashboard";
+    var role = Context.Session.GetString("UserRole");
 }
 
-<style>
-    .dash-card { height: 140px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; padding: 15px; cursor: pointer; transition: 0.3s; }
-    .dash-card:hover { filter: brightness(1.1); }
-    .bg-blue { background-color: #008bf8; }
-    .bg-red { background-color: #f02d3a; }
-</style>
+<div class="container-fluid px-4 mt-4 dashboard-font">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color: #1a2035;">Assistant Command Center</h2>
+        <p class="text-muted">Student Assistant Operational Portal</p>
+        <hr class="mx-auto" style="width: 60px; height: 4px; background: #EE1D24; opacity: 1; border-radius: 2px;">
+    </div>
 
-<h2>Welcome, Assistant!</h2>
-<div class="row g-4 mt-4">
-    <div class="col-md-4"><div class="dash-card bg-blue">Search Catalog</div></div>
-    <div class="col-md-4"><div class="dash-card bg-red">Book A Seat</div></div>
-    <div class="col-md-4">
-        <div class="card p-3 shadow-sm border-0" style="height: 140px;">
-            <h6 class="text-muted">Shift Info</h6>
-            <p class="mb-0"><strong>Location:</strong> Main Desk</p>
-            <p><strong>Status:</strong> On Duty</p>
+    <div class="row g-4">
+        <div class="col-md-9">
+            <div class="row g-3">
+                <div class="col-md-3 col-6">
+                    <a asp-controller="Book" asp-action="BookManagement" class="dash-op-card">
+                        <i class="fa-solid fa-book-open mb-2 fs-3"></i>
+                        <span>View Catalog</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a asp-controller="Patron" asp-action="ManagePatrons" class="dash-op-card">
+                        <i class="fa-solid fa-users mb-2 fs-3"></i>
+                        <span>Patrons</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a asp-controller="Transaction" asp-action="BookBorrowers" class="dash-op-card">
+                        <i class="fa-solid fa-hand-holding-hand mb-2 fs-3"></i>
+                        <span>Borrowers</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a asp-controller="Facility" asp-action="ManageBookings" class="dash-op-card">
+                        <i class="fa-solid fa-calendar-check mb-2 fs-3"></i>
+                        <span>Reservations</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-3 col-6">
+                    <a asp-controller="Report" asp-action="ReportDashboard" class="dash-op-card border-dashed">
+                        <i class="fa-solid fa-chart-pie mb-2 fs-3 text-muted"></i>
+                        <span class="text-muted">Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 12px;">
+                <h6 class="fw-bold text-clir small text-uppercase ls-1 mb-4">Shift Status</h6>
+
+                <div class="d-flex align-items-center mb-4">
+                    <div class="status-indicator bg-success me-3"></div>
+                    <div>
+                        <div class="fw-bold small">Currently On Duty</div>
+                        <p class="mb-0 small text-muted">@DateTime.Now.ToString("MMM dd, yyyy")</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div class="status-indicator bg-primary me-3"></div>
+                    <div>
+                        <div class="fw-bold small">Station</div>
+                        <p class="mb-0 small text-muted">Main Desk (Rizal)</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .dashboard-font {
+        font-family: 'Inter', sans-serif;
+    }
+
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .text-clir {
+        color: #1a2035;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    /* Operational Grid Cards - No Animations */
+    .dash-op-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 10px;
+        background-color: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        color: #1a2035;
+        text-decoration: none;
+        text-align: center;
+        height: 120px;
+    }
+
+        .dash-op-card i {
+            color: #EE1D24;
+        }
+
+        .dash-op-card span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Hover State without animation */
+        .dash-op-card:hover {
+            background-color: #f8f9fa;
+            color: #1a2035;
+            border-color: #dee2e6;
+        }
+
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+    }
+
+    /* Status Circle Indicators */
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .bg-primary {
+        background-color: #1a2035 !important;
+    }
+
+    .bg-success {
+        background-color: #198754 !important;
+    }
+</style>

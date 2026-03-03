@@ -74,7 +74,7 @@
     </div>
 </div>
 
-@section Scripts {
+    @section Scripts {
     <script>
         let rowsPerPage = 10;
         let currentPage = 1;
@@ -89,22 +89,53 @@
             let end = start + rowsPerPage;
             rows.slice(start, end).show();
 
+            // Entries Info
             $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
 
+            // Generate "Remembered" Pagination (<< < 1 > >>)
             let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
+
+            // First and Previous
+            paginationHtml += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+                </li>
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
                 </li>`;
+
+            // Current Page
+            if (totalPages > 0) {
+                paginationHtml += `
+                    <li class="page-item active">
+                        <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+                    </li>`;
             }
+
+            // Next and Last
+            paginationHtml += `
+                <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+                </li>
+                <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+                </li>`;
+
             $("#pagination").html(paginationHtml);
         }
 
         window.goToPage = function(page) {
+            let rows = $("#historyLibTable tr:not(.filtered)");
+            let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
             currentPage = page;
             updateTable();
         };
 
+        // Real-time Search
         $("#hLibSearch").on("keyup", function() {
             let value = $(this).val().toLowerCase();
             $("#historyLibTable tr").each(function() {
@@ -115,47 +146,24 @@
             updateTable();
         });
 
-        $("#btnClearFilters").on("click", function() {
-            $("#hLibSearch").val("");
-            $("#historyLibTable tr").removeClass("filtered");
-            currentPage = 1;
-            updateTable();
-        });
-
         $(document).ready(() => updateTable());
     </script>
 
     <style>
-        .transition-all {
-            transition: all 0.3s ease;
+        .page-link { color: #1a2035; font-weight: bold; border: none; }
+        .page-item.active .page-link { 
+            background-color: #1a2035 !important; 
+            color: white !important; 
+            border-radius: 4px; 
         }
-
-        .nav-link:hover {
-            color: #ed1e28 !important;
-            background-color: rgba(237, 30, 40, 0.05);
-        }
-
-        .active-tab {
-            background-color: #1e2953 !important;
-            color: white !important;
-            box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2);
-        }
-
-        .table thead th {
-            background-color: #f8f9fa;
-            border-top: none;
-        }
-
-        .page-link {
-            color: #1a2035;
-            font-weight: bold;
-            border: none;
-        }
-
-        .page-item.active .page-link {
-            background-color: #1a2035 !important;
-            color: white !important;
-            border-radius: 4px;
+        .page-item.disabled .page-link { color: #ccc; pointer-events: none; }
+        
+        .transition-all { transition: all 0.3s ease; }
+        .nav-link:hover { color: #ed1e28 !important; background-color: rgba(237, 30, 40, 0.05); }
+        .active-tab { 
+            background-color: #1e2953 !important; 
+            color: white !important; 
+            box-shadow: 0 4px 10px rgba(30, 41, 83, 0.2); 
         }
     </style>
 }

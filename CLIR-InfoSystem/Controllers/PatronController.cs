@@ -89,6 +89,13 @@ namespace CLIR_InfoSystem.Controllers
                 return Json(new { success = false, message = "Patron ID must be 10 characters long." });
             }
 
+            if (int.TryParse(p.PatronId, out int result)) {
+                Console.WriteLine("Yes gumana");
+            }
+            else{
+                return Json(new { success = false, message = "Must input digits" });
+            }
+
             if (p == null) return Json(new { success = false, message = "No data provided." });
 
             if (string.IsNullOrWhiteSpace(p.PatronId))

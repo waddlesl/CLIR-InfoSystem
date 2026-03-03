@@ -37,24 +37,32 @@ namespace CLIR_InfoSystem.Controllers
         }
 
 
+        
         [HttpPost]
         public IActionResult AddBook([FromBody] Book newBook)
         {
-            if (newBook.AccessionId.Length != 10)
-            {
-                return Json(new { success = false, message = "Accession ID must be 10 characters long." });
-            }
-
+            // 1. Check if the object exists
             if (newBook == null)
-                return Json(new { success = false, message = "Please Insert Book Info." });
+                return Json(new { success = false, message = "System could not read book data." });
 
+            // 2. Check if the ID was provided
             if (string.IsNullOrEmpty(newBook.AccessionId))
                 return Json(new { success = false, message = "Accession ID is required." });
 
+            // 3. Check the length (Must be exactly 10 characters)
+   
+            if (newBook.AccessionId.Length != 10)
+            {
+                return Json(new { success = false, message = "Accession ID must be exactly 10 characters long." });
+            }
+
+
+            // 4. Check for duplicates in the database
             bool exists = _context.Books.Any(b => b.AccessionId == newBook.AccessionId);
             if (exists)
                 return Json(new { success = false, message = "Accession ID already exists." });
 
+            // 5. Save the book
             if (ModelState.IsValid)
             {
                 _context.Books.Add(newBook);
@@ -63,7 +71,7 @@ namespace CLIR_InfoSystem.Controllers
                 return Json(new { success = true, message = "Book added successfully!" });
             }
 
-            return BadRequest(ModelState);
+            return Json(new { success = false, message = "Data validation failed." });
         }
         /*
         [HttpGet]

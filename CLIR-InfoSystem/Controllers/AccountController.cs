@@ -13,15 +13,17 @@ namespace CLIR_InfoSystem.Controllers
     {
         public AccountController(LibraryDbContext context) : base(context) { }
 
-        // Temporary route: /Account/SeedData
+        // SeedData: Populates the database with initial Admin and Staff accounts if the 'admin' user doesn't exist
         [HttpGet]
         public IActionResult SeedData()
         {
+            // Checks if the database is already populated to prevent duplicates
             if (_context.Staff.Any(u => u.Username == "admin"))
             {
                 return Content("Database already seeded. Please log in.");
             }
 
+            // Creates a predefined list of staff members with hashed passwords
             var staffList = new List<Staff>
             {
                 new Staff { FirstName = "Melard", LastName = "Salapare", Username = "msalapare", Password = BCrypt.Net.BCrypt.HashPassword("1234Admin"), TypeOfUser = "Admin", Status = "Active" },
@@ -39,13 +41,17 @@ namespace CLIR_InfoSystem.Controllers
 
         #region Staff Management
 
+        // ManageStaff: Retrieves a filtered list of Librarians and Student Assistants for the admin view
         public IActionResult ManageStaff(string searchTerm)
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
 
+            // Filters out Admins from the management list
             var query = _context.Staff
                 .Where(s => s.TypeOfUser == "Librarian" || s.TypeOfUser == "Student Assistant");
 
+
+            // Applies search filters for Username, ID, or Last Name if a search term is provided
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(s =>
@@ -57,12 +63,13 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Admin/AdminManageStaff.cshtml", query.ToList());
         }
 
+        // AddStaff: Validates and saves a new staff member to the database
         [HttpPost]
         public IActionResult AddStaff([FromBody] Staff newStaff)
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
 
-            // VALIDATION: No Empty Fields
+            // Ensures required fields are present and the username is unique
             if (string.IsNullOrWhiteSpace(newStaff.FirstName) ||
                 string.IsNullOrWhiteSpace(newStaff.LastName) ||
                 string.IsNullOrWhiteSpace(newStaff.Username) ||
@@ -83,6 +90,7 @@ namespace CLIR_InfoSystem.Controllers
             return Json(new { success = true });
         }
 
+        // UpdateStaff: Modifies existing staff details and updates the password if a new one is provided
         [HttpPost]
         public IActionResult UpdateStaff([FromBody] Staff updatedStaff)
         {
@@ -104,6 +112,7 @@ namespace CLIR_InfoSystem.Controllers
                 return Json(new { success = false, message = "Username is already taken by another user." });
             }
 
+            // Updates core properties and hashes the new password only if it's not empty
             staff.FirstName = updatedStaff.FirstName;
             staff.LastName = updatedStaff.LastName;
             staff.Username = updatedStaff.Username;
@@ -117,6 +126,9 @@ namespace CLIR_InfoSystem.Controllers
             _context.SaveChanges();
             return Json(new { success = true });
         }
+
+
+        // ToggleStatus: Switches a staff member between 'Active' and 'Inactive' (prevents self-deactivation)
         public IActionResult ToggleStatus(int id)
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
@@ -140,6 +152,7 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("ManageStaff");
         }
 
+        // GetStaffDetails: Fetches a single staff member's data for editing (returned as JSON)
         [HttpGet]
         public IActionResult GetStaffDetails(int id)
         {
@@ -162,6 +175,7 @@ namespace CLIR_InfoSystem.Controllers
 
         #region Authentication
 
+        // Login (GET): Checks if a session already exists and redirects the user to their specific dashboard
         [HttpGet]
         public IActionResult Login()
         {
@@ -174,9 +188,11 @@ namespace CLIR_InfoSystem.Controllers
             return View();
         }
 
+        // Login (POST): Authenticates either Staff (via BCrypt) or Patrons (via ID/LastName) and sets session variables
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
+            // 1. Attempt Staff login with password verification
             var staff = _context.Staff.FirstOrDefault(u => u.Username == username && u.Status == "Active");
             try
             {
@@ -190,6 +206,7 @@ namespace CLIR_InfoSystem.Controllers
                     LogAction("Logged into the system", "staff");
                     _context.SaveChanges();
 
+                    // Set Staff Sessions and Log Action
                     return RedirectToAction(staff.TypeOfUser.Replace(" ", "") + "Dashboard", "Dashboard");
                 }
             }
@@ -197,6 +214,8 @@ namespace CLIR_InfoSystem.Controllers
                 ViewBag.Error = "Invalid ID or Surname.";
                 return View();
             }
+
+            // 2. Attempt Patron login (using PatronId and LastName)
             var patron = _context.Patrons.FirstOrDefault(p => p.PatronId == username);
             if (patron != null && patron.LastName.ToLower() == password.ToLower())
             {
@@ -208,6 +227,7 @@ namespace CLIR_InfoSystem.Controllers
                 LogAction("Logged into Kiosk", "patron");
                 _context.SaveChanges();
 
+                // Set Patron Sessions and Log Action
                 return RedirectToAction("PatronDashboard", "Dashboard");
             }
 
@@ -215,6 +235,7 @@ namespace CLIR_InfoSystem.Controllers
             return View();
         }
 
+        // Logout: Logs the logout event, clears the session, and redirects to the login page
         public IActionResult Logout()
         {
             LogAction("Logged out", "session");
@@ -227,6 +248,7 @@ namespace CLIR_InfoSystem.Controllers
 
         #region Audit Logs & Reports
 
+        // AuditLogs: Collects all system logs, including related Staff and Patron data, for the Admin view
         public IActionResult AuditLogs()
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
@@ -243,16 +265,17 @@ namespace CLIR_InfoSystem.Controllers
             return View("~/Views/Admin/AdminAuditLogs.cshtml");
         }
 
+        // SystemReports: Calculates inventory value, active user counts, and monthly growth percentages for ODDS requests
         public IActionResult SystemReports()
         {
             if (!IsAuthorized("Admin")) return Unauthorized();
 
-            // Date Logic
+            // Aggregates financial and user statistics
             var now = DateTime.Now;
             var firstDayThisMonth = new DateTime(now.Year, now.Month, 1);
             var firstDayLastMonth = firstDayThisMonth.AddMonths(-1);
 
-            // Current Stats
+            // Calculates performance growth by comparing this month's stats vs. last month's stats
             ViewBag.InventoryValue = _context.Books.Sum(b => (double?)((b.Price ?? 0) - (b.Discount ?? 0))) ?? 0;
             ViewBag.ActivePatrons = _context.Patrons.Count();
             ViewBag.TotalOdds = _context.Odds.Count();
@@ -267,7 +290,7 @@ namespace CLIR_InfoSystem.Controllers
             ViewBag.OddsGrowth = lastMonthCount == 0 ? 0 : Math.Round((diff / lastMonthCount) * 100, 1);
             ViewBag.IsPositive = diff >= 0;
 
-            // ... Keep your Dictionaries here ...
+            // Groups data for charts: Staff fulfillment counts and Material demand types
             ViewBag.StaffPerformance = _context.Odds.Include(o => o.Staff).Where(o => o.RequestStatus == "Fulfilled" && o.Staff != null)
                 .GroupBy(o => o.Staff.FirstName).ToDictionary(k => k.Key, v => v.Count());
             ViewBag.MaterialDemand = _context.Odds.GroupBy(o => o.MaterialType).ToDictionary(k => k.Key ?? "Unknown", v => v.Count());

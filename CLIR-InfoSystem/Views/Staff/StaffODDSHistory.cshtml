@@ -90,45 +90,72 @@
         let currentPage = 1;
 
         function updateTable() {
+            // Select rows and calculate totals
             let rows = $("#oddsHistoryTable tr:not(.filtered)");
             let totalRows = rows.length;
             let totalPages = Math.ceil(totalRows / rowsPerPage);
 
+            // Visibility toggle
             $("#oddsHistoryTable tr").hide();
             let start = (currentPage - 1) * rowsPerPage;
             let end = start + rowsPerPage;
             rows.slice(start, end).show();
 
+            // Update Entry Info Text
             $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
 
+            // Generate "Remembered" Pagination HTML
             let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                </li>`;
+
+            // 1. First (<<) and Previous (<)
+            paginationHtml += `
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+                        </li>
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+                        </li>`;
+
+            // 2. Current Page Number
+            if (totalPages > 0) {
+                paginationHtml += `
+                            <li class="page-item active">
+                                <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+                            </li>`;
             }
+
+            // 3. Next (>) and Last (>>)
+            paginationHtml += `
+                        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+                        </li>
+                        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+                        </li>`;
+
             $("#pagination").html(paginationHtml);
         }
 
-        window.goToPage = function(page) {
+        window.goToPage = function (page) {
+            let rows = $("#oddsHistoryTable tr:not(.filtered)");
+            let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            // Safety check for bounds
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
             currentPage = page;
             updateTable();
         }
 
-        $("#hoddsSearch").on("keyup", function() {
+        // Real-time Search Integration
+        $("#hoddsSearch").on("keyup", function () {
             var value = $(this).val().toLowerCase();
-            $("#oddsHistoryTable tr").each(function() {
+            $("#oddsHistoryTable tr").each(function () {
                 let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
                 $(this).toggleClass("filtered", !isMatch);
             });
-            currentPage = 1;
-            updateTable();
-        });
-
-        $("#btnClearFilters").on("click", function() {
-            $("#hoddsSearch").val("");
-            $("#oddsHistoryTable tr").removeClass("filtered");
-            currentPage = 1;
+            currentPage = 1; // Reset to page 1 on new search
             updateTable();
         });
 
@@ -136,6 +163,23 @@
     </script>
 
     <style>
+        .page-link {
+            color: #1a2035;
+            font-weight: bold;
+            border: none;
+        }
+
+        .page-item.active .page-link {
+            background-color: #1a2035 !important;
+            color: white !important;
+            border-radius: 4px;
+        }
+
+        .page-item.disabled .page-link {
+            color: #ccc;
+            pointer-events: none;
+        }
+
         .transition-all {
             transition: all 0.3s ease;
         }
@@ -154,19 +198,6 @@
         .table thead th {
             background-color: #f8f9fa;
             border-top: none;
-        }
-
-        .page-link {
-            color: #1a2035;
-            font-weight: bold;
-            border: none;
-        }
-
-        .page-item.active .page-link {
-            background-color: #1a2035 !important;
-            border-color: #1a2035 !important;
-            color: white !important;
-            border-radius: 4px;
         }
     </style>
 }

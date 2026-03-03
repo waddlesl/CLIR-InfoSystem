@@ -142,14 +142,30 @@
                             </div>
                         </div>
                     }
-
-                    @if ((ViewBag.OverdueCount ?? 0) == 0 && (ViewBag.PendingOdds ?? 0) == 0 && (ViewBag.PendingServices ?? 0) == 0 && (ViewBag.PendingConsultations ?? 0) == 0)
+                    @if (ViewBag.PendingReservationsCount > 0)
+                    {
+                        <div class="alert-item d-flex align-items-center mb-3 text-primary p-3 bg-primary-soft rounded-3">
+                            <div class="fs-4 me-3"><i class="fa-solid fa-book"></i></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold small">Borrowing Requests</div>
+                                <p class="mb-2 small">@ViewBag.PendingReservationsCount students are waiting for books.</p>
+                               
+                            </div>
+                        </div>
+                    }
+                   @if ((ViewBag.OverdueCount ?? 0) == 0 && 
+                         (ViewBag.PendingOdds ?? 0) == 0 && 
+                         (ViewBag.PendingServices ?? 0) == 0 && 
+                         (ViewBag.PendingConsultations ?? 0) == 0 &&
+                         (ViewBag.PendingReservationsCount ?? 0) == 0)
+                    
                     {
                         <div class="text-center py-4 text-muted">
                             <i class="fa-solid fa-circle-check fs-2 mb-2 opacity-25"></i>
                             <p class="small mb-0">No actions required.</p>
                         </div>
                     }
+                    
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using Microsoft.EntityFrameworkCore;
 using CLIR_InfoSystem.Data;
 
@@ -20,6 +21,22 @@ builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 0))));
 
 var app = builder.Build();
+
+//donwload chromium
+
+Task.Run(() =>
+{
+    Console.WriteLine("Installing Playwright Chromium...");
+    var exitCode = Microsoft.Playwright.Program.Main(new[] { "install", "chromium" });
+    if (exitCode != 0)
+    {
+        Console.WriteLine($"Playwright installation failed with exit code {exitCode}");
+    }
+    else
+    {
+        Console.WriteLine("Playwright Chromium installed successfully.");
+    }
+});
 
 if (!app.Environment.IsDevelopment())
 {

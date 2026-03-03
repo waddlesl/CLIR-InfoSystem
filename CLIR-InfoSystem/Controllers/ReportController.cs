@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Playwright;
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -209,10 +210,8 @@ namespace CLIR_InfoSystem.Controllers
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
 
-            var currentYear = DateTime.Now.Year;
             ViewBag.LBookingTopProgram = bookings
-                .Where(bb => bb.BookingDate.Year == currentYear)
-                .GroupBy(bb => bb.Patron.Program.ProgramCode)
+                .GroupBy(bb => bb.Patron.Program?.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Take(5)
                 .Select(g => new { Program = g.Key, Count = g.Count() })
@@ -225,20 +224,23 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult ODDSReports(int selectedYear, int selectedTerm)
         {
             var dateRange = GetTermDates(selectedYear, selectedTerm);
-            var requests = _context.Odds.Include(b => b.Patron).ThenInclude(p => p.Program).ThenInclude(p => p.Department).Where(s => s.RequestDate >= dateRange.Start && s.RequestDate <= dateRange.End).ToList();
+            var requests = _context.Odds.Include(b => b.Patron).ThenInclude(p => p.Department).Where(s => s.RequestDate.Date >= dateRange.Start.Date && s.RequestDate.Date <= dateRange.End.Date).ToList();
 
             ViewBag.ODDSCount = requests.Count;
             ViewBag.ODDSCountForCollege = requests.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
             ViewBag.ODDSCountForSHS = requests.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
 
-            var currentYear = DateTime.Now.Year;
-            ViewBag.ODDSProgram = requests
-                .Where(bb => bb.RequestDate.Year == currentYear)
-                .GroupBy(bb => bb.Patron.Program.ProgramCode)
-                .OrderByDescending(g => g.Count())
-                .Take(5)
-                .Select(g => new { Program = g.Key, Count = g.Count() })
-                .ToList();
+            var currentYear = selectedYear;
+            var TopODDSDepartment = requests
+                .Where(bb => bb.Patron?.Department != null)
+                .GroupBy(bb => bb.Patron.Department.DeptCode)
+                .Select(g => new {
+                    Code = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(g => g.Count)
+                .FirstOrDefault();  
+            ViewBag.TopODDSDepartment = TopODDSDepartment?.Code ?? "N/A";
 
 
             return View();
@@ -302,7 +304,7 @@ namespace CLIR_InfoSystem.Controllers
 
                 var pdfBuffer = await ExportPdfAsync(startDate, endDate, selectedYear, selectedTerm ?? 0);
 
-                return File(pdfBuffer, "application/pdf", $"UsageReport.pdf_{selectedYear}_Term{selectedTerm}.pdf");
+                return File(pdfBuffer, "application/pdf", $"UsageReport.pdf_{selectedYear}.pdf");
             }
             catch (Exception ex)
             {
@@ -319,7 +321,7 @@ namespace CLIR_InfoSystem.Controllers
 
             // 2. Install Chromium (This will only download if missing)
             // Note: In Azure, this might take a while the first time.
-            Microsoft.Playwright.Program.Main(new[] { "install", "chromium" });
+
 
             using var playwright = await Playwright.CreateAsync();
 
@@ -358,80 +360,76 @@ namespace CLIR_InfoSystem.Controllers
 
         private string GetHtmlContent(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
         {
-            var patrons = _context.Patrons
-                .Include(p => p.Program)
-                .ToList();
+            string term;
+            if (termReport != 0)
+            {
+                term = termReport.ToString();
 
-            var PatronTotal = patrons.Count();
+            }
+            else {
+                term = "1-3";
+            }
+            var patrons = _context.Patrons.Include(p => p.Program).ToList();
+            var PatronTotal = patrons.Count;
             var PatronSHS = patrons.Count(p => p.DeptId == 9);
             var PatronCollege = patrons.Count(p => p.DeptId != 9);
-
             var PatronTopProgram = patrons
                 .Where(p => p.Program != null)
                 .GroupBy(p => p.Program.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
-                .FirstOrDefault();
+                .FirstOrDefault() ?? "N/A";
 
-            var requests = _context.Services.Include(r => r.Patron).Where(x => x.RequestDate >= startDate && x.RequestDate <= endDate);
+            var borrowings = _context.BookBorrowings
+                .Include(b => b.Book)
+                .Include(b => b.Patron)
+                    .ThenInclude(p => p.Program)
+                .Where(x => x.BorrowDate >= startDate && x.BorrowDate <= endDate)
+                .ToList();
 
-            var GrammarlyCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId != 9 && gat.ServiceType == "Grammarly");
-            var GrammarlyCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId == 9 && gat.ServiceType == "Grammarly");
-            var TurnitinCountForCollege = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId != 9 && gat.ServiceType == "Turnitin");
-            var TurnitinCountForSHS = requests.Count(gat => gat.Patron != null && gat.Patron.DeptId == 9 && gat.ServiceType == "Turnitin");
+            var BookBorrowCountForCollege = borrowings.Count(sb => sb.Patron?.DeptId != 9);
+            var BookBorrowCountForSHS = borrowings.Count(sb => sb.Patron?.DeptId == 9);
 
-            var bookings = _context.BookALibrarians.Include(b => b.Patron).Where(x => x.BookingDate >= startDate && x.BookingDate <= endDate).ToList();
-
-            var LBookingCountForCollege = bookings.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
-            var LBookingCountForSHS = bookings.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
-
-            var borrowings = _context.BookBorrowings.Include(b => b.Patron).Include(b => b.Book).Where(x => x.BorrowDate >= startDate && x.BorrowDate <= endDate);
-
-            var BookBorrowCountForCollege = borrowings.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
-            var BookBorrowCountForSHS = borrowings.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
-
-            var TopProgram = borrowings
-                .Where(bb => bb.Patron != null && bb.Patron.Program != null)
+            var BookTopProgram = borrowings
+                .Where(bb => bb.Patron?.Program != null)
                 .GroupBy(bb => bb.Patron.Program.ProgramCode)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
-                .FirstOrDefault();
-            var BookTopProgram = TopProgram ?? "N/A";
+                .FirstOrDefault() ?? "N/A";
 
-            var currentYear = DateTime.Now.Year;
             var BookTopBooks = borrowings
-                .Where(bb => bb.Book != null && bb.BorrowDate.Year == currentYear)
+                .Where(bb => bb.Book != null)
                 .GroupBy(bb => bb.Book.Title)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "N/A";
 
-            var Sbookings = _context.SeatBookings.Include(s => s.LibrarySeat).Include(s => s.Patron).Where(x => x.BookingDate >= startDate && x.BookingDate <= endDate);
+            var Sbookings = _context.SeatBookings
+                .Include(s => s.LibrarySeat)
+                .Include(s => s.Patron)
+                .Where(x => x.BookingDate >= startDate && x.BookingDate <= endDate)
+                .ToList();
 
-            var RBookingCountForCollege = Sbookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId != 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building");
+            var RBookingCountForCollege = Sbookings.Count(sb => sb.Patron?.DeptId != 9 && sb.LibrarySeat?.Building == "Rizal Building");
+            var RBookingCountForSHS = Sbookings.Count(sb => sb.Patron?.DeptId == 9 && sb.LibrarySeat?.Building == "Rizal Building");
+            var EBookingCountForCollege = Sbookings.Count(sb => sb.Patron?.DeptId != 9 && sb.LibrarySeat?.Building == "Einstein Building");
+            var EBookingCountForSHS = Sbookings.Count(sb => sb.Patron?.DeptId == 9 && sb.LibrarySeat?.Building == "Einstein Building");
 
-            var RBookingCountForSHS = Sbookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId == 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Rizal Building");
-
-            var EBookingCountForCollege = Sbookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId != 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building");
-
-            var EBookingCountForSHS = Sbookings
-                .Count(sb => sb.Patron != null && sb.Patron.DeptId == 9 &&
-                             sb.LibrarySeat != null && sb.LibrarySeat.Building == "Einstein Building");
+            var requests = _context.Services.Include(r => r.Patron).Where(x => x.RequestDate >= startDate && x.RequestDate <= endDate).ToList();
+            var GrammarlyCountForCollege = requests.Count(gat => gat.Patron?.DeptId != 9 && gat.ServiceType == "Grammarly");
+            var GrammarlyCountForSHS = requests.Count(gat => gat.Patron?.DeptId == 9 && gat.ServiceType == "Grammarly");
+            var TurnitinCountForCollege = requests.Count(gat => gat.Patron?.DeptId != 9 && gat.ServiceType == "Turnitin");
+            var TurnitinCountForSHS = requests.Count(gat => gat.Patron?.DeptId == 9 && gat.ServiceType == "Turnitin");
 
             var odds = _context.Odds.Include(r => r.Patron).Where(x => x.RequestDate >= startDate && x.RequestDate <= endDate).ToList();
+            var ODDSCountForScanning = odds.Count(sb => sb.ServiceType == "Scanning");
+            var ODDSCountForThesis = odds.Count(sb => sb.MaterialType == "Thesis");
+            var ODDSCountForResource = odds.Count(sb => sb.ServiceType == "Resource Link");
+            var ODDSCountForJournal = odds.Count(sb => sb.MaterialType == "Journal Article");
 
-            var ODDSCountForCollege = odds.Count(sb => sb.Patron != null && sb.Patron.DeptId != 9);
-            var ODDSCountForSHS = odds.Count(sb => sb.Patron != null && sb.Patron.DeptId == 9);
-            var ODDSCountForScanning = odds.Count(sb => sb.Patron != null && sb.ServiceType == "Scanning");
-            var ODDSCountForThesis = odds.Count(sb => sb.Patron != null && sb.MaterialType == "Thesis");
-            var ODDSCountForResource = odds.Count(sb => sb.Patron != null && sb.ServiceType == "Resource Link");
-            var ODDSCountForJournal = odds.Count(sb => sb.Patron != null && sb.MaterialType == "Journal Article");
+            var lBookings = _context.BookALibrarians.Include(b => b.Patron).Where(x => x.BookingDate >= startDate && x.BookingDate <= endDate).ToList();
+            var LBookingCountForCollege = lBookings.Count(sb => sb.Patron?.DeptId != 9);
+            var LBookingCountForSHS = lBookings.Count(sb => sb.Patron?.DeptId == 9);
 
             return $$""""
                 <!DOCTYPE html>
@@ -469,7 +467,7 @@ namespace CLIR_InfoSystem.Controllers
                             <p>CENTER FOR LEARNING AND INFORMATION RESOURCES</p>
                         </div>
                         <div class="header-right">
-                            <h2>FIRST TERM A.Y. 2024 - 2025</h2>
+                            <h2>TERM {{term}} A.Y. {{yearReport}}</h2>
                             <h1>USAGE STATISTICS REPORT</h1>
                         </div>
                     </div>

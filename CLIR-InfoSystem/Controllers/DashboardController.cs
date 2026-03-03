@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace CLIR_InfoSystem.Controllers
 {
@@ -108,26 +109,43 @@ namespace CLIR_InfoSystem.Controllers
 
         private IActionResult StaffCommonView(string staffType)
         {
+            // Basic stats
             ViewBag.BookCount = _context.Books.Count();
             ViewBag.PatronCount = _context.Patrons.Count();
             ViewBag.BorrowedCount = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
             ViewBag.OverdueCount = _context.BookBorrowings.Count(b => b.DueDate < DateTime.Now && b.Status == "Borrowed");
+
+            // Requests from other services
             ViewBag.PendingServices = _context.Services.Count(s => s.RequestStatus == "Pending");
             ViewBag.PendingConsultations = _context.BookALibrarians.Count(b => b.Status == "Pending");
             ViewBag.PendingOdds = _context.Odds.Count(o => o.RequestStatus == "Pending");
             ViewBag.DigitalQueue = ViewBag.PendingServices + ViewBag.PendingOdds;
-          
 
+            // --- NEW: BOOK BORROWING REQUESTS (RESERVATIONS) ---
+            var pendingReservations = _context.BookBorrowings
+                .Include(b => b.Book)
+                .Include(b => b.Patron)
+                .Where(b => b.Status == "Reserved") // "Reserved" = Librarian needs to confirm
+                .OrderByDescending(b => b.BorrowDate)
+                .ToList();
+
+            ViewBag.PendingReservationsCount = pendingReservations.Count;
+            ViewBag.PendingReservations = pendingReservations; // Pass the list to the view
+
+            // Activity Feed
             ViewBag.RecentTransactions = _context.BookBorrowings
+                .Include(b => b.Book)
+                .Include(b => b.Patron)
                 .OrderByDescending(b => b.BorrowDate)
                 .Take(5)
                 .ToList();
 
             LogAction($"Viewed {staffType} Dashboard", "dashboard");
             _context.SaveChanges();
+
             return View($"{staffType.Replace(" ", "")}Dashboard");
         }
 
-       
+
     }
 }

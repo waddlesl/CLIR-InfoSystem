@@ -61,7 +61,7 @@
                                 <tr>
                                     <th>Staff Name</th>
                                     <th class="text-center">Fulfilled</th>
-                                    <th>Efficiency</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,11 +72,7 @@
                                         <td class="text-center">
                                             <span class="badge rounded-pill" style="background-color: #1e2953;">@staff.Value</span>
                                         </td>
-                                        <td style="width: 45%;">
-                                            <div class="progress" style="height: 6px; background-color: #e9ecef;">
-                                                <div class="progress-bar" style="width: @(Math.Min(staff.Value * 10, 100))%; background-color: #ed1e28;"></div>
-                                            </div>
-                                        </td>
+                                        
                                     </tr>
                                 }
                             </tbody>

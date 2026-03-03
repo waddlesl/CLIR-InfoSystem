@@ -71,10 +71,10 @@
         <div class="modal-content">
             <div class="modal-header"><h5>Add New Patron</h5></div>
             <div class="modal-body">
-                <input type="text" id="addId" class="form-control mb-2" placeholder="Patron ID (Max 10 chars)" maxlength="10" required'/>
-                <input type="text" id="addFirst" class="form-control mb-2" placeholder="First Name" />
-                <input type="text" id="addLast" class="form-control mb-2" placeholder="Last Name" />
-                <input type="email" id="addEmail" class="form-control mb-2" placeholder="Email" />
+                <input type="text" id="addId" maxlength="10" class="form-control mb-2" placeholder="Patron ID (Max 10 chars)" maxlength="10" required' />
+                <input type="text" maxlength="25" id="addFirst" class="form-control mb-2" placeholder="First Name" />
+                <input type="text" maxlength="25" id="addLast" class="form-control mb-2" placeholder="Last Name" />
+                <input type="email" maxlength="50" id="addEmail" class="form-control mb-2" placeholder="Email" />
 
                 <label class="small fw-bold">Patron Type</label>
                 <select id="addType" class="form-control mb-2" onchange="toggleStudentFields('#addType', '#addDept', '#addProg')">
@@ -115,11 +115,11 @@
             <div class="modal-body">
                 <input type="hidden" id="editId" />
                 <label class="small fw-bold">First Name</label>
-                <input type="text" id="editFirst" class="form-control mb-2" />
+                <input type="text" maxlength="25" id="editFirst" class="form-control mb-2" />
                 <label class="small fw-bold">Last Name</label>
-                <input type="text" id="editLast" class="form-control mb-2" />
+                <input type="text" maxlength="25" id="editLast" class="form-control mb-2" />
                 <label class="small fw-bold">Email</label>
-                <input type="email" id="editEmail" class="form-control mb-2" />
+                <input type="email" maxlength="50" id="editEmail" class="form-control mb-2" />
 
                 <label class="small fw-bold">Patron Type</label>
                 <select id="editType" class="form-control mb-2" onchange="toggleStudentFields('#editType', '#editDept', '#editProg')">
@@ -158,32 +158,63 @@
         let currentPage = 1;
 
         function updateTable() {
-                let rows = $("#patronTable tr:not(.filtered)");
+            let rows = $("#patronTable tr:not(.filtered)");
             let totalRows = rows.length;
             let totalPages = Math.ceil(totalRows / rowsPerPage);
 
-                $("#patronTable tr").hide();
+            $("#patronTable tr").hide();
 
             let start = (currentPage - 1) * rowsPerPage;
             let end = start + rowsPerPage;
-
             rows.slice(start, end).show();
 
-            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+            // Update Page Info Text
+            let showingStart = totalRows > 0 ? start + 1 : 0;
+            let showingEnd = Math.min(end, totalRows);
+            $("#pageInfo").text(`Showing ${showingStart} to ${showingEnd} of ${totalRows} entries`);
 
+            // Generate Pagination: << < Current > >>
             let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                        </li>`;
+
+            // 1. First («) and Previous (‹)
+            paginationHtml += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+                </li>
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+                </li>`;
+
+            // 2. The Current Page Number
+            if (totalPages > 0) {
+                paginationHtml += `
+                    <li class="page-item active">
+                        <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+                    </li>`;
             }
+
+            // 3. Next (›) and Last (»)
+            paginationHtml += `
+                <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+                </li>
+                <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+                </li>`;
+
             $("#pagination").html(paginationHtml);
         }
 
         function goToPage(page) {
+            let rows = $("#patronTable tr:not(.filtered)");
+            let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
             currentPage = page;
             updateTable();
-        }
+        }  
         $("#patronSearch").on("keyup", function() {
             var value = $(this).val().toLowerCase();
                 $("#patronTable tr").each(function() {

@@ -122,33 +122,60 @@
 
             $("#borrowHisroryTable tr").hide();
 
-            let start = (currentPage - 1) * rowsPerPage;
-            let end = start + rowsPerPage;
-
-            rows.slice(start, end).show();
+            let startIdx = (currentPage - 1) * rowsPerPage;
+            let endIdx = startIdx + rowsPerPage;
+            rows.slice(startIdx, endIdx).show();
 
             // Page Info
-            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+            $("#pageInfo").text(`Showing ${totalRows > 0 ? startIdx + 1 : 0} to ${Math.min(endIdx, totalRows)} of ${totalRows} entries`);
 
-            // Generate Pagination
+            // --- Generate Simplified Pagination ---
             let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                        </li>`;
+
+            // 1. First (<<) and Previous (<)
+            paginationHtml += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+                </li>
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+                </li>`;
+
+            // 2. Current page num
+            if (totalPages > 0) {
+                paginationHtml += `
+                    <li class="page-item active">
+                        <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+                    </li>`;
             }
+
+            // 3. Next (>) and Last (>>)
+            paginationHtml += `
+                <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+                </li>
+                <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+                </li>`;
+
             $("#pagination").html(paginationHtml);
         }
-
         function goToPage(page) {
+            let rows = $("#borrowHisroryTable tr:not(.filtered)");
+            let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            // Safety check to keep page within bounds
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
             currentPage = page;
             updateTable();
         }
 
         // Real-time Search
-        $("#borrowSearch").on("keyup", function() {
+        $("#borrowSearch").on("keyup", function () {
             var value = $(this).val().toLowerCase();
-            $("#borrowHisroryTable tr").each(function() {
+            $("#borrowHisroryTable tr").each(function () {
                 let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
                 $(this).toggleClass("filtered", !isMatch);
             });
@@ -156,11 +183,9 @@
             updateTable();
         });
 
-        // Initialize
-        $(document).ready(function() {
+        $(document).ready(function () {
             updateTable();
         });
-
     </script>
     <style>
         .page-link {

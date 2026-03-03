@@ -2,66 +2,55 @@
 
 <div class="container-fluid px-4 mt-3">
     <div class="row g-3 mb-4">
-        <div class="col-md-2">
+        <div class="col-20">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #1e2953 !important;">
                 <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <i class="fa-solid fa-book fa-2x" style="color: #1e2953; opacity: 0.8;"></i>
-                    </div>
+                    
                     <div>
-                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Book Count</h6>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold" style="font-size: 0.75rem;">Book Count</h6>
                         <h3 class="mb-0">@ViewBag.BookCount</h3>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-20">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
                 <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <i class="fa-solid fa-hand-holding-hand fa-2x" style="color: #ed1e28; opacity: 0.8;"></i>
-                    </div>
                     <div>
-                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Borrowed</h6>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold" style="font-size: 0.75rem;">Borrowed</h6>
                         <h3 class="mb-0">@ViewBag.BorrowedBookCount</h3>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-20">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #198754 !important;">
                 <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <i class="fa-solid fa-circle-check fa-2x" style="color: #198754; opacity: 0.8;"></i>
-                    </div>
+                    
                     <div>
-                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Available</h6>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold" style="font-size: 0.75rem;">Available Books</h6>
                         <h3 class="mb-0">@ViewBag.AvailableBookCount</h3>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-20">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #6c757d !important;">
                 <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <i class="fa-solid fa-box-archive fa-2x" style="color: #6c757d; opacity: 0.8;"></i>
-                    </div>
+                   
                     <div>
-                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Archived</h6>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold" style="font-size: 0.75rem;">Archived Books</h6>
                         <h3 class="mb-0">@ViewBag.ArchivedBookCount</h3>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-20">
             <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid #ed1e28 !important;">
                 <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <i class="fa-solid fa-exclamation fa-2x" style="color: #ed1e28; opacity: 0.8;"></i>
-                    </div>
+                    
                     <div>
-                        <h6 class="text-muted mb-1 small text-uppercase fw-bold">Overdued Books</h6>
+                        <h6 class="text-muted mb-1 small text-uppercase fw-bold" style="font-size: 0.75rem;">Overdued Books</h6>
                         <h3 class="mb-0">@ViewBag.OverdueCount</h3>
                     </div>
                 </div>
@@ -180,9 +169,9 @@
             <div class="modal-header"><h5>Add New Book</h5></div>
             <div class="modal-body">
                 <label class="small fw-bold">Accession ID</label>
-                <input type="text" id="bookId" class="form-control mb-2" placeholder="Accession ID" />
-                <input type="text" id="bookTitle" class="form-control mb-2" placeholder="Book Title" />
-                <input type="text" id="bookAuthor" class="form-control mb-2" placeholder="Book Author" />
+                <input type="text" maxlength="10" id="bookId" class="form-control mb-2" placeholder="Accession ID" />
+                <input type="text" maxlength="100" id="bookTitle" class="form-control mb-2" placeholder="Book Title" />
+                <input type="text" maxlength="100" id="bookAuthor" class="form-control mb-2" placeholder="Book Author" />
                 <label class="small fw-bold">Book Availability</label>
                 <select id="bookAvailability" class="form-control mb-2">
                     <option value="">Select Status</option>
@@ -191,9 +180,9 @@
                     <option value="Reserved">Reserved</option>
                     <option value="Lost">Lost</option>
                 </select>
-                <input type="text" id="bookEdition" class="form-control mb-2" placeholder="Book Edition" />
-                <input type="text" id="bookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
-                <input type="text" id="bookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
+                <input type="text" maxlength="25" id="bookEdition" class="form-control mb-2" placeholder="Book Edition" />
+                <input type="text" maxlength="5" id="bookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
+                <input type="text" maxlength="50" id="bookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
                 <label class="small fw-bold">Book Collection</label>
                 <select id="bookCollection" class="form-control mb-2">
                     <option value="">Select Collection</option>
@@ -201,8 +190,8 @@
                     <option value="Circulation">Circulation</option>
                     <option value="Reference">Reference</option>
                 </select>
-                <input type="text" id="bookLocation" class="form-control mb-2" placeholder="Book Location" />
-                <input type="text" id="bookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
+                <input type="text" maxlength="50" id="bookLocation" class="form-control mb-2" placeholder="Book Location" />
+                <input type="text" maxlength="50" id="bookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
                 <label class="small fw-bold">Sourced From</label>
                 <select id="bookSource" class="form-control mb-2">
                     <option value="">Select Source</option>
@@ -210,8 +199,8 @@
                     <option value="Purchase">Purchase</option>
                     <option value="Subscription">Subscription</option>
                 </select>
-                <input type="number" id="bookPrice" class="form-control mb-2" placeholder="Book Price" />
-                <input type="number" id="bookDiscount" class="form-control mb-2" placeholder="Discount" />
+                <input type="number" maxlength="6" id="bookPrice" class="form-control mb-2" placeholder="Book Price" />
+                <input type="number" maxlength="6" id="bookDiscount" class="form-control mb-2" placeholder="Discount" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="AddBook()">Create</button>
@@ -227,8 +216,8 @@
             <div class="modal-body">
                 <label class="small fw-bold">Accession ID (Read Only)</label>
                 <input type="text" id="editAccessionId" class="form-control mb-2" readonly />
-                <input type="text" id="editBookTitle" class="form-control mb-2" placeholder="Book Title" />
-                <input type="text" id="editBookAuthor" class="form-control mb-2" placeholder="Book Author" />
+                <input type="text" maxlength="100"  id="editBookTitle" maxlength="100" class="form-control mb-2" placeholder="Book Title" />
+                <input type="text" maxlength="100" id="editBookAuthor" maxlength="100" class="form-control mb-2" placeholder="Book Author" />
                 <label class="small fw-bold">Book Availability</label>
                 <select id="editAvailability" class="form-control mb-2">
                     <option value="">Select Status</option>
@@ -237,9 +226,9 @@
                     <option value="Reserved">Reserved</option>
                     <option value="Lost">Lost</option>
                 </select>
-                <input type="text" id="editBookEdition" class="form-control mb-2" placeholder="Book Edition" />
-                <input type="text" id="editBookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
-                <input type="text" id="editBookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
+                <input type="text" maxlength="25" id="editBookEdition" class="form-control mb-2" placeholder="Book Edition" />
+                <input type="text" maxlength="4" id="editBookYearPublication" class="form-control mb-2" placeholder="Year of Publication" />
+                <input type="text" maxlength="50" id="editBookPublisher" class="form-control mb-2" placeholder="Book Publisher" />
                 <label class="small fw-bold">Book Collection</label>
                 <select id="editBookCollection" class="form-control mb-2">
                     <option value="">Select Collection</option>
@@ -247,8 +236,8 @@
                     <option value="Circulation">Circulation</option>
                     <option value="Reference">Reference</option>
                 </select>
-                <input type="text" id="editBookLocation" class="form-control mb-2" placeholder="Book Location" />
-                <input type="text" id="editBookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
+                <input type="text" maxlength="50" id="editBookLocation" class="form-control mb-2" placeholder="Book Location" />
+                <input type="text" maxlength="50" id="editBookSupplier" class="form-control mb-2" placeholder="Book Supplier" />
                 <label class="small fw-bold">Sourced From</label>
                 <select id="editBookSource" class="form-control mb-2">
                     <option value="">Select Source</option>
@@ -256,10 +245,10 @@
                     <option value="Purchase">Purchase</option>
                     <option value="Subscription">Subscription</option>
                 </select>
-                <input type="number" id="editBookPrice" class="form-control mb-2" placeholder="Book Price" />
-                <input type="number" id="editBookDiscount" class="form-control mb-2" placeholder="Discount" />
+                <input type="number" maxlength="6" id="editBookPrice" class="form-control mb-2" placeholder="Book Price" />
+                <input type="number" maxlength="6" id="editBookDiscount" class="form-control mb-2" placeholder="Discount" />
                 <label class="small fw-bold">Subtotal(Read Only)</label>
-                <input type="number" id="editBookSubtotal" class="form-control mb-2" readonly />
+                <input type="number" maxlength="6" id="editBookSubtotal" class="form-control mb-2" readonly />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="saveBook()">Save Changes</button>
@@ -274,36 +263,64 @@
         let rowsPerPage = 10;
         let currentPage = 1;
 
-        function updateTable() {
-            let rows = $("#booksTable tr:not(.filtered)");
-            let totalRows = rows.length;
-            let totalPages = Math.ceil(totalRows / rowsPerPage);
-            $("#booksTable tr").hide();
-            let start = (currentPage - 1) * rowsPerPage;
-            let end = start + rowsPerPage;
-            rows.slice(start, end).show();
-            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+       function updateTable() {
+    let rows = $("#booksTable tr:not(.filtered)");
+    let totalRows = rows.length;
+    let totalPages = Math.ceil(totalRows / rowsPerPage);
 
-            let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                </li>`;
-            }
-            $("#pagination").html(paginationHtml);
-        }
+    $("#booksTable tr").hide();
 
-        function goToPage(page) { currentPage = page; updateTable(); }
+    let start = (currentPage - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    rows.slice(start, end).show();
 
-        $("#bookSearch").on("keyup", function() {
-            var value = $(this).val().toLowerCase();
-            $("#booksTable tr").each(function() {
-                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
-                $(this).toggleClass("filtered", !isMatch);
-            });
-            currentPage = 1;
-            updateTable();
-        });
+    // Update Page Info Text
+    let showingStart = totalRows > 0 ? start + 1 : 0;
+    let showingEnd = Math.min(end, totalRows);
+    $("#pageInfo").text(`Showing ${showingStart} to ${showingEnd} of ${totalRows} entries`);
+
+    // Generate Pagination: << < Current > >>
+    let paginationHtml = "";
+
+    // 1. First («) and Previous (‹)
+    paginationHtml += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+        </li>
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+        </li>`;
+
+    // 2. The Current Page Number Only
+    if (totalPages > 0) {
+        paginationHtml += `
+            <li class="page-item active">
+                <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+            </li>`;
+    }
+
+    // 3. Next (›) and Last (»)
+    paginationHtml += `
+        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+        </li>
+        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+        </li>`;
+
+    $("#pagination").html(paginationHtml);
+}
+
+function goToPage(page) {
+    let rows = $("#booksTable tr:not(.filtered)");
+    let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    if (page < 1) page = 1;
+    if (page > totalPages && totalPages > 0) page = totalPages;
+
+    currentPage = page;
+    updateTable();
+}
 
         $(document).ready(function() { updateTable(); });
 
@@ -314,37 +331,50 @@
         }
 
         function AddBook() {
-            const price = parseFloat(document.getElementById('bookPrice').value) || 0;
-            const discount = parseFloat(document.getElementById('bookDiscount').value) || 0;
-            const bookData = {
-                AccessionId: document.getElementById('bookId').value,
-                Title: document.getElementById('bookTitle').value,
-                Author: document.getElementById('bookAuthor').value,
-                AvailabilityStatus: document.getElementById('bookAvailability').value || 'Available',
-                Edition: document.getElementById('bookEdition').value,
-                YearOfPublication: document.getElementById('bookYearPublication').value,
-                Publisher: document.getElementById('bookPublisher').value,
-                Collection: document.getElementById('bookCollection').value,
-                Location: document.getElementById('bookLocation').value,
-                Supplier: document.getElementById('bookSupplier').value,
-                Source: document.getElementById('bookSource').value,
-                Price: price,
-                Discount: discount,
-                Subtotal : price - discount
-            };
+    // 1. Get and Trim Values
+    const id = document.getElementById('bookId').value.trim();
+    const title = document.getElementById('bookTitle').value.trim();
+    const author = document.getElementById('bookAuthor').value.trim();
+    const status = document.getElementById('bookAvailability').value;
 
-                $.ajax({
-                url: '/Book/AddBook',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(bookData),
-                success: function(res) {
-                    if(res.success) location.reload();
-                    else Swal.fire('Error', res.message, 'error');
-                }
-            });
-                
+    // 2. Validation: Check if important fields are empty
+    if (!id || !title || !author || !status) {
+        Swal.fire('Required Fields', 'Please fill in Accession ID, Title, Author, and Status.', 'warning');
+        return; // Stop execution
+    }
+
+    const price = parseFloat(document.getElementById('bookPrice').value) || 0;
+    const discount = parseFloat(document.getElementById('bookDiscount').value) || 0;
+
+    // 3. Apply "N/A" to optional fields if left blank
+    const bookData = {
+        AccessionId: id,
+        Title: title,
+        Author: author,
+        AvailabilityStatus: status,
+        Edition: document.getElementById('bookEdition').value.trim() || 'N/A',
+        YearOfPublication: document.getElementById('bookYearPublication').value.trim() || 'N/A',
+        Publisher: document.getElementById('bookPublisher').value.trim() || 'N/A',
+        Collection: document.getElementById('bookCollection').value || 'N/A',
+        Location: document.getElementById('bookLocation').value.trim() || 'N/A',
+        Supplier: document.getElementById('bookSupplier').value.trim() || 'N/A',
+        Source: document.getElementById('bookSource').value || 'N/A',
+        Price: price,
+        Discount: discount,
+        Subtotal: price - discount
+    };
+
+    $.ajax({
+        url: '/Book/AddBook',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(bookData),
+        success: function(res) {
+            if(res.success) location.reload();
+            else Swal.fire('Error', res.message, 'error');
         }
+    });
+}
 
 
         function openEditModal(id) {
@@ -370,33 +400,49 @@
         }
 
         function saveBook() {
-            const price = parseFloat(document.getElementById('editBookPrice').value) || 0;
-            const discount = parseFloat(document.getElementById('editBookDiscount').value) || 0;
-            const bookData = {
-                AccessionId: document.getElementById('editAccessionId').value,
-                Title: document.getElementById('editBookTitle').value,
-                Author: document.getElementById('editBookAuthor').value,
-                AvailabilityStatus: document.getElementById('editAvailability').value,
-                Edition: document.getElementById('editBookEdition').value,
-                Publisher: document.getElementById('editBookPublisher').value,
-                Collection: document.getElementById('editBookCollection').value,
-                Location: document.getElementById('editBookLocation').value,
-                Supplier: document.getElementById('editBookSupplier').value,
-                Source: document.getElementById('editBookSource').value,
-                Price: price,
-                Discount: discount,
-                Subtotal: price - discount,
-                YearOfPublication: parseInt(document.getElementById('editBookYearPublication').value)
-            };
-            fetch('/Book/UpdateBook', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookData)
-            }).then(response => {
-                if (response.ok) { Swal.fire("Updated!", "Changes saved successfully.", "success").then(() => location.reload()); }
-                else { Swal.fire("Error", "Update failed.", "error"); }
-            }).catch(err => console.error("Update Error:", err));
+    const title = document.getElementById('editBookTitle').value.trim();
+    const author = document.getElementById('editBookAuthor').value.trim();
+    const status = document.getElementById('editAvailability').value;
+
+    // Validation for important fields
+    if (!title || !author || !status) {
+        Swal.fire('Missing Information', 'Title, Author, and Status cannot be left blank.', 'warning');
+        return;
+    }
+
+    const price = parseFloat(document.getElementById('editBookPrice').value) || 0;
+    const discount = parseFloat(document.getElementById('editBookDiscount').value) || 0;
+
+    const bookData = {
+        AccessionId: document.getElementById('editAccessionId').value,
+        Title: title,
+        Author: author,
+        AvailabilityStatus: status,
+        // Optional fields defaulted to "N/A"
+        Edition: document.getElementById('editBookEdition').value.trim() || 'N/A',
+        Publisher: document.getElementById('editBookPublisher').value.trim() || 'N/A',
+        Collection: document.getElementById('editBookCollection').value || 'N/A',
+        Location: document.getElementById('editBookLocation').value.trim() || 'N/A',
+        Supplier: document.getElementById('editBookSupplier').value.trim() || 'N/A',
+        Source: document.getElementById('editBookSource').value || 'N/A',
+        Price: price,
+        Discount: discount,
+        Subtotal: price - discount,
+        YearOfPublication: document.getElementById('editBookYearPublication').value.trim() || 'N/A'
+    };
+
+    fetch('/Book/UpdateBook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookData)
+    }).then(response => {
+        if (response.ok) { 
+            Swal.fire("Updated!", "Changes saved successfully.", "success").then(() => location.reload()); 
+        } else { 
+            Swal.fire("Error", "Update failed.", "error"); 
         }
+    }).catch(err => console.error("Update Error:", err));
+}
 
         function confirmToggle(id, nextStatus) {
             Swal.fire({
@@ -423,5 +469,11 @@
             border-color: #1a2035;
             color: white;
         }
+
+        .col-20 {
+            flex: 0 0 20%;
+            max-width: 20%;
+        }
+
     </style>
 }

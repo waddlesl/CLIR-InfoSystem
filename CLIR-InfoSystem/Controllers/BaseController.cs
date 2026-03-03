@@ -12,22 +12,22 @@ namespace CLIR_InfoSystem.Controllers
     {
         protected readonly LibraryDbContext _context;
 
+        // Constructor: Receives the database context and stores it in a protected field
+        // so that all inheriting controllers (like AccountController) can access the DB.
         public BaseController(LibraryDbContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// This method runs before every single Action in any Controller inheriting from BaseController.
-        /// It prevents users from bypassing the Login screen via the URL.
-        /// </summary>
+        // OnActionExecuting: Runs automatically before every action method in the system.
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var userId = HttpContext.Session.GetString("UserId");
             var controller = context.RouteData.Values["controller"]?.ToString();
             var action = context.RouteData.Values["action"]?.ToString();
 
-            // Allow access to the Login page and SeedData without redirecting
+            // AUTHENTICATION GUARD: If no user is logged in and they aren't trying 
+            // to access the Login/Account pages, force a redirect to the Login screen.
             if (string.IsNullOrEmpty(userId) && controller != "Account")
             {
                 context.Result = new RedirectToActionResult("Login", "Account", null);
@@ -37,9 +37,7 @@ namespace CLIR_InfoSystem.Controllers
             base.OnActionExecuting(context);
         }
 
-        /// <summary>
-        /// Universal Helper to log actions to the audit_logs table.
-        /// </summary>
+        // LogAction: Creates a record of user activity (Staff or Patron) in the AuditLogs table.
         protected void LogAction(string action, string table)
         {
             // Get IDs from Session
@@ -61,10 +59,7 @@ namespace CLIR_InfoSystem.Controllers
             // SaveChanges is intentionally left out so the calling method can handle the transaction.
         }
 
-        /// <summary>
-        /// Helper to check if the current user has the required role.
-        /// Usage: if (!IsAuthorized("Admin")) return Unauthorized();
-        /// </summary>
+     
         protected bool IsAuthorized(params string[] allowedRoles)
         {
             var userRole = HttpContext.Session.GetString("UserRole");

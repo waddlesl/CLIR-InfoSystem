@@ -35,7 +35,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const selectedYearFromUrl = urlParams.get('selectedYear');
 
-        const currentYear = new Date().getFullYear();
+        const currentYear = new Date().getFullYear() -1;
         const yearsToInclude = 5;
 
         selectElement.innerHTML = '';

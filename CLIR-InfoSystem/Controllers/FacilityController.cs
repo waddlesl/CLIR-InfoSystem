@@ -43,7 +43,7 @@ namespace CLIR_InfoSystem.Controllers
             }
 
             booking.PatronId = loggedInId;
-            booking.Status = "Completed";
+            booking.Status = "Reserved";
 
             ModelState.Remove("Patron");
             ModelState.Remove("LibrarySeat");
@@ -83,7 +83,7 @@ namespace CLIR_InfoSystem.Controllers
             var today = DateTime.Now;
             var reservedRequest = _context.SeatBookings
                 .Include(s => s.TimeSlot)
-                .Where(b => b.Status == "Reserved")
+                .Where(b => b.Status == "Reserved" && b.BookingDate.Date <= today)
                 .ToList();
 
             if (reservedRequest.Any())
@@ -186,8 +186,12 @@ namespace CLIR_InfoSystem.Controllers
         public IActionResult HistoryBookaLibrarian()
         {
             var today = DateTime.Now;
+            string userId = HttpContext.Session.GetString("UserId");
+            int currentStaffId = Convert.ToInt32(userId);
+
+            // 1. Run the autocomplete logic first
             var completedRequest = _context.BookALibrarians
-                .Where(b => b.Status == "Approved" && today > b.BookingDate)
+                .Where(b => b.Status == "Approved" && b.BookingDate.Date < today.Date)
                 .ToList();
 
             if (completedRequest.Any())
@@ -199,22 +203,22 @@ namespace CLIR_InfoSystem.Controllers
                 _context.SaveChanges();
             }
 
-            string userId = HttpContext.Session.GetString("UserId");
-            var librarian = _context.BookALibrarians
-                .Include(s => s.Patron)
-                    .ThenInclude(p => p.Department)
+            // 2. FETCH THE HISTORY: Show everything that is NOT active
+            var history = _context.BookALibrarians
+                .Include(s => s.Patron).ThenInclude(p => p.Department)
                 .Include(s => s.Staff)
-                .Where(s => s.Staff.StaffId == Convert.ToInt32(userId))
+                .Where(s => (s.Status == "Completed" || s.Status == "Cancelled")
+                         && (s.StaffId == currentStaffId || s.StaffId == null))
                 .OrderByDescending(o => o.BookingDate)
                 .ToList();
 
-            return View("~/Views/Staff/StaffHistoryBookaLibrarian.cshtml", librarian);
+            return View("~/Views/Staff/StaffHistoryBookaLibrarian.cshtml", history);
         }
         public IActionResult ManageBookaLibrarian()
         {
             var today = DateTime.Now;
             var completedRequest = _context.BookALibrarians
-                .Where(b => b.Status == "Approved" && today > b.BookingDate)
+                .Where(b => b.Status == "Approved" && b.BookingDate.Date < today.Date)
                 .ToList();
 
             if (completedRequest.Any())
@@ -359,13 +363,16 @@ namespace CLIR_InfoSystem.Controllers
         //    return RedirectToAction("ManageBookings");
         //}
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult LibrarianCheckIn(int sessionId)
         {
             var booking = _context.BookALibrarians.Find(sessionId);
-            if (booking != null)
+            string? loggedInId = HttpContext.Session.GetString("UserId");
+            if (booking != null && !string.IsNullOrEmpty(loggedInId))
             {
                 booking.Status = "Approved";
+                booking.StaffId = Convert.ToInt32(loggedInId);
+
                 LogAction($"Approved Librarian Consultation #{sessionId}", "book_a_librarian");
                 _context.SaveChanges();
                 TempData["Success"] = "Patron checked in successfully.";
@@ -379,12 +386,12 @@ namespace CLIR_InfoSystem.Controllers
 
             if (status == "approve")
             {
-                return RedirectToAction("LibrarianComplete", new { sessionId = id });
+                return RedirectToAction("LibrarianCheckIn", new { sessionId = id });
             }
             return RedirectToAction("CancelLibrarianBooking", new { sessionId = id });
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult LibrarianComplete(int sessionId)
         {
             var booking = _context.BookALibrarians.Find(sessionId);
@@ -398,7 +405,7 @@ namespace CLIR_InfoSystem.Controllers
             return RedirectToAction("ManageBookaLibrarian");
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult CancelLibrarianBooking(int sessionId)
         {
             var booking = _context.BookALibrarians.Find(sessionId);

@@ -121,34 +121,66 @@
         let currentPage = 1;
 
         function updateTable() {
-            let rows = $("#borrowRequestTable tr:not(.filtered)");
-            let totalRows = rows.length;
-            let totalPages = Math.ceil(totalRows / rowsPerPage);
+    // Filter rows based on search
+    let rows = $("#borrowRequestTable tr:not(.filtered)");
+    let totalRows = rows.length;
+    let totalPages = Math.ceil(totalRows / rowsPerPage);
 
-            $("#borrowRequestTable tr").hide();
+    // Initial Hide
+    $("#borrowRequestTable tr").hide();
 
-            let start = (currentPage - 1) * rowsPerPage;
-            let end = start + rowsPerPage;
+    // Slicing Logic
+    let start = (currentPage - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    rows.slice(start, end).show();
 
-            rows.slice(start, end).show();
+    // Update Entries Info Text
+    let showingStart = totalRows > 0 ? start + 1 : 0;
+    let showingEnd = Math.min(end, totalRows);
+    $("#pageInfo").text(`Showing ${showingStart} to ${showingEnd} of ${totalRows} entries`);
 
-            // Page Info
-            $("#pageInfo").text(`Showing ${totalRows > 0 ? start + 1 : 0} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+    // Generate Pagination: << < Current > >>
+    let paginationHtml = "";
 
-            // Generate Pagination
-            let paginationHtml = "";
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(${i})">${i}</a>
-                                </li>`;
-            }
-            $("#pagination").html(paginationHtml);
-        }
+    // 1. First (<<) and Previous (<)
+    paginationHtml += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">«</a>
+        </li>
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage - 1})">‹</a>
+        </li>`;
 
-        function goToPage(page) {
-            currentPage = page;
-            updateTable();
-        }
+    // 2. The Current Page Number Only
+    if (totalPages > 0) {
+        paginationHtml += `
+            <li class="page-item active">
+                <a class="page-link" href="javascript:void(0)">${currentPage}</a>
+            </li>`;
+    }
+
+    // 3. Next (>) and Last (>>)
+    paginationHtml += `
+        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${currentPage + 1})">›</a>
+        </li>
+        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToPage(${totalPages})">»</a>
+        </li>`;
+
+    $("#pagination").html(paginationHtml);
+}
+
+function goToPage(page) {
+    let rows = $("#borrowRequestTable tr:not(.filtered)");
+    let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    if (page < 1) page = 1;
+    if (page > totalPages && totalPages > 0) page = totalPages;
+
+    currentPage = page;
+    updateTable();
+}
 
         // Real-time Search
         $("#borrowRequestSearch").on("keyup", function() {
