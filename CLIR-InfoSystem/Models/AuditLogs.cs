@@ -26,7 +26,6 @@ namespace CLIR_InfoSystem.Models
         [Column("log_date")]
         public DateTime LogDate { get; set; } = DateTime.Now;
 
-        // Navigation Properties
         [ForeignKey("StaffId")]
         public virtual Staff? Staff { get; set; }
 

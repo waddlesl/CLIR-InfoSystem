@@ -16,7 +16,7 @@ namespace CLIR_InfoSystem.Models
         public virtual Patron Patron { get; set; }
 
         [Column("staff_id")]
-        // FIX: Added '?' to make it nullable so Pending requests can have no staff assigned yet
+       
         public int? StaffId { get; set; }
         public virtual Staff Staff { get; set; }
 

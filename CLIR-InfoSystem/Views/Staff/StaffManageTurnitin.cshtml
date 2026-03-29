@@ -133,7 +133,7 @@
         // Edit Modal Functions
                 function openEditModal(id) {
             $.get('/Account/GetStaffDetails/' + id, function(data) {
-                // Try camelCase if PascalCase fails (staffId vs StaffId)
+                
                 $('#editId').val(data.staffId || data.StaffId);
                 $('#editFirst').val(data.firstName || data.FirstName);
                 $('#editLast').val(data.lastName || data.LastName);

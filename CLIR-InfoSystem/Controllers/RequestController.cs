@@ -47,12 +47,10 @@ namespace CLIR_InfoSystem.Controllers
             model.RequestStatus = "Pending";
             model.StaffId = null;
 
-            // Remove irrelevant ModelState keys
             ModelState.Remove("Patron");
             ModelState.Remove("Staff");
             ModelState.Remove("RequestStatus");
 
-            // **SERVER-SIDE DUPLICATE CHECK**
             bool alreadyRequested = _context.Services.Any(s =>
                 s.PatronId == patronId &&
                 s.ServiceType == model.ServiceType &&

@@ -44,7 +44,7 @@ namespace CLIR_InfoSystem.Models
         [Column("date_of_access_provided")]
         public DateTime? DateOfAccessProvided { get; set; }
 
-        // Navigation Properties - MUST BE NULLABLE
+        
         [ForeignKey("PatronId")]
         public virtual Patron? Patron { get; set; }
 

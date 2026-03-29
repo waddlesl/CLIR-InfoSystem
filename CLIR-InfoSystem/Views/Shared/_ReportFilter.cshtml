@@ -21,9 +21,23 @@
         <button type="submit" class="btn btn-primary shadow-sm flex-grow-1">
             <i class="fas fa-filter me-1"></i> Apply Filter
         </button>
-        <button type="submit" asp-controller="Report" asp-action="DownloadReport" class="btn btn-outline-danger shadow-sm flex-grow-1">
-            <i class="fas fa-file-pdf me-1"></i> Export General PDF
-        </button>
+        @{
+            var role = Context.Session.GetString("UserRole");
+        }
+        @if (role == "Librarian")
+        {
+            <button type="submit" asp-controller="Report" asp-action="DownloadReport" class="btn btn-outline-danger shadow-sm flex-grow-1">
+                <i class="fas fa-file-pdf me-1"></i> Export General PDF
+            </button>
+        }
+        else
+        {
+
+            <button type="submit" asp-controller="Report" asp-action="DownloadReport" class="btn btn-outline-danger shadow-sm flex-grow-1" disabled>
+                <i class="fas fa-file-pdf me-1"></i> Export General PDF
+            </button>
+        }
+
     </div>
 </form>
 
@@ -43,8 +57,7 @@
         for (let i = 0; i <= yearsToInclude; i++) {
             const year = currentYear - i;
             const option = document.createElement('option');
-            // Academic year format often looks like 2023-2024,
-            // but we'll keep the value as the integer for your controller logic.
+            
             option.value = year;
             option.text = `AY ${year}-${year + 1}`;
 

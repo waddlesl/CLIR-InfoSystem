@@ -331,13 +331,13 @@ function goToPage(page) {
         }
 
         function AddBook() {
-    // 1. Get and Trim Values
+    // Get and Trim Values
     const id = document.getElementById('bookId').value.trim();
     const title = document.getElementById('bookTitle').value.trim();
     const author = document.getElementById('bookAuthor').value.trim();
     const status = document.getElementById('bookAvailability').value;
 
-    // 2. Validation: Check if important fields are empty
+    // Validation: Check if important fields are empty
     if (!id || !title || !author || !status) {
         Swal.fire('Required Fields', 'Please fill in Accession ID, Title, Author, and Status.', 'warning');
         return; // Stop execution
@@ -346,7 +346,7 @@ function goToPage(page) {
     const price = parseFloat(document.getElementById('bookPrice').value) || 0;
     const discount = parseFloat(document.getElementById('bookDiscount').value) || 0;
 
-    // 3. Apply "N/A" to optional fields if left blank
+    //  Apply "N/A" to optional fields if left blank
     const bookData = {
         AccessionId: id,
         Title: title,
@@ -356,7 +356,7 @@ function goToPage(page) {
         YearOfPublication: document.getElementById('bookYearPublication').value.trim() || 'N/A',
         Publisher: document.getElementById('bookPublisher').value.trim() || 'N/A',
         Collection: document.getElementById('bookCollection').value || 'N/A',
-        Location: document.getElementById('bookLocation').value.trim() || 'N/A',
+        LibraryLocation: document.getElementById('bookLocation').value.trim() || 'N/A',
         Supplier: document.getElementById('bookSupplier').value.trim() || 'N/A',
         Source: document.getElementById('bookSource').value || 'N/A',
         Price: price,
@@ -389,7 +389,7 @@ function goToPage(page) {
                 document.getElementById('editBookYearPublication').value = book.yearOfPublication;
                 document.getElementById('editBookPublisher').value = book.publisher;
                 document.getElementById('editBookCollection').value = book.collection;
-                document.getElementById('editBookLocation').value = book.location;
+                document.getElementById('editBookLocation').value = book.libraryLocation;
                 document.getElementById('editBookSupplier').value = book.supplier;
                 document.getElementById('editBookSource').value = book.source;
                 document.getElementById('editBookPrice').value = book.price;
@@ -418,11 +418,10 @@ function goToPage(page) {
         Title: title,
         Author: author,
         AvailabilityStatus: status,
-        // Optional fields defaulted to "N/A"
         Edition: document.getElementById('editBookEdition').value.trim() || 'N/A',
         Publisher: document.getElementById('editBookPublisher').value.trim() || 'N/A',
         Collection: document.getElementById('editBookCollection').value || 'N/A',
-        Location: document.getElementById('editBookLocation').value.trim() || 'N/A',
+        LibraryLocation: document.getElementById('editBookLocation').value.trim() || 'N/A',
         Supplier: document.getElementById('editBookSupplier').value.trim() || 'N/A',
         Source: document.getElementById('editBookSource').value || 'N/A',
         Price: price,

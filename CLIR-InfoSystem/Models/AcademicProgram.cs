@@ -6,7 +6,7 @@ namespace CLIR_InfoSystem.Models
     [Table("programs")]
     public class AcademicProgram
     {
-        [Key]  // <-- This is required
+        [Key] 
         [Column("program_id")]
         public int ProgramId { get; set; }          // primary key
 

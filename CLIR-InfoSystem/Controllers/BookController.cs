@@ -73,36 +73,7 @@ namespace CLIR_InfoSystem.Controllers
 
             return Json(new { success = false, message = "Data validation failed." });
         }
-        /*
-        [HttpGet]
-        public IActionResult EditBook(string id)
-        {
-            var book = _context.Books.Find(id);
-            if (book == null)
-                return Json(new { success = false, message = "Book Does not Exist" });
-            return View("~/Views/Staff/StaffEditBook.cshtml", book);
-        }
-
-        [HttpPost]
-        public IActionResult EditBook(Book updatedBook)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Books.Update(updatedBook);
-                    LogAction($"Edited book: {updatedBook.AccessionId}", "book");
-                    _context.SaveChanges();
-                    return RedirectToAction("BookManagement", "Book");
-                }
-                catch (DbUpdateException)
-                {
-                    ModelState.AddModelError("", "Unable to save changes. Please try again.");
-                }
-            }
-            return View(updatedBook);
-        }
-        */
+        
         [HttpGet]
         public IActionResult GetBookDetails(string id)
         {
@@ -269,6 +240,35 @@ namespace CLIR_InfoSystem.Controllers
 
             return Ok(query);
         }
+        /*
+        [HttpGet]
+        public IActionResult EditBook(string id)
+        {
+            var book = _context.Books.Find(id);
+            if (book == null)
+                return Json(new { success = false, message = "Book Does not Exist" });
+            return View("~/Views/Staff/StaffEditBook.cshtml", book);
+        }
 
+        [HttpPost]
+        public IActionResult EditBook(Book updatedBook)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Books.Update(updatedBook);
+                    LogAction($"Edited book: {updatedBook.AccessionId}", "book");
+                    _context.SaveChanges();
+                    return RedirectToAction("BookManagement", "Book");
+                }
+                catch (DbUpdateException)
+                {
+                    ModelState.AddModelError("", "Unable to save changes. Please try again.");
+                }
+            }
+            return View(updatedBook);
+        }
+        */
     }
 }

@@ -54,7 +54,7 @@ namespace CLIR_InfoSystem.Controllers
                 foreach (var service in expiredRequest)
                 {
                     service.RequestStatus = "Expired";
-                    // AUDIT LOG (Internal System Action)
+                    // AUDIT LOG 
                     LogAction($"Service Request #{service.ServiceId} automatically expired.", "System");
                 }
                 _context.SaveChanges();
@@ -82,7 +82,7 @@ namespace CLIR_InfoSystem.Controllers
                 foreach (var service in expiredRequest)
                 {
                     service.RequestStatus = "Expired";
-                    // AUDIT LOG (Internal System Action)
+                    // AUDIT LOG 
                     LogAction($"Service Request #{service.ServiceId} automatically expired.", "System");
                 }
                 _context.SaveChanges();

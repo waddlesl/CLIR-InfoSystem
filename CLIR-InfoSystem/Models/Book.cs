@@ -11,40 +11,40 @@ namespace CLIR_InfoSystem.Models
         public string AccessionId { get; set; } = string.Empty;
 
         [Column("title")]
-        public string? Title { get; set; } // Added ?
+        public string? Title { get; set; } 
 
         [Column("author")]
-        public string? Author { get; set; } // Added ?
+        public string? Author { get; set; } 
 
         [Column("availability_status")]
-        public string? AvailabilityStatus { get; set; } // Added ?
+        public string? AvailabilityStatus { get; set; } 
 
         [Column("edition")]
-        public string? Edition { get; set; } // Added ?
+        public string? Edition { get; set; } 
 
         [Column("year_of_publication")]
-        public int? YearOfPublication { get; set; } // Added ? to int
+        public int? YearOfPublication { get; set; } 
 
         [Column("publisher")]
-        public string? Publisher { get; set; } // Added ?
+        public string? Publisher { get; set; } 
 
         [Column("collection")]
-        public string? Collection { get; set; } // Added ?
+        public string? Collection { get; set; } 
 
         [Column("library_location")]
-        public string? LibraryLocation { get; set; } // Added ?
+        public string? LibraryLocation { get; set; } 
 
         [Column("supplier")]
-        public string? Supplier { get; set; } // Added ?
+        public string? Supplier { get; set; } 
 
         [Column("sourced_from")]
-        public string? SourcedFrom { get; set; } // Added ?
+        public string? SourcedFrom { get; set; } 
 
         [Column("price")]
-        public decimal? Price { get; set; } // Added ?
+        public decimal? Price { get; set; } 
 
         [Column("discount")]
-        public decimal? Discount { get; set; } // Added ?
+        public decimal? Discount { get; set; } 
 
         [NotMapped]
         public decimal Subtotal => (Price ?? 0) - (Discount ?? 0);

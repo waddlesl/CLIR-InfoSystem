@@ -22,7 +22,6 @@ namespace CLIR_InfoSystem.Controllers
         //repeatable filter
         private (DateTime Start, DateTime End, int Year) GetTermDates(int selectedYear, int selectedTerm)
         {
-            // Default to current Academic Year if none selected
             if (selectedYear == 0)
             {
                 selectedYear = (DateTime.Now.Month >= 8) ? DateTime.Now.Year : DateTime.Now.Year - 1;
@@ -314,18 +313,18 @@ namespace CLIR_InfoSystem.Controllers
 
         private async Task<byte[]> ExportPdfAsync(DateTime startDate, DateTime endDate, int yearReport, int? termReport)
         {
-            // 1. Tell Playwright where to store/find the browser in Azure
+
             var homePath = Environment.GetEnvironmentVariable("HOME") ?? ".";
             var browserPath = Path.Combine(homePath, "playwright");
             Environment.SetEnvironmentVariable("PLAYWRIGHT_BROWSERS_PATH", browserPath);
 
-            // 2. Install Chromium (This will only download if missing)
-            // Note: In Azure, this might take a while the first time.
+            // Install Chromium (This will only download if missing)movrd tp progam.cs
+    
 
 
             using var playwright = await Playwright.CreateAsync();
 
-            // 3. Launch with specific Azure-friendly arguments
+          
             await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
                 Headless = true,
