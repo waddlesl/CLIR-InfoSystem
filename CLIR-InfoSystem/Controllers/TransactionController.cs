@@ -162,7 +162,7 @@ namespace CLIR_InfoSystem.Controllers
         [HttpGet]
         public IActionResult ApproveRequest(int id)
         {
-            if (!IsAuthorized("Librarian")) return Unauthorized();
+            if (!IsAuthorized("Librarian") && !IsAuthorized("Admin")) return Unauthorized();
             var request = _context.BookBorrowings.Include(b => b.Book).Include(b => b.Patron).FirstOrDefault(r => r.BorrowId == id);
             if (request != null)
             {

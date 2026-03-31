@@ -195,6 +195,13 @@
                 <div class="nav-item"><a asp-controller="Account" asp-action="ManageStaff"><i class="fa-solid fa-users-gear"></i> Manage Staffs</a></div>
                 <div class="nav-item"><a asp-controller="Account" asp-action="AuditLogs"><i class="fa-solid fa-clipboard-check"></i> Audit Logs</a></div>
                 <div class="nav-item"><a asp-controller="Account" asp-action="SystemReports"><i class="fa-solid fa-chart-line"></i> System Reports</a></div>
+                <div class="nav-item"><a asp-controller="Patron" asp-action="ManagePatrons"><i class="fa-solid fa-user-tag"></i> Patron Management</a></div>
+                <div class="nav-item"><a asp-controller="Book" asp-action="BookManagement"><i class="fa-solid fa-book-bookmark"></i> Book Catalog</a></div>
+                <div class="nav-item"><a asp-controller="Transaction" asp-action="BookBorrowers"><i class="fa-solid fa-handshake"></i> Book Borrowers</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="BookingsHistory"><i class="fa-solid fa-chair"></i> Seat Reservations</a></div>
+                <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian"><i class="fa-solid fa-chalkboard-user"></i> Book A Librarian</a></div>
+                <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS"><i class="fa-solid fa-envelope-open-text"></i> Digital Requests</a></div>
+                <div class="nav-item"><a asp-controller="Service" asp-action="ManageServices"><i class="fa-solid fa-screwdriver-wrench"></i> Service Requests</a></div>
             }
 
             @if (role == "Librarian")
@@ -207,7 +214,7 @@
                 <div class="nav-item"><a asp-controller="Facility" asp-action="ManageBookaLibrarian"><i class="fa-solid fa-chalkboard-user"></i> Book A Librarian</a></div>
                 <div class="nav-item"><a asp-controller="Service" asp-action="ManageODDS"><i class="fa-solid fa-envelope-open-text"></i> Digital Requests</a></div>
                 <div class="nav-item"><a asp-controller="Service" asp-action="ManageServices"><i class="fa-solid fa-screwdriver-wrench"></i> Service Requests</a></div>
-                }
+            }
 
             @if (role == "Student Assistant")
             {

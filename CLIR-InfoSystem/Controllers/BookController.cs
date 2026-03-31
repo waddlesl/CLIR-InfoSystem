@@ -202,7 +202,7 @@ namespace CLIR_InfoSystem.Controllers
         }
         public IActionResult confirmRequest(int id)
         {
-            if (!IsAuthorized("Librarian")) return Unauthorized();
+            if (!IsAuthorized("Librarian") && !IsAuthorized("Admin")) return Unauthorized();
             var request = _context.BookBorrowings.Find(id);
             if (request != null)
             {
@@ -224,7 +224,7 @@ namespace CLIR_InfoSystem.Controllers
         //accept deny
         public IActionResult denyRequest(int id)
         {
-            if (!IsAuthorized("Librarian")) return Unauthorized();
+            if (!IsAuthorized("Librarian") && !IsAuthorized("Admin")) return Unauthorized();
             var request = _context.BookBorrowings.Find(id);
             if (request != null)
             {

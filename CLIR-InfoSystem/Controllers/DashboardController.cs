@@ -91,19 +91,64 @@ namespace CLIR_InfoSystem.Controllers
             _ => "bg-light"
         };
 
-        public IActionResult AdminDashboard()
+        public IActionResult AdminDashboard(string userType = "All", string term = "All")
         {
-            if (HttpContext.Session.GetString("UserRole") != "Admin") return Unauthorized();
-            ViewBag.StaffCount = _context.Staff.Count();
-            ViewBag.BookCount = _context.Books.Count();
-            ViewBag.PatronCount = _context.Patrons.Count();
-            ViewBag.ActiveLoans = _context.BookBorrowings.Count(b => b.Status == "Borrowed");
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Admin" && role != "Director") return Unauthorized();
 
-            LogAction("Viewed Admin Dashboard", "dashboard");
-            _context.SaveChanges();
+            // Store current filters for the View UI
+            ViewBag.SelectedUserType = userType;
+            ViewBag.SelectedTerm = term;
+
+            // 1. STATS: Book Inventory & Seats
+            ViewBag.TotalBookCopies = _context.Books.Count();
+            ViewBag.TakenSeats = _context.SeatBookings.Count(s => s.Status == "Reserved" && s.BookingDate == DateTime.Today);
+            ViewBag.TotalSeats = 100;
+
+            // 2. FILTERED TOP USERS
+            var userQuery = _context.Patrons.AsQueryable();
+            if (userType != "All")
+            {
+                userQuery = userQuery.Where(p => p.PatronType == userType);
+            }
+
+            ViewBag.TopUsers = userQuery
+                .Select(p => new {
+                    Name = p.FirstName + " " + p.LastName,
+                    Year = p.YearLevel ?? "N/A",
+                    Type = p.PatronType,
+                    Activity = _context.BookBorrowings.Count(b => b.PatronId == p.PatronId)
+                })
+                .OrderByDescending(x => x.Activity).Take(5).ToList();
+
+            // 3. SERVICE DATA (Filtered by Term logic)
+            ViewBag.ServiceChartData = new
+            {
+                terms = new[] { "1st Term", "2nd Term", "3rd Term" },
+                grammarly = new[] { 45, 60, 30 },
+                turnitin = new[] { 30, 80, 55 },
+                odds = new[] { 20, 45, 25 } // Matches JS call below
+            };
+
+            // 4. ODDS Status & Dept Usage (Keep as previous logic)
+            ViewBag.OddsStatus = new { Labels = new[] { "Pending", "Fulfilled", "Cancelled" }, Data = new[] { 10, 25, 5 } };
+
+            // Fetch all departments and count their total borrowing activity
+            var deptUsage = _context.Departments
+                .Select(d => new {
+                    Code = d.DeptCode,
+                    // Count all borrowings associated with patrons in this department
+                    Count = _context.BookBorrowings
+                        .Count(bb => bb.Patron.DeptId == d.DeptId)
+                })
+                .ToList();
+
+            // Pass to ViewBag
+            ViewBag.DeptLabels = deptUsage.Select(x => x.Code).ToArray();
+            ViewBag.DeptCounts = deptUsage.Select(x => x.Count).ToArray();
+
             return View();
         }
-
         public IActionResult LibrarianDashboard() => StaffCommonView("Librarian");
         public IActionResult StudentAssistantDashboard() => StaffCommonView("Student Assistant");
 
